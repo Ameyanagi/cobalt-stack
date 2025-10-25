@@ -51,6 +51,7 @@ services:
       REDIS_URL: redis://redis:6379
       PORT: 3000
       RUST_LOG: ${RUST_LOG:-debug}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:2727}
     depends_on:
       postgres:
         condition: service_healthy
