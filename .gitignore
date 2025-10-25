@@ -19,6 +19,9 @@ frontend/.env
 *~
 .DS_Store
 
+# Serena MCP
+.serena/
+
 # Logs
 *.log
 logs/
