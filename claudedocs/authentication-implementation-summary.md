@@ -45,6 +45,7 @@ Successfully implemented complete JWT-based authentication system for the Cobalt
 - `de2c560` - Add FRONTEND_URL configuration
 - `db22422` - Add authentication-aware home page and dashboard
 - `0a149ff` - Use dynamic API URL based on current hostname
+- `989c855` - Update CORS to allow dynamic origins on port 2727
 
 All changes pushed to GitHub `main` branch.
 
@@ -84,6 +85,19 @@ This allows the application to work seamlessly when accessed from:
 - `http://your-server-ip:2727` (remote access)
 
 The backend API is always accessed on port 2750 of the same hostname.
+
+### Dynamic CORS Configuration
+The backend uses a flexible CORS policy for development:
+- **Allowed Origins**: Any origin ending with `:2727` (frontend port)
+- **Security**: Maintains credential support while allowing network access
+- **Implementation**: Uses `AllowOrigin::predicate` to validate origins dynamically
+
+This means the backend will accept requests from:
+- `http://localhost:2727` ✅
+- `http://127.0.0.1:2727` ✅
+- `http://192.168.1.50:2727` ✅
+- `http://any-ip:2727` ✅
+- `http://example.com:8080` ❌ (wrong port)
 
 ### Port Configuration
 - **Frontend**: Port 2727
