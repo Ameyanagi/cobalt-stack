@@ -5,6 +5,7 @@ resolver = "2"
 [workspace.dependencies]
 # Web framework
 axum = "0.7"
+axum-extra = { version = "0.9", features = ["cookie"] }
 tokio = { version = "1", features = ["full"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["cors", "trace"] }
@@ -42,6 +43,7 @@ thiserror = "1"
 
 # Time
 chrono = { version = "0.4", features = ["serde"] }
+time = "0.3"
 
 # UUID
 uuid = { version = "1", features = ["v4", "serde"] }

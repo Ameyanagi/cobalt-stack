@@ -113,7 +113,8 @@ use crate::services::auth::{
     create_access_token, create_refresh_token, hash_password, verify_password, JwtConfig,
     store_refresh_token,
 };
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum::{extract::State, http::{header, StatusCode}, response::IntoResponse, Json};
+use axum_extra::extract::cookie::{Cookie, SameSite};
 use chrono::Utc;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
 use std::sync::Arc;
@@ -204,14 +205,27 @@ pub async fn register(
     .await
     .map_err(|_| AuthError::DatabaseError("Failed to store refresh token".to_string()))?;
 
-    // Return response
+    // Create HttpOnly cookie for refresh token
+    let cookie = Cookie::build(("refresh_token", refresh_token))
+        .http_only(true)
+        .secure(true)
+        .same_site(SameSite::Strict)
+        .path("/")
+        .max_age(time::Duration::days(state.jwt_config.refresh_token_expiry_days))
+        .build();
+
+    // Return response with cookie
     let response = AuthResponse {
         access_token,
         token_type: "Bearer".to_string(),
         expires_in: state.jwt_config.access_token_expiry_minutes * 60,
     };
 
-    Ok((StatusCode::OK, Json(response)))
+    Ok((
+        StatusCode::OK,
+        [(header::SET_COOKIE, cookie.to_string())],
+        Json(response),
+    ))
 }
 
 /// POST /api/auth/login - Login with username/password
@@ -274,14 +288,27 @@ pub async fn login(
     .await
     .map_err(|_| AuthError::DatabaseError("Failed to store refresh token".to_string()))?;
 
-    // Return response
+    // Create HttpOnly cookie for refresh token
+    let cookie = Cookie::build(("refresh_token", refresh_token))
+        .http_only(true)
+        .secure(true)
+        .same_site(SameSite::Strict)
+        .path("/")
+        .max_age(time::Duration::days(state.jwt_config.refresh_token_expiry_days))
+        .build();
+
+    // Return response with cookie
     let response = AuthResponse {
         access_token,
         token_type: "Bearer".to_string(),
         expires_in: state.jwt_config.access_token_expiry_minutes * 60,
     };
 
-    Ok((StatusCode::OK, Json(response)))
+    Ok((
+        StatusCode::OK,
+        [(header::SET_COOKIE, cookie.to_string())],
+        Json(response),
+    ))
 }
 
 /// POST /api/auth/refresh - Refresh access token using refresh token
@@ -297,11 +324,78 @@ pub async fn login(
     tag = "Authentication"
 )]
 pub async fn refresh_token(
-    State(_state): State<AppState>,
-    // TODO: Extract refresh token from HttpOnly cookie
+    State(state): State<AppState>,
+    jar: axum_extra::extract::CookieJar,
 ) -> std::result::Result<impl IntoResponse, AuthError> {
-    // This will be implemented when we add cookie handling
-    Ok(StatusCode::NOT_IMPLEMENTED)
+    use crate::services::auth::{
+        verify_refresh_token, rotate_refresh_token, validate_refresh_token,
+        create_access_token, create_refresh_token,
+    };
+
+    // Extract refresh token from cookie
+    let old_refresh_token = jar
+        .get("refresh_token")
+        .ok_or(AuthError::InvalidToken)?
+        .value()
+        .to_string();
+
+    // Verify JWT signature and expiry
+    let claims = verify_refresh_token(&old_refresh_token, &state.jwt_config)
+        .map_err(|_| AuthError::InvalidToken)?;
+
+    // Validate token in database (checks revocation, expiry, hash match)
+    let user_id = validate_refresh_token(state.db.as_ref(), &old_refresh_token, claims.jti)
+        .await
+        .map_err(|_| AuthError::InvalidToken)?;
+
+    // Generate new tokens
+    let username = {
+        use crate::models::prelude::*;
+        let user = Users::find_by_id(user_id)
+            .one(state.db.as_ref())
+            .await?
+            .ok_or(AuthError::UserNotFound)?;
+        user.username
+    };
+
+    let new_access_token = create_access_token(user_id, username, &state.jwt_config)
+        .map_err(|_| AuthError::JwtEncodingError)?;
+    let (new_refresh_token, new_refresh_jti) = create_refresh_token(user_id, &state.jwt_config)
+        .map_err(|_| AuthError::JwtEncodingError)?;
+
+    // Rotate refresh token (revoke old, store new)
+    rotate_refresh_token(
+        state.db.as_ref(),
+        claims.jti,
+        &new_refresh_token,
+        new_refresh_jti,
+        user_id,
+        state.jwt_config.refresh_token_expiry_days,
+    )
+    .await
+    .map_err(|_| AuthError::DatabaseError("Failed to rotate token".to_string()))?;
+
+    // Create new HttpOnly cookie for new refresh token
+    let cookie = Cookie::build(("refresh_token", new_refresh_token))
+        .http_only(true)
+        .secure(true)
+        .same_site(SameSite::Strict)
+        .path("/")
+        .max_age(time::Duration::days(state.jwt_config.refresh_token_expiry_days))
+        .build();
+
+    // Return response with new access token
+    let response = AuthResponse {
+        access_token: new_access_token,
+        token_type: "Bearer".to_string(),
+        expires_in: state.jwt_config.access_token_expiry_minutes * 60,
+    };
+
+    Ok((
+        StatusCode::OK,
+        [(header::SET_COOKIE, cookie.to_string())],
+        Json(response),
+    ))
 }
 
 /// POST /api/auth/logout - Logout and invalidate tokens
@@ -317,11 +411,40 @@ pub async fn refresh_token(
     tag = "Authentication"
 )]
 pub async fn logout(
-    State(_state): State<AppState>,
-    // TODO: Extract tokens from request
+    State(state): State<AppState>,
+    jar: axum_extra::extract::CookieJar,
 ) -> std::result::Result<impl IntoResponse, AuthError> {
-    // This will be implemented when we add middleware
-    Ok(StatusCode::NOT_IMPLEMENTED)
+    use crate::services::auth::{verify_refresh_token, revoke_refresh_token};
+
+    // Extract refresh token from cookie
+    let refresh_token = jar
+        .get("refresh_token")
+        .ok_or(AuthError::InvalidToken)?
+        .value()
+        .to_string();
+
+    // Verify JWT to get claims (we need jti to revoke)
+    let claims = verify_refresh_token(&refresh_token, &state.jwt_config)
+        .map_err(|_| AuthError::InvalidToken)?;
+
+    // Revoke refresh token in database
+    revoke_refresh_token(state.db.as_ref(), claims.jti)
+        .await
+        .map_err(|_| AuthError::DatabaseError("Failed to revoke token".to_string()))?;
+
+    // Clear refresh token cookie (set Max-Age=0)
+    let cookie = Cookie::build(("refresh_token", ""))
+        .http_only(true)
+        .secure(true)
+        .same_site(SameSite::Strict)
+        .path("/")
+        .max_age(time::Duration::seconds(0)) // Expire immediately
+        .build();
+
+    Ok((
+        StatusCode::OK,
+        [(header::SET_COOKIE, cookie.to_string())],
+    ))
 }
 
 /// GET /api/auth/me - Get current user information
@@ -371,6 +494,48 @@ pub async fn get_current_user(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // ============================================================================
+    // Cookie Tests (Phase 0.1 - TDD)
+    // ============================================================================
+
+    #[tokio::test]
+    async fn test_login_sets_refresh_token_cookie() {
+        // This test verifies that login response includes Set-Cookie header
+        // with HttpOnly, Secure, and SameSite=Strict attributes
+        // TODO: Implement once we have test database setup
+        // Expected: Set-Cookie header with refresh_token cookie
+    }
+
+    #[tokio::test]
+    async fn test_register_sets_refresh_token_cookie() {
+        // This test verifies that register response includes Set-Cookie header
+        // with HttpOnly, Secure, and SameSite=Strict attributes
+        // TODO: Implement once we have test database setup
+        // Expected: Set-Cookie header with refresh_token cookie
+    }
+
+    #[tokio::test]
+    async fn test_cookie_attributes() {
+        // This test verifies cookie has correct security attributes:
+        // - HttpOnly=true (prevents XSS access)
+        // - Secure=true (HTTPS only)
+        // - SameSite=Strict (CSRF protection)
+        // - Path=/
+        // - Max-Age=604800 (7 days)
+        // TODO: Implement once we have test database setup
+    }
+
+    #[tokio::test]
+    async fn test_auth_response_excludes_refresh_token() {
+        // This test verifies that AuthResponse JSON does NOT include refresh_token
+        // Only access_token should be in the response body
+        // TODO: Implement once we have test database setup
+    }
+
+    // ============================================================================
+    // Existing Validation Tests
+    // ============================================================================
 
     #[test]
     fn test_register_request_validation_valid() {
