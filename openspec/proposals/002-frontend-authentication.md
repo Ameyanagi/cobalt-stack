@@ -11,14 +11,20 @@ Implement complete authentication flow in Next.js 16 frontend with JWT token man
 
 ## Context
 
-The backend authentication system is complete with:
+The backend authentication system has core functionality with:
 - ✅ User registration (`POST /api/auth/register`)
 - ✅ User login (`POST /api/auth/login`)
 - ✅ Protected routes with JWT middleware (`GET /api/auth/me`)
-- ✅ JWT dual-token pattern (access + refresh tokens)
+- ✅ JWT dual-token pattern (access + refresh tokens generated)
 - ✅ Comprehensive test coverage (59 tests passing)
 
-The frontend needs to integrate with these endpoints and provide a seamless authentication experience for users.
+**Backend Gaps Requiring Completion:**
+- ⚠️ Refresh token only stored in database (not returned to client)
+- ⚠️ `/api/auth/refresh` endpoint returns `NOT_IMPLEMENTED`
+- ⚠️ `/api/auth/logout` endpoint returns `NOT_IMPLEMENTED`
+- ⚠️ No HttpOnly cookie support for refresh tokens
+
+**This proposal follows a backend-first approach:** Complete backend cookie support and token refresh/logout endpoints using TDD, then implement frontend integration.
 
 ## Goals
 
@@ -222,6 +228,144 @@ export const registerSchema = z.object({
 - Display user-friendly error messages
 
 ## Implementation Plan
+
+### Phase 0: Backend Cookie & Token Management (TDD) - **PREREQUISITE**
+
+**Branch**: Continue on `feature/frontend-auth` (includes backend changes)
+
+**Objective**: Complete backend refresh token and logout functionality with HttpOnly cookie support following TDD methodology.
+
+#### 0.1: Refresh Token Cookie Support
+
+**Write Tests First:**
+```rust
+// backend/src/handlers/auth.rs - Add to tests module
+
+#[tokio::test]
+async fn test_login_sets_refresh_token_cookie() {
+    // Test that login response includes Set-Cookie header
+    // Verify cookie attributes: HttpOnly, Secure, SameSite=Strict
+}
+
+#[tokio::test]
+async fn test_register_sets_refresh_token_cookie() {
+    // Test that register response includes Set-Cookie header
+}
+```
+
+**Implementation:**
+- [ ] Add `axum-extra` dependency for cookie support
+- [ ] Update `AuthResponse` to NOT include refresh_token in JSON
+- [ ] Modify `register` handler to set HttpOnly cookie with refresh token
+- [ ] Modify `login` handler to set HttpOnly cookie with refresh token
+- [ ] Configure cookie attributes: `http_only=true`, `secure=true`, `same_site=Strict`, `path=/`, `max_age=7 days`
+- [ ] Update OpenAPI documentation to reflect cookie usage
+- [ ] Run tests: `cargo test --lib handlers::auth` - Should pass
+
+#### 0.2: Token Refresh Endpoint Implementation
+
+**Write Tests First:**
+```rust
+#[tokio::test]
+async fn test_refresh_token_with_valid_cookie() {
+    // Mock valid refresh token in cookie
+    // Call /api/auth/refresh
+    // Assert: Returns new access token
+    // Assert: Returns new refresh token cookie (rotation)
+}
+
+#[tokio::test]
+async fn test_refresh_token_without_cookie() {
+    // Call /api/auth/refresh without cookie
+    // Assert: Returns 401 Unauthorized
+}
+
+#[tokio::test]
+async fn test_refresh_token_with_invalid_cookie() {
+    // Mock invalid/expired refresh token
+    // Call /api/auth/refresh
+    // Assert: Returns 401 Unauthorized
+}
+
+#[tokio::test]
+async fn test_refresh_token_with_revoked_token() {
+    // Mock revoked refresh token (not in database)
+    // Call /api/auth/refresh
+    // Assert: Returns 401 Unauthorized
+}
+```
+
+**Implementation:**
+- [ ] Extract refresh token from `Cookie` header using `axum-extra::extract::CookieJar`
+- [ ] Validate refresh token JWT signature and expiry
+- [ ] Query database to verify refresh token exists and isn't revoked
+- [ ] Generate new access token
+- [ ] Rotate refresh token (revoke old, create new) for security
+- [ ] Return new access token in JSON
+- [ ] Set new refresh token as HttpOnly cookie
+- [ ] Run tests: `cargo test --lib handlers::auth::test_refresh` - Should pass
+
+#### 0.3: Logout Endpoint Implementation
+
+**Write Tests First:**
+```rust
+#[tokio::test]
+async fn test_logout_revokes_refresh_token() {
+    // Mock user with active refresh token cookie
+    // Call /api/auth/logout
+    // Assert: Refresh token revoked in database
+    // Assert: Cookie cleared (Max-Age=0)
+}
+
+#[tokio::test]
+async fn test_logout_without_cookie() {
+    // Call /api/auth/logout without cookie
+    // Assert: Returns 200 OK (idempotent)
+}
+
+#[tokio::test]
+async fn test_logout_requires_authentication() {
+    // Call /api/auth/logout without access token
+    // Assert: Middleware returns 401 Unauthorized
+}
+```
+
+**Implementation:**
+- [ ] Apply auth middleware to `/api/auth/logout` route (already done)
+- [ ] Extract refresh token from cookie
+- [ ] Revoke refresh token in database (set `revoked_at` timestamp)
+- [ ] Clear refresh token cookie (set `Max-Age=0`)
+- [ ] Return 200 OK
+- [ ] Run tests: `cargo test --lib handlers::auth::test_logout` - Should pass
+
+#### 0.4: Integration & Cleanup
+
+**Deliverables:**
+- [ ] Update `Cargo.toml` with `axum-extra = { version = "0.9", features = ["cookie"] }`
+- [ ] Run full test suite: `cargo test --lib` - All tests should pass
+- [ ] Manual testing with curl:
+  ```bash
+  # Login and capture cookie
+  curl -v -X POST http://localhost:3000/api/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"username":"test","password":"test123"}' \
+    -c cookies.txt
+
+  # Refresh token using cookie
+  curl -v -X POST http://localhost:3000/api/auth/refresh \
+    -b cookies.txt \
+    -c cookies.txt
+
+  # Logout
+  curl -v -X POST http://localhost:3000/api/auth/logout \
+    -H "Authorization: Bearer <access_token>" \
+    -b cookies.txt
+  ```
+- [ ] Commit Phase 0: "feat(auth): Implement refresh token cookies and logout with TDD"
+
+**Estimated Time**: 1-2 days
+
+---
 
 ### Phase 1: Core Auth Infrastructure (Foundation)
 
