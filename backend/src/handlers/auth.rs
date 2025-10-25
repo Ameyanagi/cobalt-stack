@@ -340,11 +340,32 @@ pub async fn logout(
     )
 )]
 pub async fn get_current_user(
-    State(_state): State<AppState>,
-    // TODO: Extract user from middleware
+    State(state): State<AppState>,
+    req: axum::http::Request<axum::body::Body>,
 ) -> std::result::Result<impl IntoResponse, AuthError> {
-    // This will be implemented when we add auth middleware
-    Ok(StatusCode::NOT_IMPLEMENTED)
+    use crate::middleware::auth::AuthUser;
+
+    // Extract AuthUser from request extensions (injected by middleware)
+    let auth_user = req
+        .extensions()
+        .get::<AuthUser>()
+        .ok_or(AuthError::InvalidToken)?;
+
+    // Fetch full user information from database
+    let user = Users::find_by_id(auth_user.user_id)
+        .one(state.db.as_ref())
+        .await?
+        .ok_or(AuthError::UserNotFound)?;
+
+    // Return user response
+    let response = UserResponse {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        email_verified: user.email_verified,
+    };
+
+    Ok((StatusCode::OK, Json(response)))
 }
 
 #[cfg(test)]
