@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
+import { env } from '@/lib/env'
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -38,7 +39,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+      const response = await fetch(`${env.apiUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +56,7 @@ export default function LoginPage() {
       const result = await response.json()
 
       // Fetch user info with access token
-      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      const userResponse = await fetch(`${env.apiUrl}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${result.access_token}`,
         },

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ProtectedRoute } from '@/components/auth/protected-route'
 import { useAuth } from '@/contexts/auth-context'
 import { LogoutButton } from '@/components/auth/logout-button'
+import { env } from '@/lib/env'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -89,7 +90,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <a
-                  href={`${process.env.NEXT_PUBLIC_API_URL}/swagger-ui`}
+                  href={`${env.apiUrl}/swagger-ui`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

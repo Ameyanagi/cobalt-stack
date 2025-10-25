@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { env } from '@/lib/env'
 
 // Types for authentication state
 interface User {
@@ -65,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     try {
       // Call logout endpoint to revoke refresh token
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
+      const response = await fetch(`${env.apiUrl}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include', // Send HttpOnly cookie
       })
@@ -92,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
+      const response = await fetch(`${env.apiUrl}/api/auth/refresh`, {
         method: 'POST',
         credentials: 'include', // Send HttpOnly cookie
         headers: {
@@ -114,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json()
 
       // Fetch user info with new access token
-      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      const userResponse = await fetch(`${env.apiUrl}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${data.access_token}`,
         },

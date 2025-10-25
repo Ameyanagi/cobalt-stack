@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
+import { env } from '@/lib/env'
 
 const registerSchema = z.object({
   username: z.string()
@@ -50,7 +51,7 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+      const response = await fetch(`${env.apiUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +72,7 @@ export default function RegisterPage() {
       const result = await response.json()
 
       // Fetch user info with access token
-      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      const userResponse = await fetch(`${env.apiUrl}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${result.access_token}`,
         },
