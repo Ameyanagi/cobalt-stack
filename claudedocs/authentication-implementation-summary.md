@@ -28,6 +28,12 @@ Successfully implemented complete JWT-based authentication system for the Cobalt
 - Added `FRONTEND_URL` environment variable
 - Updated docker-compose.yml configuration
 
+### 4. "Load failed" Errors on LAN Access ✅
+- Fixed hardcoded `process.env.NEXT_PUBLIC_API_URL` references in all components
+- Updated AuthContext, Login, Register, and Dashboard to use dynamic `env.apiUrl`
+- All API calls now construct URLs based on current hostname
+- Tested successfully with Playwright automation
+
 ## Testing Results
 
 ✅ User Registration - Working
@@ -37,6 +43,9 @@ Successfully implemented complete JWT-based authentication system for the Cobalt
 ✅ Dashboard Page - Working
 ✅ Home Page Auth UI - Working
 ✅ Navigation Flow - Working
+✅ Health Check Page - Working (no "Load failed" errors)
+✅ LAN IP Access - Working (192.168.1.50:2727)
+✅ Dynamic API URL Resolution - Working
 
 ## Git Commits
 
@@ -46,6 +55,8 @@ Successfully implemented complete JWT-based authentication system for the Cobalt
 - `db22422` - Add authentication-aware home page and dashboard
 - `0a149ff` - Use dynamic API URL based on current hostname
 - `989c855` - Update CORS to allow dynamic origins on port 2727
+- `f7194a3` - Document dynamic CORS configuration
+- `39cc94a` - Fix API URL references to use dynamic env helper
 
 All changes pushed to GitHub `main` branch.
 
