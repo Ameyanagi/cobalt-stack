@@ -7,6 +7,7 @@ rust-version = "1.75"
 [dependencies]
 # Web framework
 axum = { workspace = true }
+axum-extra = { workspace = true }
 tokio = { workspace = true }
 tower = { workspace = true }
 tower-http = { workspace = true }
@@ -38,6 +39,7 @@ thiserror = { workspace = true }
 
 # Time
 chrono = { workspace = true }
+time = { workspace = true }
 
 # UUID
 uuid = { workspace = true }

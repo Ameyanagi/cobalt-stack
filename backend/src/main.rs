@@ -6,7 +6,7 @@ mod openapi;
 mod services;
 mod utils;
 
-use axum::{middleware as axum_middleware, routing::{get, post}, Router};
+use axum::{http::HeaderValue, middleware as axum_middleware, routing::{get, post}, Router};
 use std::{net::SocketAddr, sync::Arc};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -69,8 +69,16 @@ async fn main() {
 
 fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtConfig) -> Router {
     // Configure CORS with credentials support
+    // Note: When allow_credentials(true) is set, allow_origin cannot be Any
+    // In production, set FRONTEND_URL environment variable to your frontend domain
+    let frontend_url = std::env::var("FRONTEND_URL")
+        .unwrap_or_else(|_| "http://localhost:3001".to_string());
+
+    let origin = frontend_url.parse::<HeaderValue>()
+        .expect("Invalid FRONTEND_URL");
+
     let cors = CorsLayer::new()
-        .allow_origin(Any)
+        .allow_origin(origin)
         .allow_methods(Any)
         .allow_headers(Any)
         .allow_credentials(true);
