@@ -8,8 +8,13 @@ rust-version = "1.75"
 name = "migration"
 path = "src/lib.rs"
 
+[[bin]]
+name = "migration"
+path = "src/main.rs"
+
 [dependencies]
 sea-orm-migration = { workspace = true }
+async-std = { version = "1", features = ["attributes", "tokio1"] }
 
 [dependencies.sea-orm]
 workspace = true
