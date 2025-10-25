@@ -1,0 +1,55 @@
+[package]
+name = "cobalt-stack-backend"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+# Web framework
+axum = { workspace = true }
+tokio = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+
+# Database
+sea-orm = { workspace = true }
+
+# Redis (optional feature)
+redis = { workspace = true, optional = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# OpenAPI
+utoipa = { workspace = true }
+utoipa-swagger-ui = { workspace = true }
+
+# Environment variables
+dotenvy = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Time
+chrono = { workspace = true }
+
+# UUID
+uuid = { workspace = true }
+
+[dev-dependencies]
+# Testing
+mockall = "0.13"
+
+[features]
+default = []
+redis-cache = ["redis"]
+
+[[bin]]
+name = "cobalt-stack-backend"
+path = "src/main.rs"
