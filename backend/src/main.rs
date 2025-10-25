@@ -6,7 +6,7 @@ mod openapi;
 mod services;
 mod utils;
 
-use axum::{http::HeaderValue, middleware as axum_middleware, routing::{get, post}, Router};
+use axum::{http::{header, HeaderValue, Method}, middleware as axum_middleware, routing::{get, post}, Router};
 use std::{net::SocketAddr, sync::Arc};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -79,8 +79,19 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
 
     let cors = CorsLayer::new()
         .allow_origin(origin)
-        .allow_methods(Any)
-        .allow_headers(Any)
+        .allow_methods(vec![
+            Method::GET,
+            Method::POST,
+            Method::PUT,
+            Method::DELETE,
+            Method::OPTIONS,
+        ])
+        .allow_headers(vec![
+            header::AUTHORIZATION,
+            header::CONTENT_TYPE,
+            header::ACCEPT,
+            header::COOKIE,
+        ])
         .allow_credentials(true);
 
     // Auth routes (public)
