@@ -1,9 +1,12 @@
 # Proposal: Frontend Authentication Implementation
 
-**Status**: Proposed
+**Status**: Implemented
 **Created**: 2025-01-26
+**Implemented**: 2025-10-26
 **Author**: AI Assistant
 **Related**: Backend auth system (feature/auth-system merged to master)
+**Branch**: feature/frontend-auth
+**Commit**: 29f06b7
 
 ## Summary
 
