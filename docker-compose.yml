@@ -5,11 +5,11 @@ services:
     container_name: cobalt-postgres-dev
     restart: unless-stopped
     environment:
-      POSTGRES_DB: cobalt_dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-cobalt_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-2800}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -25,7 +25,7 @@ services:
     container_name: cobalt-redis-dev
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-2900}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -45,12 +45,12 @@ services:
     container_name: cobalt-backend-dev
     restart: unless-stopped
     ports:
-      - "3002:3000"
+      - "${BACKEND_PORT:-2750}:3000"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/cobalt_dev
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-cobalt_dev}
       REDIS_URL: redis://redis:6379
       PORT: 3000
-      RUST_LOG: debug
+      RUST_LOG: ${RUST_LOG:-debug}
     depends_on:
       postgres:
         condition: service_healthy
@@ -71,12 +71,13 @@ services:
       dockerfile: Dockerfile
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:2750}
     container_name: cobalt-frontend-dev
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "${FRONTEND_PORT:-2727}:3001"
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:2750}
       PORT: 3001
       NODE_ENV: production
     depends_on:

@@ -13,7 +13,7 @@ function getEnvVar(key: string, defaultValue?: string): string {
 }
 
 export const env = {
-  apiUrl: getEnvVar('NEXT_PUBLIC_API_URL', 'http://localhost:3002'),
+  apiUrl: getEnvVar('NEXT_PUBLIC_API_URL', 'http://localhost:2750'),
 } as const
 
 // Validate environment on module load (development only)

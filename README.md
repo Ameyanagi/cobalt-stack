@@ -272,19 +272,44 @@ JWT_SECRET         # JWT signing secret
 
 ## 🔧 Configuration
 
-### Environment Variables
+### Docker Compose Environment (Recommended)
+
+For Docker deployment, copy `.env.example` to `.env` and customize as needed:
+
+```bash
+# Port Configuration
+FRONTEND_PORT=2727       # Frontend accessible at http://localhost:2727
+BACKEND_PORT=2750        # Backend API at http://localhost:2750
+POSTGRES_PORT=2800       # PostgreSQL at localhost:2800
+REDIS_PORT=2900          # Redis at localhost:2900
+
+# API URL (must match BACKEND_PORT)
+NEXT_PUBLIC_API_URL=http://localhost:2750
+
+# Database Configuration
+POSTGRES_DB=cobalt_dev
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+# Backend Logging
+RUST_LOG=debug  # Options: trace, debug, info, warn, error
+```
+
+All ports and URLs are now configurable through the `.env` file. When you change `BACKEND_PORT`, make sure to update `NEXT_PUBLIC_API_URL` to match.
+
+### Local Development Environment
 
 **Backend** - Copy `backend/.env.example` to `backend/.env`:
 
 ```bash
 # Server
 PORT=3000
-RUST_LOG=debug  # info for production
+RUST_LOG=debug
 
 # Database
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/cobalt_dev
 
-# Redis (optional)
+# Redis
 REDIS_URL=redis://localhost:6379
 
 # Security

@@ -59,7 +59,7 @@ class ApiClient {
   /**
    * Health check endpoint
    */
-  async healthCheck(): Promise<ApiResponse<HealthResponse>> {
+  healthCheck = async (): Promise<ApiResponse<HealthResponse>> => {
     return this.get<HealthResponse>('/health')
   }
 }
