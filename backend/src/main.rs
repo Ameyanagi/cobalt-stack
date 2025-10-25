@@ -10,6 +10,8 @@ use axum::{routing::get, Router};
 use std::net::SocketAddr;
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 #[tokio::main]
 async fn main() {
@@ -24,6 +26,13 @@ async fn main() {
 
     // Load environment variables
     dotenvy::dotenv().ok();
+
+    // Generate OpenAPI schema for frontend
+    if let Err(e) = openapi::write_openapi_schema() {
+        tracing::warn!("Failed to write OpenAPI schema: {}", e);
+    } else {
+        tracing::info!("OpenAPI schema generated at openapi/schema.json");
+    }
 
     // Build application router
     let app = create_app();
@@ -52,6 +61,7 @@ fn create_app() -> Router {
     // Build router
     Router::new()
         .route("/health", get(handlers::health::health_check))
+        .merge(SwaggerUi::new("/swagger-ui").url("/openapi.json", openapi::ApiDoc::openapi()))
         .layer(cors)
         .layer(tower_http::trace::TraceLayer::new_for_http())
 }

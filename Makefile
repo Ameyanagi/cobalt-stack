@@ -1,4 +1,4 @@
-.PHONY: setup dev dev-backend test build docker-build clean help migrate generate-openapi
+.PHONY: setup dev dev-backend dev-frontend test build build-frontend docker-build clean help migrate generate-openapi generate-types
 
 ## Default target
 .DEFAULT_GOAL := help
@@ -13,6 +13,7 @@ help:
 	@echo "Development:"
 	@echo "  make dev            - Run full stack with docker-compose"
 	@echo "  make dev-backend    - Run backend with hot reload (cargo-watch)"
+	@echo "  make dev-frontend   - Run frontend dev server (bun)"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make test           - Run all tests with coverage"
@@ -20,13 +21,15 @@ help:
 	@echo ""
 	@echo "Building:"
 	@echo "  make build          - Build release binary"
-	@echo "  make docker-build   - Build Docker image"
+	@echo "  make build-frontend - Build frontend for production"
+	@echo "  make docker-build   - Build Docker images"
 	@echo ""
 	@echo "Database:"
 	@echo "  make migrate        - Run database migrations"
 	@echo ""
 	@echo "OpenAPI:"
-	@echo "  make generate-openapi - Generate OpenAPI schema and frontend types"
+	@echo "  make generate-openapi - Generate OpenAPI schema"
+	@echo "  make generate-types   - Generate TypeScript types from OpenAPI schema"
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  make clean          - Clean build artifacts and stop containers"
@@ -35,9 +38,11 @@ help:
 setup:
 	@echo "🚀 Setting up Cobalt Stack..."
 	@if [ ! -f backend/.env ]; then cp backend/.env.example backend/.env; echo "✅ Created backend/.env"; fi
-	@if [ ! -f frontend/.env ]; then cp frontend/.env.example frontend/.env; echo "✅ Created frontend/.env"; fi
+	@if [ ! -f frontend/.env.local ]; then cp frontend/.env.local.example frontend/.env.local; echo "✅ Created frontend/.env.local"; fi
 	@echo "📦 Installing Rust dependencies..."
 	@cd backend && cargo build
+	@echo "📦 Installing frontend dependencies..."
+	@cd frontend && bun install
 	@echo "✅ Setup complete! Run 'make dev' to start development."
 
 ## dev: Run full stack with docker-compose
@@ -53,6 +58,11 @@ dev-backend:
 		cargo install cargo-watch; \
 	fi
 	cd backend && cargo watch -x run
+
+## dev-frontend: Run frontend dev server
+dev-frontend:
+	@echo "⚡ Starting frontend dev server with bun..."
+	@cd frontend && bun run dev
 
 ## test: Run all tests
 test:
@@ -83,6 +93,12 @@ build:
 	@cd backend && cargo build --release
 	@echo "✅ Binary built: backend/target/release/cobalt-stack-backend"
 
+## build-frontend: Build frontend for production
+build-frontend:
+	@echo "🔨 Building frontend for production..."
+	@cd frontend && bun run build
+	@echo "✅ Frontend built in: frontend/.next"
+
 ## docker-build: Build Docker image
 docker-build:
 	@echo "🐳 Building Docker image with BuildKit..."
@@ -105,13 +121,20 @@ migrate:
 ## generate-openapi: Generate OpenAPI schema
 generate-openapi:
 	@echo "📝 Generating OpenAPI schema..."
-	@cd backend && cargo build
-	@echo "✅ OpenAPI schema generated"
+	@cd backend && cargo run
+	@echo "✅ OpenAPI schema generated at openapi/schema.json"
+
+## generate-types: Generate TypeScript types from OpenAPI schema
+generate-types:
+	@echo "🔧 Generating TypeScript types..."
+	@cd frontend && bunx openapi-typescript ../openapi/schema.json -o src/types/api.ts
+	@echo "✅ TypeScript types generated at frontend/src/types/api.ts"
 
 ## clean: Clean build artifacts and stop containers
 clean:
 	@echo "🧹 Cleaning up..."
 	@cd backend && cargo clean
+	@rm -rf frontend/.next frontend/node_modules
 	@docker-compose down -v
 	@echo "✅ Cleanup complete"
 

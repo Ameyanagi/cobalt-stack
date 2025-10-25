@@ -1,14 +1,25 @@
 use axum::{http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, ToSchema)]
 pub struct HealthResponse {
+    /// Health status of the service
+    #[schema(example = "healthy")]
     pub status: String,
 }
 
 /// Health check endpoint
 ///
 /// Returns a simple health status to verify the server is running.
+#[utoipa::path(
+    get,
+    path = "/health",
+    responses(
+        (status = 200, description = "Service is healthy", body = HealthResponse)
+    ),
+    tag = "health"
+)]
 pub async fn health_check() -> (StatusCode, Json<HealthResponse>) {
     (
         StatusCode::OK,
