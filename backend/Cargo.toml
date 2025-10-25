@@ -14,8 +14,8 @@ tower-http = { workspace = true }
 # Database
 sea-orm = { workspace = true }
 
-# Redis (optional feature)
-redis = { workspace = true, optional = true }
+# Valkey (Redis-compatible) - required for auth
+redis = { workspace = true }
 
 # Serialization
 serde = { workspace = true }
@@ -45,6 +45,7 @@ uuid = { workspace = true }
 # Authentication
 jsonwebtoken = { workspace = true }
 argon2 = { workspace = true }
+sha2 = { workspace = true }
 
 [dev-dependencies]
 # Testing
@@ -52,7 +53,6 @@ mockall = "0.13"
 
 [features]
 default = []
-redis-cache = ["redis"]
 
 [[bin]]
 name = "cobalt-stack-backend"

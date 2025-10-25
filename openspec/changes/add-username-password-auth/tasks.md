@@ -14,7 +14,7 @@
 - [ ] 2.3 Add thiserror crate for domain error types
 - [ ] 2.4 Add anyhow crate for application error propagation
 - [ ] 2.5 Add serde for JWT claims serialization
-- [ ] 2.6 Update redis crate for connection pooling if needed
+- [ ] 2.6 Add redis crate for Valkey connection pooling (Redis-compatible)
 - [ ] 2.7 Run cargo build to verify dependencies
 
 ## 3. Backend - Core Auth Service
@@ -31,12 +31,12 @@
 - [ ] 3.11 Implement token refresh logic
 - [ ] 3.12 Implement logout logic (revoke + blacklist)
 
-## 4. Backend - Redis Integration
-- [ ] 4.1 Create Redis connection pool in main.rs
+## 4. Backend - Valkey Integration
+- [ ] 4.1 Create Valkey connection pool in main.rs
 - [ ] 4.2 Implement token blacklist operations (add, check)
 - [ ] 4.3 Implement rate limiting for login attempts
 - [ ] 4.4 Implement user data caching (optional optimization)
-- [ ] 4.5 Test Redis operations
+- [ ] 4.5 Test Valkey operations
 
 ## 5. Backend - Error Handling
 - [ ] 5.1 Create src/services/auth/error.rs with AuthError enum (thiserror)
@@ -191,9 +191,9 @@
 - [ ] 23.6 Verify password complexity requirements enforced
 
 ## 24. Performance Optimization
-- [ ] 24.1 Implement Redis caching for user data
+- [ ] 24.1 Implement Valkey caching for user data
 - [ ] 24.2 Add database connection pooling configuration
-- [ ] 24.3 Add Redis connection pooling
+- [ ] 24.3 Add Valkey connection pooling
 - [ ] 24.4 Benchmark login endpoint (<100ms p99 target)
 - [ ] 24.5 Benchmark token refresh (<50ms p99 target)
 - [ ] 24.6 Benchmark protected route auth check (<10ms p99 target)

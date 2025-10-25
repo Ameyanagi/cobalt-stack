@@ -10,7 +10,7 @@ The Cobalt Stack requires user authentication to support protected resources, us
 - Security: Need industry-standard security practices
 
 **Constraints:**
-- Must use existing PostgreSQL and Redis infrastructure
+- Must use existing PostgreSQL and Valkey infrastructure
 - Must integrate with Axum backend and Next.js 16 frontend
 - Must support future OAuth without breaking changes
 - Must follow OWASP security guidelines
@@ -47,7 +47,7 @@ The Cobalt Stack requires user authentication to support protected resources, us
 
 **Alternatives Considered:**
 1. **Session-based auth (cookies + server-side session store)**
-   - Rejected: Requires DB/Redis query on every request (slower), harder to scale across microservices
+   - Rejected: Requires DB/Valkey query on every request (slower), harder to scale across microservices
 
 2. **Single long-lived JWT**
    - Rejected: No way to revoke compromised tokens without complex blacklisting infrastructure
@@ -72,18 +72,19 @@ The Cobalt Stack requires user authentication to support protected resources, us
 2. **PBKDF2**
    - Rejected: Lower memory usage makes GPU attacks easier
 
-### Decision 3: Redis for Blacklist + Rate Limiting
+### Decision 3: Valkey for Blacklist + Rate Limiting
 
-**Choice:** Use Redis for token blacklist and login rate limiting, not for session storage.
+**Choice:** Use Valkey (Redis-compatible) for token blacklist and login rate limiting, not for session storage.
 
 **Rationale:**
 - Blacklist: Enables immediate logout by invalidating access tokens
 - Rate limiting: Fast, distributed-friendly counter with TTL
 - Already in stack: No new infrastructure needed
-- Ephemeral data: Perfect fit for Redis vs PostgreSQL
+- Ephemeral data: Perfect fit for Valkey vs PostgreSQL
+- Redis-compatible: Drop-in replacement with same API
 
 **Alternatives Considered:**
-1. **Database-only (no Redis)**
+1. **Database-only (no Valkey)**
    - Rejected: Slower rate limiting, adds DB load for blacklist checks
 
 2. **In-memory application cache**
@@ -174,7 +175,7 @@ CREATE TABLE oauth_accounts (
 
 **Implementation:**
 ```rust
-// Redis key: "ratelimit:login:{ip}"
+// Valkey key: "ratelimit:login:{ip}"
 // Increment counter, set TTL on first attempt
 // Block if counter exceeds 5
 ```
@@ -341,7 +342,7 @@ impl IntoResponse for AuthError {
 - Protected route auth check: <10ms
 
 ### Caching Strategy
-- Cache user data in Redis after login (TTL: access token lifetime)
+- Cache user data in Valkey after login (TTL: access token lifetime)
 - Cache hit rate target: >80% for user lookups
 - Expected query reduction: 80-90% vs no caching
 
@@ -354,7 +355,7 @@ impl IntoResponse for AuthError {
 
 ### Connection Pooling
 - PostgreSQL: SeaORM default (max: 10 connections)
-- Redis: Connection pool (r2d2 or deadpool, max: 20 connections)
+- Valkey: Connection pool (r2d2 or deadpool, max: 20 connections)
 - Reuse connections across requests
 
 ## Migration Plan
@@ -379,7 +380,7 @@ impl IntoResponse for AuthError {
 ### Rollback Plan
 1. Database migrations are reversible (down migrations)
 2. Deploy code rollback: redeploy previous version
-3. Clear Redis blacklist: `FLUSHDB` (or let TTL expire)
+3. Clear Valkey blacklist: `FLUSHDB` (or let TTL expire)
 4. Remove auth routes from router if needed
 
 ### Zero-Downtime Deployment
