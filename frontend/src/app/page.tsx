@@ -1,11 +1,41 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from '@/contexts/auth-context'
+import { LogoutButton } from '@/components/auth/logout-button'
 
 export default function Home() {
+  const { user, isAuthenticated, isLoading } = useAuth()
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="max-w-2xl w-full space-y-8">
+        {/* Authentication Status */}
+        <div className="flex justify-end">
+          {isLoading ? (
+            <div className="text-sm text-muted-foreground">Loading...</div>
+          ) : isAuthenticated && user ? (
+            <div className="flex items-center gap-4">
+              <div className="text-sm">
+                <span className="text-muted-foreground">Welcome, </span>
+                <span className="font-medium">{user.username}</span>
+              </div>
+              <LogoutButton variant="outline" size="sm" />
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Link href="/login">
+                <Button variant="outline" size="sm">Login</Button>
+              </Link>
+              <Link href="/register">
+                <Button size="sm">Register</Button>
+              </Link>
+            </div>
+          )}
+        </div>
+
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight mb-4">
             Cobalt Stack
@@ -27,6 +57,7 @@ export default function Home() {
                 <li>PostgreSQL with SeaORM</li>
                 <li>Redis caching</li>
                 <li>OpenAPI documentation</li>
+                <li>JWT authentication with token rotation</li>
               </ul>
             </CardContent>
           </Card>
@@ -42,17 +73,25 @@ export default function Home() {
                 <li>TailwindCSS styling</li>
                 <li>shadcn/ui components</li>
                 <li>Type-safe API client</li>
+                <li>Secure authentication flow</li>
               </ul>
             </CardContent>
           </Card>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-4">
           <Link href="/health">
-            <Button size="lg">
+            <Button size="lg" variant="outline">
               Check System Health
             </Button>
           </Link>
+          {isAuthenticated && (
+            <Link href="/dashboard">
+              <Button size="lg">
+                Go to Dashboard
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </main>
