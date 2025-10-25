@@ -44,6 +44,7 @@ Successfully implemented complete JWT-based authentication system for the Cobalt
 - `9a2dc37` - Fix CORS configuration
 - `de2c560` - Add FRONTEND_URL configuration
 - `db22422` - Add authentication-aware home page and dashboard
+- `0a149ff` - Use dynamic API URL based on current hostname
 
 All changes pushed to GitHub `main` branch.
 
@@ -69,3 +70,30 @@ All changes pushed to GitHub `main` branch.
   - System Health status check
   - API Documentation access
 - Clean, professional UI using shadcn/ui Card components
+
+## Network Access Configuration
+
+### Dynamic API URL Resolution
+The frontend automatically constructs the backend API URL based on the current hostname:
+- **Client-side**: Uses `window.location.hostname` + port 2750
+- **Server-side (SSR)**: Uses NEXT_PUBLIC_API_URL environment variable
+
+This allows the application to work seamlessly when accessed from:
+- `http://localhost:2727` (local development)
+- `http://192.168.1.50:2727` (LAN access)
+- `http://your-server-ip:2727` (remote access)
+
+The backend API is always accessed on port 2750 of the same hostname.
+
+### Port Configuration
+- **Frontend**: Port 2727
+- **Backend API**: Port 2750
+- **PostgreSQL**: Port 2800
+- **Redis**: Port 2900
+
+### Future Improvements
+For production deployment, consider:
+- Using a reverse proxy (Traefik/nginx) to serve both frontend and backend on the same domain/port
+- This eliminates the need for dynamic port configuration
+- Provides better security with SSL/TLS termination
+- Simplifies CORS configuration
