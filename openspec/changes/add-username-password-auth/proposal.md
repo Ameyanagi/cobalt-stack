@@ -44,7 +44,8 @@ None - this is a new capability with no existing auth to replace.
 New Rust crates:
 - `jsonwebtoken` - JWT encoding/decoding
 - `argon2` - Password hashing
-- `thiserror` - Error handling
+- `thiserror` - Domain error types with HTTP mapping
+- `anyhow` - Application error propagation with context
 - Redis connection pool (upgrade existing redis crate)
 
 ### Performance

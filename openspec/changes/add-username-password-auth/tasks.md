@@ -11,10 +11,11 @@
 ## 2. Backend - Dependencies
 - [ ] 2.1 Add jsonwebtoken crate to Cargo.toml
 - [ ] 2.2 Add argon2 crate to Cargo.toml
-- [ ] 2.3 Add thiserror crate for error handling
-- [ ] 2.4 Add serde for JWT claims serialization
-- [ ] 2.5 Update redis crate for connection pooling if needed
-- [ ] 2.6 Run cargo build to verify dependencies
+- [ ] 2.3 Add thiserror crate for domain error types
+- [ ] 2.4 Add anyhow crate for application error propagation
+- [ ] 2.5 Add serde for JWT claims serialization
+- [ ] 2.6 Update redis crate for connection pooling if needed
+- [ ] 2.7 Run cargo build to verify dependencies
 
 ## 3. Backend - Core Auth Service
 - [ ] 3.1 Create src/services/auth.rs module
@@ -38,10 +39,12 @@
 - [ ] 4.5 Test Redis operations
 
 ## 5. Backend - Error Handling
-- [ ] 5.1 Create src/services/auth/error.rs with AuthError enum
+- [ ] 5.1 Create src/services/auth/error.rs with AuthError enum (thiserror)
 - [ ] 5.2 Implement IntoResponse for AuthError (HTTP status mapping)
 - [ ] 5.3 Add error variants (InvalidCredentials, UserAlreadyExists, TokenExpired, RateLimitExceeded, etc.)
-- [ ] 5.4 Ensure error messages don't leak sensitive information
+- [ ] 5.4 Define Result<T> type alias using anyhow for service methods
+- [ ] 5.5 Use .context() for error propagation with additional context
+- [ ] 5.6 Ensure error messages don't leak sensitive information
 
 ## 6. Backend - Middleware
 - [ ] 6.1 Create src/middleware/auth.rs module

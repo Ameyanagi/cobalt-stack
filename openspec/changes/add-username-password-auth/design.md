@@ -215,6 +215,63 @@ CREATE TABLE oauth_accounts (
 **Phase 1 Implementation:** HS256 only
 **Phase 2:** Add RS256 support with public/private key pair
 
+### Decision 10: Error Handling with thiserror + anyhow
+
+**Choice:** Use `thiserror` for library errors (AuthError) and `anyhow` for application errors.
+
+**Pattern:**
+```rust
+// Library-style errors (auth service) - use thiserror
+#[derive(Debug, thiserror::Error)]
+pub enum AuthError {
+    #[error("Invalid credentials")]
+    InvalidCredentials,
+
+    #[error("User already exists")]
+    UserAlreadyExists,
+
+    #[error("Token expired")]
+    TokenExpired,
+
+    #[error("Rate limit exceeded")]
+    RateLimitExceeded,
+
+    #[error("Database error: {0}")]
+    DatabaseError(#[from] sea_orm::DbErr),
+}
+
+// Application-level error propagation - use anyhow
+pub type Result<T> = anyhow::Result<T>;
+
+// Handlers convert AuthError to HTTP responses
+impl IntoResponse for AuthError {
+    fn into_response(self) -> Response {
+        let (status, message) = match self {
+            AuthError::InvalidCredentials => (StatusCode::UNAUTHORIZED, "Invalid credentials"),
+            AuthError::UserAlreadyExists => (StatusCode::CONFLICT, "User already exists"),
+            // ...
+        };
+        (status, Json(json!({ "error": message }))).into_response()
+    }
+}
+```
+
+**Rationale:**
+- `thiserror`: Perfect for domain-specific errors with structured types and HTTP mapping
+- `anyhow`: Excellent for error propagation with context (using `.context()`)
+- Combines best of both: Type safety where it matters, flexibility for propagation
+- Industry standard pattern in Rust ecosystem
+
+**Alternatives Considered:**
+1. **thiserror only**
+   - Rejected: Requires defining error types for every possible failure, verbose
+
+2. **anyhow only**
+   - Rejected: Loses type safety for domain errors, harder to map to HTTP status codes
+
+3. **Custom error type without thiserror**
+   - Rejected: Reinventing the wheel, thiserror provides better derive macros
+
 ## Risks / Trade-offs
 
 ### Risk 1: Token Theft
