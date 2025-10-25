@@ -69,16 +69,18 @@ async fn main() {
 
 fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtConfig) -> Router {
     // Configure CORS with credentials support
-    // Note: When allow_credentials(true) is set, allow_origin cannot be Any
-    // In production, set FRONTEND_URL environment variable to your frontend domain
-    let frontend_url = std::env::var("FRONTEND_URL")
-        .unwrap_or_else(|_| "http://localhost:3001".to_string());
-
-    let origin = frontend_url.parse::<HeaderValue>()
-        .expect("Invalid FRONTEND_URL");
+    // Allow any origin ending with :2727 (frontend port) for development
+    // In production, set specific allowed origins
+    use tower_http::cors::AllowOrigin;
 
     let cors = CorsLayer::new()
-        .allow_origin(origin)
+        .allow_origin(AllowOrigin::predicate(|origin: &HeaderValue, _request_parts| {
+            // Allow any origin that ends with :2727 (frontend port)
+            // This enables access from localhost, LAN IPs, etc.
+            origin.to_str()
+                .map(|s| s.ends_with(":2727") || s == "http://localhost:2727" || s == "http://127.0.0.1:2727")
+                .unwrap_or(false)
+        }))
         .allow_methods(vec![
             Method::GET,
             Method::POST,
