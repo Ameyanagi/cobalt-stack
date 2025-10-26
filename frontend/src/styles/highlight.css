@@ -121,9 +121,8 @@
   color: oklch(0.55 0.15 250);
 }
 
-/* SQL */
-.hljs-keyword {
-  color: oklch(0.55 0.15 300);
+/* SQL - only uppercase keywords in SQL language blocks */
+.language-sql .hljs-keyword {
   text-transform: uppercase;
 }
 
