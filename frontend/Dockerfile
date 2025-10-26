@@ -8,7 +8,7 @@ FROM base AS deps
 WORKDIR /app
 
 # Copy package files
-COPY package.json bun.lock* ./
+COPY frontend/package.json frontend/bun.lock* ./
 
 # Install dependencies
 RUN bun install
@@ -23,8 +23,11 @@ ARG NEXT_PUBLIC_API_URL=http://localhost:2750
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy source files
-COPY . .
+# Copy frontend source files
+COPY frontend/ .
+
+# Copy docs directory from project root
+COPY docs/ ../docs/
 
 # Set environment variables for build
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
@@ -46,6 +49,9 @@ RUN addgroup --system --gid 1001 nodejs && \
 
 # Copy built application
 COPY --from=builder /app/public ./public
+
+# Copy docs directory
+COPY --from=builder --chown=nextjs:nodejs /docs ../docs
 
 # Set the correct permission for prerender cache
 RUN mkdir .next && chown nextjs:nodejs .next
