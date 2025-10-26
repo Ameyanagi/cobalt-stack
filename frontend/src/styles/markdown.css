@@ -1,22 +1,35 @@
 /* Markdown Content Styles */
 .markdown-content {
   color: oklch(var(--foreground));
-  font-size: 1rem;
-  line-height: 1.75;
+  font-size: 0.9375rem; /* 15px on mobile */
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .markdown-content {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
 }
 
 /* Headings */
 .markdown-content h1 {
-  font-size: 2.25rem;
+  font-size: 1.875rem; /* 30px on mobile */
   font-weight: 700;
   margin-top: 2rem;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid oklch(var(--border));
+}
+
+@media (min-width: 768px) {
+  .markdown-content h1 {
+    font-size: 2.25rem; /* 36px on tablet/desktop */
+  }
 }
 
 .markdown-content h2 {
-  font-size: 1.875rem;
+  font-size: 1.5rem; /* 24px on mobile */
   font-weight: 700;
   margin-top: 2rem;
   margin-bottom: 1rem;
@@ -24,11 +37,23 @@
   border-bottom: 1px solid oklch(var(--border));
 }
 
+@media (min-width: 768px) {
+  .markdown-content h2 {
+    font-size: 1.875rem; /* 30px on tablet/desktop */
+  }
+}
+
 .markdown-content h3 {
-  font-size: 1.5rem;
+  font-size: 1.25rem; /* 20px on mobile */
   font-weight: 600;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .markdown-content h3 {
+    font-size: 1.5rem; /* 24px on tablet/desktop */
+  }
 }
 
 .markdown-content h4 {
@@ -129,21 +154,36 @@
 .markdown-content pre {
   position: relative;
   background-color: oklch(var(--card));
-  padding: 1.25rem;
+  padding: 0.75rem; /* Reduced padding on mobile */
   border-radius: 0.5rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
   margin-bottom: 1.5rem;
   border: 1px solid oklch(var(--border));
   box-shadow: 0 2px 8px oklch(var(--foreground) / 0.05);
 }
 
+@media (min-width: 768px) {
+  .markdown-content pre {
+    padding: 1.25rem;
+  }
+}
+
 .markdown-content pre code {
   background-color: transparent;
   padding: 0;
-  font-size: 0.9rem;
+  font-size: 0.8125rem; /* 13px on mobile */
   line-height: 1.7;
   font-weight: 400;
   color: oklch(var(--foreground));
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (min-width: 768px) {
+  .markdown-content pre code {
+    font-size: 0.9rem; /* 14.4px on tablet/desktop */
+  }
 }
 
 /* Code block with language label */
@@ -167,19 +207,35 @@
 
 .markdown-content .copy-button {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  padding: 0.4rem 0.75rem;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.3rem 0.5rem; /* Smaller on mobile */
   background-color: oklch(var(--primary));
   color: oklch(var(--primary-foreground));
   border: none;
   border-radius: 0.375rem;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   opacity: 0;
   z-index: 10;
+}
+
+@media (min-width: 768px) {
+  .markdown-content .copy-button {
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Always visible on touch devices (mobile) */
+@media (max-width: 768px) {
+  .markdown-content .copy-button {
+    opacity: 1;
+  }
 }
 
 .markdown-content .code-block-wrapper:hover .copy-button {
@@ -202,7 +258,27 @@
 /* Tables */
 .markdown-content .table-wrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin-bottom: 1rem;
+  position: relative;
+}
+
+/* Shadow indicator for table overflow */
+.markdown-content .table-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 2rem;
+  background: linear-gradient(to right, transparent, oklch(var(--background) / 0.1));
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .markdown-content table {
+    min-width: 640px; /* Ensure table doesn't get too cramped */
+  }
 }
 
 .markdown-content table {

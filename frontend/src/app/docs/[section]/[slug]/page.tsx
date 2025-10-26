@@ -88,16 +88,16 @@ export default async function DocPage({ params }: DocPageProps) {
   const { previousDoc, nextDoc } = getAdjacentDocs(section, slug)
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8">
+    <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <Link href="/docs" className="hover:text-foreground transition-colors">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6 overflow-x-auto">
+        <Link href="/docs" className="hover:text-foreground transition-colors whitespace-nowrap">
           Docs
         </Link>
-        <span>/</span>
-        <span className="text-foreground font-medium">{doc.section}</span>
-        <span>/</span>
-        <span className="text-foreground font-medium">{doc.title}</span>
+        <span className="hidden sm:inline">/</span>
+        <span className="hidden sm:inline text-foreground font-medium whitespace-nowrap">{doc.section}</span>
+        <span className="hidden sm:inline">/</span>
+        <span className="text-foreground font-medium truncate max-w-[200px] sm:max-w-none">{doc.title}</span>
       </div>
 
       {/* Edit on GitHub Link */}
@@ -120,17 +120,22 @@ export default async function DocPage({ params }: DocPageProps) {
       </article>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between pt-12 mt-12 border-t">
+      <div className="flex items-center justify-between pt-12 mt-12 border-t gap-2">
         {previousDoc ? (
           <Link
             href={`/docs/${previousDoc.sectionSlug}/${previousDoc.slug}`}
             className="flex items-center gap-2 group"
           >
-            <Button variant="outline" size="lg" className="gap-2">
+            {/* Mobile: Icon only */}
+            <Button variant="outline" size="sm" className="gap-1 sm:hidden">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            {/* Tablet/Desktop: Full button */}
+            <Button variant="outline" size="lg" className="gap-2 hidden sm:flex">
               <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
               <div className="text-left">
                 <div className="text-xs text-muted-foreground">Previous</div>
-                <div className="font-medium">{previousDoc.title}</div>
+                <div className="font-medium truncate max-w-[150px] md:max-w-none">{previousDoc.title}</div>
               </div>
             </Button>
           </Link>
@@ -143,10 +148,15 @@ export default async function DocPage({ params }: DocPageProps) {
             href={`/docs/${nextDoc.sectionSlug}/${nextDoc.slug}`}
             className="flex items-center gap-2 group"
           >
-            <Button variant="outline" size="lg" className="gap-2">
+            {/* Mobile: Icon only */}
+            <Button variant="outline" size="sm" className="gap-1 sm:hidden">
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            {/* Tablet/Desktop: Full button */}
+            <Button variant="outline" size="lg" className="gap-2 hidden sm:flex">
               <div className="text-right">
                 <div className="text-xs text-muted-foreground">Next</div>
-                <div className="font-medium">{nextDoc.title}</div>
+                <div className="font-medium truncate max-w-[150px] md:max-w-none">{nextDoc.title}</div>
               </div>
               <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
