@@ -1,29 +1,29 @@
 # Implementation Tasks
 
 ## 1. Database Schema
-- [ ] 1.1 Create migration for `role` enum type (user, admin)
-- [ ] 1.2 Add `role` column to users table with default 'user'
-- [ ] 1.3 Create `email_verifications` table with columns: id, user_id, token_hash, expires_at, verified_at, created_at
-- [ ] 1.4 Add indexes on role, email_verified, token_hash, expires_at
-- [ ] 1.5 Run migrations
+- [x] 1.1 Create migration for `role` enum type (user, admin)
+- [x] 1.2 Add `role` column to users table with default 'user'
+- [x] 1.3 Create `email_verifications` table with columns: id, user_id, token_hash, expires_at, verified_at, created_at
+- [x] 1.4 Add indexes on role, email_verified, token_hash, expires_at
+- [x] 1.5 Run migrations
 
 ## 2. Backend Models
-- [ ] 2.1 Add Role enum to user.rs (User, Admin)
-- [ ] 2.2 Add role field to User model
-- [ ] 2.3 Create EmailVerification model (backend/src/models/email_verification.rs)
-- [ ] 2.4 Add SeaORM entity for email_verifications table
+- [x] 2.1 Add Role enum to user.rs (User, Admin)
+- [x] 2.2 Add role field to User model
+- [x] 2.3 Create EmailVerification model (backend/src/models/email_verification.rs)
+- [x] 2.4 Add SeaORM entity for email_verifications table
 
 ## 3. Email Verification - Backend
-- [ ] 3.1 Create email service module (backend/src/services/email.rs)
-- [ ] 3.2 Implement mock email sender (logs to console)
-- [ ] 3.3 Add SMTP configuration (env vars, but use mock by default)
-- [ ] 3.4 Create verification token generation utility
-- [ ] 3.5 Add POST /api/auth/send-verification endpoint
-- [ ] 3.6 Add POST /api/auth/verify-email endpoint
+- [x] 3.1 Create email service module (backend/src/services/email.rs)
+- [x] 3.2 Implement mock email sender (logs to console)
+- [x] 3.3 Add SMTP configuration (env vars, but use mock by default)
+- [x] 3.4 Create verification token generation utility
+- [x] 3.5 Add POST /api/auth/send-verification endpoint
+- [x] 3.6 Add POST /api/auth/verify-email endpoint
 - [ ] 3.7 Modify registration to send verification email
-- [ ] 3.8 Add verification token validation logic
-- [ ] 3.9 Update email_verified field on successful verification
-- [ ] 3.10 Add OpenAPI annotations for verification endpoints
+- [x] 3.8 Add verification token validation logic
+- [x] 3.9 Update email_verified field on successful verification
+- [x] 3.10 Add OpenAPI annotations for verification endpoints
 
 ## 4. Email Verification - Frontend
 - [ ] 4.1 Create /verify-email page (frontend/src/app/verify-email/page.tsx)
