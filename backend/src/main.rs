@@ -101,12 +101,14 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
         .route("/api/auth/register", post(handlers::auth::register))
         .route("/api/auth/login", post(handlers::auth::login))
         .route("/api/auth/refresh", post(handlers::auth::refresh_token))
+        .route("/api/auth/verify-email", post(handlers::auth::verify_email))
         .with_state(state.clone());
 
     // Auth routes (protected)
     let auth_protected_routes = Router::new()
         .route("/api/auth/me", get(handlers::auth::get_current_user))
         .route("/api/auth/logout", post(handlers::auth::logout))
+        .route("/api/auth/send-verification", post(handlers::auth::send_verification_email))
         .layer(axum_middleware::from_fn_with_state(
             jwt_config,
             middleware::auth::auth_middleware,

@@ -1,5 +1,8 @@
 // Email service for sending verification emails
 
+mod verification;
+
+pub use verification::{create_verification_token, verify_email_token};
 use anyhow::Result;
 
 /// Email sender trait for mock and SMTP implementations

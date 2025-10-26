@@ -491,6 +491,112 @@ pub async fn get_current_user(
     Ok((StatusCode::OK, Json(response)))
 }
 
+// ============================================================================
+// Email Verification
+// ============================================================================
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct VerifyEmailRequest {
+    #[schema(example = "abc123def456")]
+    pub token: String,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct MessageResponse {
+    pub message: String,
+}
+
+/// POST /api/auth/send-verification - Send verification email
+///
+/// Protected route - requires valid access token.
+#[utoipa::path(
+    post,
+    path = "/api/auth/send-verification",
+    responses(
+        (status = 200, description = "Verification email sent", body = MessageResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 400, description = "Email already verified", body = ErrorResponse),
+    ),
+    tag = "Authentication",
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn send_verification_email(
+    State(state): State<AppState>,
+    req: axum::http::Request<axum::body::Body>,
+) -> std::result::Result<impl IntoResponse, AuthError> {
+    use crate::middleware::auth::AuthUser;
+    use crate::services::email::{create_verification_token, EmailSender, MockEmailSender};
+
+    // Extract AuthUser from request extensions
+    let auth_user = req
+        .extensions()
+        .get::<AuthUser>()
+        .ok_or(AuthError::InvalidToken)?;
+
+    // Get user from database
+    let user = Users::find_by_id(auth_user.user_id)
+        .one(state.db.as_ref())
+        .await?
+        .ok_or(AuthError::UserNotFound)?;
+
+    // Check if already verified
+    if user.email_verified {
+        return Err(AuthError::InvalidInput("Email already verified".to_string()));
+    }
+
+    // Create verification token
+    let token = create_verification_token(state.db.as_ref(), user.id)
+        .await
+        .map_err(|e| AuthError::DatabaseError(format!("Failed to create token: {}", e)))?;
+
+    // Send verification email
+    let email_sender = MockEmailSender;
+    email_sender
+        .send_verification_email(&user.email, &token)
+        .map_err(|e| AuthError::InternalError)?;
+
+    Ok((
+        StatusCode::OK,
+        Json(MessageResponse {
+            message: "Verification email sent".to_string(),
+        }),
+    ))
+}
+
+/// POST /api/auth/verify-email - Verify email with token
+///
+/// Public route - verifies email address using token from email.
+#[utoipa::path(
+    post,
+    path = "/api/auth/verify-email",
+    request_body = VerifyEmailRequest,
+    responses(
+        (status = 200, description = "Email verified successfully", body = MessageResponse),
+        (status = 400, description = "Invalid or expired token", body = ErrorResponse),
+    ),
+    tag = "Authentication"
+)]
+pub async fn verify_email(
+    State(state): State<AppState>,
+    Json(req): Json<VerifyEmailRequest>,
+) -> std::result::Result<impl IntoResponse, AuthError> {
+    use crate::services::email::verify_email_token;
+
+    // Verify the token
+    verify_email_token(state.db.as_ref(), &req.token)
+        .await
+        .map_err(|e| AuthError::InvalidInput(format!("Verification failed: {}", e)))?;
+
+    Ok((
+        StatusCode::OK,
+        Json(MessageResponse {
+            message: "Email verified successfully".to_string(),
+        }),
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
