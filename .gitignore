@@ -183,6 +183,7 @@ temp/
 # MCP Servers & Tools
 # ==========================================
 .serena/
+.playwright-mcp/
 
 # ==========================================
 # Package Manager Lock Files (Optional)

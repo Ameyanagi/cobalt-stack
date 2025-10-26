@@ -34,10 +34,10 @@
 - [ ] 4.6 Generate TypeScript types for verification endpoints
 
 ## 5. Admin Middleware & Authorization
-- [ ] 5.1 Create admin middleware (backend/src/middleware/admin.rs)
-- [ ] 5.2 Check user role in middleware (must be 'admin')
-- [ ] 5.3 Return 403 Forbidden for non-admin users
-- [ ] 5.4 Add middleware to Axum router for admin routes
+- [x] 5.1 Create admin middleware (backend/src/middleware/admin.rs)
+- [x] 5.2 Check user role in middleware (must be 'admin')
+- [x] 5.3 Return 403 Forbidden for non-admin users
+- [x] 5.4 Add middleware to Axum router for admin routes
 
 ## 6. Admin Endpoints - Backend
 - [ ] 6.1 Create admin handlers module (backend/src/handlers/admin.rs)

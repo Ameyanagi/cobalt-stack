@@ -110,6 +110,20 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
         .route("/api/auth/logout", post(handlers::auth::logout))
         .route("/api/auth/send-verification", post(handlers::auth::send_verification_email))
         .layer(axum_middleware::from_fn_with_state(
+            jwt_config.clone(),
+            middleware::auth::auth_middleware,
+        ))
+        .with_state(state.clone());
+
+    // Admin routes (protected - requires admin role)
+    // TODO: Add actual admin handlers in Phase 6
+    let admin_routes = Router::new()
+        // Placeholder routes will be added in Phase 6
+        .layer(axum_middleware::from_fn_with_state(
+            state.db.clone(),
+            middleware::admin::admin_middleware,
+        ))
+        .layer(axum_middleware::from_fn_with_state(
             jwt_config,
             middleware::auth::auth_middleware,
         ))
@@ -120,6 +134,7 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
         .route("/health", get(handlers::health::health_check))
         .merge(auth_public_routes)
         .merge(auth_protected_routes)
+        .merge(admin_routes)
         .merge(SwaggerUi::new("/swagger-ui").url("/openapi.json", openapi::ApiDoc::openapi()))
         .layer(cors)
         .layer(tower_http::trace::TraceLayer::new_for_http())
