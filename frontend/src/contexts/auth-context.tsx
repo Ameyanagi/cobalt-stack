@@ -9,6 +9,7 @@ interface User {
   username: string
   email: string
   email_verified: boolean
+  role: 'admin' | 'user'
 }
 
 interface AuthState {

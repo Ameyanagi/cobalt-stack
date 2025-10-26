@@ -42,6 +42,7 @@ pub struct UserResponse {
     pub username: String,
     pub email: String,
     pub email_verified: bool,
+    pub role: crate::models::sea_orm_active_enums::UserRole,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -502,6 +503,7 @@ pub async fn get_current_user(
         username: user.username,
         email: user.email,
         email_verified: user.email_verified,
+        role: user.role,
     };
 
     Ok((StatusCode::OK, Json(response)))

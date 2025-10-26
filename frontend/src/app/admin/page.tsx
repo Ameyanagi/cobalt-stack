@@ -70,8 +70,8 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <p className="text-muted-foreground">
+        <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard</h2>
+        <p className="text-gray-600 dark:text-gray-400">
           Overview of your platform statistics
         </p>
       </div>
@@ -85,8 +85,8 @@ export default function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_users || 0}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.total_users || 0}</div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               All registered users
             </p>
           </CardContent>
@@ -100,8 +100,8 @@ export default function AdminDashboardPage() {
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.verified_users || 0}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.verified_users || 0}</div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               {verificationRate}% verification rate
             </p>
           </CardContent>
@@ -115,8 +115,8 @@ export default function AdminDashboardPage() {
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.admin_users || 0}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.admin_users || 0}</div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               Users with admin access
             </p>
           </CardContent>
@@ -138,8 +138,8 @@ export default function AdminDashboardPage() {
             <div className="flex items-center gap-3">
               <Users className="h-5 w-5 text-primary" />
               <div>
-                <p className="font-medium">Manage Users</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="font-medium text-gray-900 dark:text-white">Manage Users</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   View, disable, or enable user accounts
                 </p>
               </div>
