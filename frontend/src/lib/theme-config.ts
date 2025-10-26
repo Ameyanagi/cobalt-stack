@@ -21,12 +21,12 @@ export interface ThemeConfig {
 export const themes: Record<ThemeName, Theme> = {
   'default': {
     id: 'default',
-    name: 'Default',
-    description: 'Clean and professional default theme',
+    name: 'Cobalt',
+    description: 'Clean and professional cobalt blue theme',
     preview: {
-      primary: '#2563eb',
-      secondary: '#64748b',
-      accent: '#0ea5e9'
+      primary: '#0047AB',
+      secondary: '#6B8EC9',
+      accent: '#2E5A9E'
     }
   },
   'nature': {
