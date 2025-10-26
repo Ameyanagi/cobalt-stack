@@ -57,7 +57,9 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
         rehypePlugins={[rehypeHighlight, rehypeRaw]}
         components={{
           // Custom rendering for code blocks
-          code({ node, inline, className, children, ...props }) {
+          code(props) {
+            const { node, className, children, ...rest } = props
+            const inline = !('inline' in props) ? false : (props as any).inline
             const match = /language-(\w+)/.exec(className || '')
             const language = match ? match[1] : ''
 
@@ -65,7 +67,7 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
               // Mermaid diagrams are handled by useEffect
               return (
                 <pre className={className}>
-                  <code className={className} {...props}>
+                  <code className={className} {...rest}>
                     {children}
                   </code>
                 </pre>
@@ -75,7 +77,7 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
             if (!inline) {
               return (
                 <pre className={className}>
-                  <code className={className} {...props}>
+                  <code className={className} {...rest}>
                     {children}
                   </code>
                 </pre>
@@ -83,7 +85,7 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
             }
 
             return (
-              <code className={className} {...props}>
+              <code className={className} {...rest}>
                 {children}
               </code>
             )
