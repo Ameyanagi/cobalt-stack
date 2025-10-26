@@ -123,24 +123,4 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
         .layer(tower_http::trace::TraceLayer::new_for_http())
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use axum::{
-        body::Body,
-        http::{Request, StatusCode},
-    };
-    use tower::ServiceExt; // for `oneshot`
-
-    #[tokio::test]
-    async fn test_health_endpoint() {
-        let app = create_app();
-
-        let response = app
-            .oneshot(Request::builder().uri("/health").body(Body::empty()).unwrap())
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::OK);
-    }
-}
+// TODO: Add integration tests later

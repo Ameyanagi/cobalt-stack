@@ -33,6 +33,8 @@ utoipa-swagger-ui = { version = "8", features = ["axum"] }
 jsonwebtoken = "9"
 argon2 = "0.5"
 sha2 = "0.10"
+rand = "0.8"
+hex = "0.4"
 
 # Environment variables
 dotenvy = "0.15"
