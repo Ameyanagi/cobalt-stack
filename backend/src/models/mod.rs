@@ -2,6 +2,8 @@
 
 pub mod prelude;
 
+pub mod email_verifications;
 pub mod o_auth_accounts;
 pub mod refresh_tokens;
+pub mod sea_orm_active_enums;
 pub mod users;

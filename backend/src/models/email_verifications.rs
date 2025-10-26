@@ -4,18 +4,15 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "o_auth_accounts")]
+#[sea_orm(table_name = "email_verifications")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
     pub user_id: Uuid,
-    pub provider: String,
-    pub provider_user_id: String,
-    #[sea_orm(column_type = "Text", nullable)]
-    pub access_token: Option<String>,
-    #[sea_orm(column_type = "Text", nullable)]
-    pub refresh_token: Option<String>,
-    pub expires_at: Option<DateTimeWithTimeZone>,
+    #[sea_orm(unique)]
+    pub token_hash: String,
+    pub expires_at: DateTimeWithTimeZone,
+    pub verified_at: Option<DateTimeWithTimeZone>,
     pub created_at: DateTimeWithTimeZone,
 }
 
