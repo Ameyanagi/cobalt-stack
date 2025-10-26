@@ -6,6 +6,8 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { Shield, Users, BarChart3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { ThemeSelector } from '@/components/theme/theme-selector'
 
 export default function AdminLayout({
   children,
@@ -76,6 +78,10 @@ export default function AdminLayout({
               >
                 Back to App
               </Link>
+              <div className="flex items-center gap-2 ml-4">
+                <ThemeSelector />
+                <ThemeToggle />
+              </div>
             </nav>
           </div>
         </div>

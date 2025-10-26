@@ -7,6 +7,8 @@ import { ProtectedRoute } from '@/components/auth/protected-route'
 import { useAuth } from '@/contexts/auth-context'
 import { LogoutButton } from '@/components/auth/logout-button'
 import { env } from '@/lib/env'
+import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { ThemeSelector } from '@/components/theme/theme-selector'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -24,6 +26,8 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex gap-2">
+              <ThemeSelector />
+              <ThemeToggle />
               <Link href="/">
                 <Button variant="outline">Home</Button>
               </Link>

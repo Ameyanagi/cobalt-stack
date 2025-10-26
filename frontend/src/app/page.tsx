@@ -3,97 +3,402 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/contexts/auth-context'
 import { LogoutButton } from '@/components/auth/logout-button'
+import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { ThemeSelector } from '@/components/theme/theme-selector'
+import {
+  Zap, Shield, Database, Code2, Layers, Palette,
+  CheckCircle2, ArrowRight, Github, BookOpen
+} from 'lucide-react'
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth()
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="max-w-2xl w-full space-y-8">
-        {/* Authentication Status */}
-        <div className="flex justify-end">
-          {isLoading ? (
-            <div className="text-sm text-muted-foreground">Loading...</div>
-          ) : isAuthenticated && user ? (
-            <div className="flex items-center gap-4">
-              <div className="text-sm">
-                <span className="text-muted-foreground">Welcome, </span>
-                <span className="font-medium">{user.username}</span>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      {/* Header */}
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                <Zap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <LogoutButton variant="outline" size="sm" />
+              <span className="text-xl font-bold">Cobalt Stack</span>
             </div>
-          ) : (
-            <div className="flex gap-2">
-              <Link href="/login">
-                <Button variant="outline" size="sm">Login</Button>
-              </Link>
-              <Link href="/register">
-                <Button size="sm">Register</Button>
-              </Link>
-            </div>
-          )}
-        </div>
 
-        <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
-            Cobalt Stack
+            <div className="flex items-center gap-3">
+              <ThemeSelector />
+              <ThemeToggle />
+              {isLoading ? (
+                <div className="text-sm text-muted-foreground">Loading...</div>
+              ) : isAuthenticated && user ? (
+                <div className="flex items-center gap-3">
+                  <Link href="/dashboard">
+                    <Button variant="ghost" size="sm">Dashboard</Button>
+                  </Link>
+                  <LogoutButton variant="outline" size="sm" />
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Link href="/login">
+                    <Button variant="ghost" size="sm">Login</Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button size="sm">Get Started</Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-24 text-center">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-muted/50 text-sm">
+            <Palette className="h-4 w-4" />
+            <span>Now with dynamic themes & dark mode</span>
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+            Production-Ready
+            <br />
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Full-Stack Template
+            </span>
           </h1>
-          <p className="text-lg text-gray-600">
-            Full-stack application with Rust backend (Axum + SeaORM) and Next.js 16 frontend
+
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Build modern web applications with confidence using Rust's performance
+            and Next.js's developer experience. Everything you need to ship faster.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            {isAuthenticated ? (
+              <Link href="/dashboard">
+                <Button size="lg" className="gap-2">
+                  Go to Dashboard
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/register">
+                <Button size="lg" className="gap-2">
+                  Get Started Free
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            )}
+            <Link href="/health">
+              <Button size="lg" variant="outline" className="gap-2">
+                <CheckCircle2 className="h-4 w-4" />
+                System Health
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Why Cobalt Stack?</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            A modern, opinionated stack that combines the best tools for building
+            scalable, maintainable applications.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <Card className="border-2 hover:border-primary/50 transition-colors">
             <CardHeader>
-              <CardTitle>Backend</CardTitle>
-              <CardDescription>Rust + Axum + SeaORM</CardDescription>
+              <Zap className="h-10 w-10 text-primary mb-2" />
+              <CardTitle>Blazing Fast</CardTitle>
+              <CardDescription>
+                Rust backend delivers exceptional performance with memory safety guarantees
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <ul className="list-disc list-inside space-y-1 text-sm">
-                <li>Axum 0.7+ web framework</li>
-                <li>PostgreSQL with SeaORM</li>
-                <li>Redis caching</li>
-                <li>OpenAPI documentation</li>
-                <li>JWT authentication with token rotation</li>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Zero-cost abstractions</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Async/await concurrency</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Low resource usage</span>
+                </li>
               </ul>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-2 hover:border-primary/50 transition-colors">
             <CardHeader>
-              <CardTitle>Frontend</CardTitle>
-              <CardDescription>Next.js 16 + TypeScript</CardDescription>
+              <Shield className="h-10 w-10 text-primary mb-2" />
+              <CardTitle>Type-Safe & Secure</CardTitle>
+              <CardDescription>
+                End-to-end type safety with JWT authentication and role-based access control
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <ul className="list-disc list-inside space-y-1 text-sm">
-                <li>Next.js 16 App Router</li>
-                <li>TailwindCSS styling</li>
-                <li>shadcn/ui components</li>
-                <li>Type-safe API client</li>
-                <li>Secure authentication flow</li>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>JWT with token rotation</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Email verification</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Admin role management</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 hover:border-primary/50 transition-colors">
+            <CardHeader>
+              <Database className="h-10 w-10 text-primary mb-2" />
+              <CardTitle>Modern Data Layer</CardTitle>
+              <CardDescription>
+                PostgreSQL with SeaORM and Redis caching for optimal performance
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Type-safe queries</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Migration management</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Redis session store</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 hover:border-primary/50 transition-colors">
+            <CardHeader>
+              <Code2 className="h-10 w-10 text-primary mb-2" />
+              <CardTitle>Developer Experience</CardTitle>
+              <CardDescription>
+                Next.js 16 with App Router and shadcn/ui for rapid development
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Hot module replacement</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>TypeScript strict mode</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Pre-built components</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 hover:border-primary/50 transition-colors">
+            <CardHeader>
+              <Palette className="h-10 w-10 text-primary mb-2" />
+              <CardTitle>Beautiful Themes</CardTitle>
+              <CardDescription>
+                Multiple color schemes with dark mode using OKLCH color space
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>3+ built-in themes</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Dark mode support</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Persistent preferences</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 hover:border-primary/50 transition-colors">
+            <CardHeader>
+              <Layers className="h-10 w-10 text-primary mb-2" />
+              <CardTitle>Production Ready</CardTitle>
+              <CardDescription>
+                Docker deployment with comprehensive API documentation
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Docker Compose setup</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>OpenAPI/Swagger docs</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span>Health check endpoints</span>
+                </li>
               </ul>
             </CardContent>
           </Card>
         </div>
+      </section>
 
-        <div className="flex justify-center gap-4">
-          <Link href="/health">
-            <Button size="lg" variant="outline">
-              Check System Health
-            </Button>
-          </Link>
-          {isAuthenticated && (
-            <Link href="/dashboard">
-              <Button size="lg">
-                Go to Dashboard
-              </Button>
-            </Link>
-          )}
+      {/* Tech Stack */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Tech Stack</h2>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-orange-500" />
+                  Backend
+                </CardTitle>
+                <CardDescription>Rust-powered performance and safety</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary">Axum 0.7+</Badge>
+                  <Badge variant="secondary">SeaORM</Badge>
+                  <Badge variant="secondary">PostgreSQL</Badge>
+                  <Badge variant="secondary">Redis</Badge>
+                  <Badge variant="secondary">Tokio</Badge>
+                  <Badge variant="secondary">Serde</Badge>
+                  <Badge variant="secondary">JWT</Badge>
+                  <Badge variant="secondary">Utoipa</Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-blue-500" />
+                  Frontend
+                </CardTitle>
+                <CardDescription>Modern React with Next.js 16</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary">Next.js 16</Badge>
+                  <Badge variant="secondary">React 19</Badge>
+                  <Badge variant="secondary">TypeScript</Badge>
+                  <Badge variant="secondary">Tailwind CSS</Badge>
+                  <Badge variant="secondary">shadcn/ui</Badge>
+                  <Badge variant="secondary">Lucide Icons</Badge>
+                  <Badge variant="secondary">OKLCH Colors</Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
-    </main>
+      </section>
+
+      {/* CTA Section */}
+      <section className="container mx-auto px-4 py-16">
+        <Card className="max-w-4xl mx-auto bg-primary/5 border-primary/20">
+          <CardContent className="p-12 text-center space-y-6">
+            <h2 className="text-3xl font-bold">Ready to Build Something Amazing?</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Start with a solid foundation and focus on your unique features.
+              Cobalt Stack handles the boring stuff so you can ship faster.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+              {!isAuthenticated && (
+                <Link href="/register">
+                  <Button size="lg" className="gap-2">
+                    Get Started Now
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              )}
+              <a
+                href="https://github.com/yourusername/cobalt-stack"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button size="lg" variant="outline" className="gap-2">
+                  <Github className="h-4 w-4" />
+                  View on GitHub
+                </Button>
+              </a>
+              <a
+                href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/swagger-ui`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button size="lg" variant="outline" className="gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  API Docs
+                </Button>
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t mt-24">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Zap className="h-4 w-4" />
+              <span>Cobalt Stack - Built with Rust & Next.js</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <Link href="/health" className="hover:text-foreground transition-colors">
+                System Health
+              </Link>
+              <a
+                href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/swagger-ui`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                API Docs
+              </a>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   )
 }
