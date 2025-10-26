@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Axum middleware modules for authentication and authorization."><title>cobalt_stack_backend::middleware - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="cobalt_stack_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-68b7e25d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../cobalt_stack_backend/index.html">cobalt_<wbr>stack_<wbr>backend</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module middleware</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#middleware-chain" title="Middleware Chain">Middleware Chain</a></li><li><a href="#usage-example" title="Usage Example">Usage Example</a></li></ul><h3><a href="#modules-1">Module Items</a></h3><ul class="block"><li><a href="#modules-1" title="Modules">Modules</a></li></ul></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="../index.html">In crate cobalt_<wbr>stack_<wbr>backend</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">cobalt_stack_backend</a></div><h1>Module <span>middleware</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/cobalt_stack_backend/middleware/mod.rs.html#1-49">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Axum middleware modules for authentication and authorization.</p>
+<p>This module provides middleware layers for securing API endpoints
+with JWT-based authentication and role-based authorization.</p>
+<h2 id="modules"><a class="doc-anchor" href="#modules">§</a>Modules</h2>
+<ul>
+<li><strong>auth</strong>: JWT authentication middleware that validates tokens</li>
+<li><strong>admin</strong>: Role-based authorization middleware for admin-only endpoints</li>
+</ul>
+<h2 id="middleware-chain"><a class="doc-anchor" href="#middleware-chain">§</a>Middleware Chain</h2>
+<p>Middleware is applied in layers with specific ordering requirements:</p>
+<ol>
+<li><strong>auth_middleware</strong> - First layer: validates JWT token, injects AuthUser</li>
+<li><strong>admin_middleware</strong> - Second layer: checks admin role (requires auth_middleware)</li>
+</ol>
+<h2 id="usage-example"><a class="doc-anchor" href="#usage-example">§</a>Usage Example</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>axum::{Router, routing::get, middleware};
+<span class="kw">use </span>cobalt_stack_backend::middleware::{auth::auth_middleware, admin::admin_middleware};
+<span class="kw">use </span>cobalt_stack_backend::services::auth::JwtConfig;
+<span class="kw">use </span>sea_orm::DatabaseConnection;
+<span class="kw">use </span>std::sync::Arc;
+
+<span class="kw">let </span>jwt_config = JwtConfig::from_env();
+
+<span class="comment">// Protected routes (authenticated users only)
+</span><span class="kw">let </span>protected_routes = Router::new()
+    .route(<span class="string">"/profile"</span>, get(get_profile))
+    .layer(middleware::from_fn_with_state(
+        jwt_config.clone(),
+        auth_middleware
+    ));
+
+<span class="comment">// Admin routes (admin users only)
+</span><span class="kw">let </span>admin_routes = Router::new()
+    .route(<span class="string">"/admin/users"</span>, get(list_users))
+    .layer(middleware::from_fn_with_state(db, admin_middleware))
+    .layer(middleware::from_fn_with_state(jwt_config, auth_middleware));</code></pre></div>
+</div></details><h2 id="modules-1" class="section-header">Modules<a href="#modules-1" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="admin/index.html" title="mod cobalt_stack_backend::middleware::admin">admin</a></dt><dd>Role-based authorization middleware for admin access control.</dd><dt><a class="mod" href="auth/index.html" title="mod cobalt_stack_backend::middleware::auth">auth</a></dt><dd>JWT authentication middleware for Axum.</dd></dl></section></div></main></body></html>

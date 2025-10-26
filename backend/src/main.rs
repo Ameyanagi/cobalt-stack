@@ -1,3 +1,91 @@
+//! Cobalt Stack Backend API Server.
+//!
+//! Full-featured REST API backend built with Axum, SeaORM, and PostgreSQL.
+//! Provides JWT authentication, email verification, admin user management,
+//! and comprehensive OpenAPI documentation.
+//!
+//! # Features
+//!
+//! - **JWT Authentication**: Secure token-based auth with refresh tokens
+//! - **Email Verification**: Token-based email confirmation
+//! - **Role-Based Access**: Admin and user role separation
+//! - **Rate Limiting**: Login attempt protection via Valkey/Redis
+//! - **Token Blacklist**: Immediate token revocation support
+//! - **OpenAPI Documentation**: Interactive Swagger UI
+//! - **Database Migrations**: SeaORM migration support
+//! - **CORS Configuration**: Flexible cross-origin setup
+//!
+//! # Quick Start
+//!
+//! ```bash
+//! # Set environment variables
+//! cp .env.example .env
+//! # Edit .env with your settings
+//!
+//! # Run migrations
+//! sea-orm-cli migrate up
+//!
+//! # Seed admin user
+//! cargo run --bin seed_admin
+//!
+//! # Start server
+//! cargo run
+//! ```
+//!
+//! # Environment Variables
+//!
+//! Required configuration via `.env` file:
+//!
+//! - `DATABASE_URL` - PostgreSQL connection string
+//! - `JWT_SECRET` - Secret key for JWT signing
+//! - `JWT_ACCESS_EXPIRY_MINUTES` - Access token lifetime (default: 30)
+//! - `JWT_REFRESH_EXPIRY_DAYS` - Refresh token lifetime (default: 7)
+//! - `PORT` - Server port (default: 3000)
+//!
+//! # API Endpoints
+//!
+//! ## Public Endpoints
+//!
+//! - `GET /health` - Health check
+//! - `POST /api/auth/register` - User registration
+//! - `POST /api/auth/login` - User login
+//! - `POST /api/auth/refresh` - Refresh access token
+//! - `POST /api/auth/verify-email` - Verify email address
+//!
+//! ## Protected Endpoints (Requires JWT)
+//!
+//! - `GET /api/auth/me` - Get current user info
+//! - `POST /api/auth/logout` - Logout user
+//! - `POST /api/auth/send-verification` - Resend verification email
+//!
+//! ## Admin Endpoints (Requires Admin Role)
+//!
+//! - `GET /api/admin/users` - List all users
+//! - `GET /api/admin/users/:id` - Get user details
+//! - `PATCH /api/admin/users/:id/disable` - Disable user account
+//! - `PATCH /api/admin/users/:id/enable` - Enable user account
+//! - `GET /api/admin/stats` - System statistics
+//!
+//! # Documentation
+//!
+//! Interactive API documentation available at:
+//! - Swagger UI: http://localhost:3000/swagger-ui
+//! - OpenAPI JSON: http://localhost:3000/openapi.json
+//!
+//! # Architecture
+//!
+//! ```text
+//! ┌─────────────┐
+//! │   Handlers  │ ← HTTP layer (routes, extractors, responses)
+//! ├─────────────┤
+//! │ Middleware  │ ← Auth, CORS, logging
+//! ├─────────────┤
+//! │  Services   │ ← Business logic (auth, email, cache)
+//! ├─────────────┤
+//! │   Models    │ ← Database entities (SeaORM)
+//! └─────────────┘
+//! ```
+
 mod config;
 mod handlers;
 mod middleware;
@@ -14,6 +102,17 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use sea_orm::Database;
 
+/// Application entry point.
+///
+/// Initializes logging, database connection, and starts the Axum HTTP server.
+/// Loads configuration from environment variables and `.env` file.
+///
+/// # Panics
+///
+/// Panics if:
+/// - `DATABASE_URL` environment variable is not set
+/// - Database connection fails
+/// - Server fails to bind to port
 #[tokio::main]
 async fn main() {
     // Initialize tracing
@@ -67,6 +166,28 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
+/// Create the Axum router with all routes, middleware, and state.
+///
+/// Configures the complete application including:
+/// - Public routes (register, login, refresh)
+/// - Protected routes (profile, logout)
+/// - Admin routes (user management)
+/// - CORS middleware
+/// - Swagger UI documentation
+///
+/// # Arguments
+///
+/// * `state` - Application state with database connection and JWT config
+/// * `jwt_config` - JWT configuration for authentication middleware
+///
+/// # Returns
+///
+/// Fully configured Axum [`Router`] ready to serve HTTP requests.
+///
+/// # CORS Configuration
+///
+/// Allows requests from origins ending with `:2727` (frontend port) for development.
+/// In production, configure specific allowed origins via environment variables.
 fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtConfig) -> Router {
     // Configure CORS with credentials support
     // Allow any origin ending with :2727 (frontend port) for development

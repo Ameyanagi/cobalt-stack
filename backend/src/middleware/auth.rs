@@ -1,3 +1,51 @@
+//! JWT authentication middleware for Axum.
+//!
+//! This module provides authentication middleware that validates JWT tokens
+//! from the Authorization header and injects authenticated user information
+//! into request extensions for downstream handlers.
+//!
+//! # Security
+//!
+//! - Validates JWT signature and expiration
+//! - Requires "Bearer \<token\>" format in Authorization header
+//! - Returns 401 Unauthorized for missing/invalid tokens
+//! - Injects [`AuthUser`] into request extensions for handler access
+//!
+//! # Usage
+//!
+//! ```no_run
+//! use axum::{Router, routing::get, middleware};
+//! use cobalt_stack_backend::middleware::auth::auth_middleware;
+//! use cobalt_stack_backend::services::auth::JwtConfig;
+//!
+//! # async fn example() {
+//! let jwt_config = JwtConfig::from_env();
+//!
+//! let app = Router::new()
+//!     .route("/protected", get(protected_handler))
+//!     .layer(middleware::from_fn_with_state(
+//!         jwt_config,
+//!         auth_middleware
+//!     ));
+//! # }
+//!
+//! # async fn protected_handler() -> &'static str { "OK" }
+//! ```
+//!
+//! # Handler Access
+//!
+//! Protected handlers can access authenticated user via request extensions:
+//!
+//! ```no_run
+//! use axum::extract::Request;
+//! use cobalt_stack_backend::middleware::auth::AuthUser;
+//!
+//! async fn handler(req: Request) -> String {
+//!     let auth_user = req.extensions().get::<AuthUser>().unwrap();
+//!     format!("Hello, {}!", auth_user.username)
+//! }
+//! ```
+
 use crate::services::auth::{verify_access_token, AuthError, JwtConfig};
 use axum::{
     extract::{Request, State},
@@ -7,15 +55,71 @@ use axum::{
 };
 use uuid::Uuid;
 
-/// User claims extracted from JWT token
+/// Authenticated user information extracted from JWT token.
+///
+/// This struct is injected into request extensions by [`auth_middleware`]
+/// and can be accessed by downstream handlers to identify the authenticated user.
+///
+/// # Fields
+///
+/// - `user_id`: Unique identifier of the authenticated user
+/// - `username`: Username of the authenticated user
+///
+/// # Examples
+///
+/// ```no_run
+/// use axum::extract::Request;
+/// use cobalt_stack_backend::middleware::auth::AuthUser;
+///
+/// async fn handler(req: Request) -> String {
+///     let auth_user = req.extensions().get::<AuthUser>().unwrap();
+///     format!("User ID: {}, Username: {}", auth_user.user_id, auth_user.username)
+/// }
+/// ```
 #[derive(Debug, Clone)]
 pub struct AuthUser {
+    /// Unique identifier of the authenticated user.
     pub user_id: Uuid,
+    /// Username of the authenticated user.
     pub username: String,
 }
 
-/// Extract JWT token from Authorization header
-/// Expected format: "Bearer <token>"
+/// Extract JWT token from Authorization header.
+///
+/// Parses the Authorization header and extracts the JWT token.
+/// Expected header format: `Authorization: Bearer <token>`
+///
+/// # Arguments
+///
+/// * `headers` - HTTP request headers
+///
+/// # Returns
+///
+/// - `Ok(String)` - Extracted JWT token
+/// - `Err(AuthError::InvalidToken)` - Missing header, invalid format, or empty token
+///
+/// # Examples
+///
+/// ```
+/// use axum::http::HeaderMap;
+/// # use cobalt_stack_backend::middleware::auth::extract_token_from_header;
+///
+/// # fn example() {
+/// let mut headers = HeaderMap::new();
+/// headers.insert("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...".parse().unwrap());
+///
+/// // let token = extract_token_from_header(&headers).unwrap();
+/// // assert!(token.starts_with("eyJ"));
+/// # }
+/// ```
+///
+/// # Errors
+///
+/// Returns [`AuthError::InvalidToken`] if:
+/// - Authorization header is missing
+/// - Header value is not valid UTF-8
+/// - Header doesn't start with "Bearer "
+/// - Token portion is empty after "Bearer " prefix
 fn extract_token_from_header(headers: &HeaderMap) -> Result<String, AuthError> {
     let auth_header = headers
         .get("authorization")
@@ -36,7 +140,57 @@ fn extract_token_from_header(headers: &HeaderMap) -> Result<String, AuthError> {
     Ok(token)
 }
 
-/// Auth middleware that validates JWT tokens and injects user claims
+/// Axum middleware that validates JWT tokens and injects authenticated user.
+///
+/// This middleware extracts and validates the JWT token from the Authorization header,
+/// then injects the authenticated user's information into request extensions for
+/// downstream handlers to access.
+///
+/// # Flow
+///
+/// 1. Extract token from `Authorization: Bearer <token>` header
+/// 2. Verify token signature and validate expiration
+/// 3. Extract user claims (user_id, username) from token
+/// 4. Create [`AuthUser`] and inject into request extensions
+/// 5. Pass request to next middleware/handler
+///
+/// # Arguments
+///
+/// * `jwt_config` - JWT configuration with secret and expiry settings
+/// * `req` - Incoming HTTP request
+/// * `next` - Next middleware/handler in chain
+///
+/// # Returns
+///
+/// - `Ok(Response)` - Request processed successfully by downstream handler
+/// - `Err(StatusCode::UNAUTHORIZED)` - Token missing, invalid, or expired
+///
+/// # Examples
+///
+/// ```no_run
+/// use axum::{Router, routing::get, middleware};
+/// use cobalt_stack_backend::middleware::auth::auth_middleware;
+/// use cobalt_stack_backend::services::auth::JwtConfig;
+///
+/// # async fn example() {
+/// let jwt_config = JwtConfig::from_env();
+///
+/// let protected_routes = Router::new()
+///     .route("/profile", get(get_profile))
+///     .layer(middleware::from_fn_with_state(
+///         jwt_config,
+///         auth_middleware
+///     ));
+/// # }
+/// # async fn get_profile() -> &'static str { "Profile" }
+/// ```
+///
+/// # Security Notes
+///
+/// - Always use HTTPS in production to protect tokens in transit
+/// - Token validation includes signature check and expiration check
+/// - Invalid tokens return 401 Unauthorized without detailed error messages
+/// - This middleware should be applied to all protected routes
 pub async fn auth_middleware(
     State(jwt_config): State<JwtConfig>,
     mut req: Request,

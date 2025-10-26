@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_current_user","login","logout","refresh_token","register","send_verification_email","verify_email"],"struct":["AppState","AuthResponse","ErrorResponse","LoginRequest","MessageResponse","RegisterRequest","UserResponse","VerifyEmailRequest"]};

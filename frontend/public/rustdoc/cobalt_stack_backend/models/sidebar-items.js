@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["email_verifications","o_auth_accounts","prelude","refresh_tokens","sea_orm_active_enums","users"]};

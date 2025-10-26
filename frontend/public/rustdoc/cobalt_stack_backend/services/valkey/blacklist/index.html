@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Token blacklist service for JWT revocation."><title>cobalt_stack_backend::services::valkey::blacklist - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="cobalt_stack_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../../static.files/storage-68b7e25d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../cobalt_stack_backend/index.html">cobalt_<wbr>stack_<wbr>backend</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module blacklist</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#architecture" title="Architecture">Architecture</a></li><li><a href="#use-cases" title="Use Cases">Use Cases</a></li><li><a href="#security-notes" title="Security Notes">Security Notes</a></li><li><a href="#examples" title="Examples">Examples</a></li></ul><h3><a href="#functions">Module Items</a></h3><ul class="block"><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In cobalt_<wbr>stack_<wbr>backend::<wbr>services::<wbr>valkey</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../../index.html">cobalt_stack_backend</a>::<wbr><a href="../../index.html">services</a>::<wbr><a href="../index.html">valkey</a></div><h1>Module <span>blacklist</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../../src/cobalt_stack_backend/services/valkey/blacklist.rs.html#1-186">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Token blacklist service for JWT revocation.</p>
+<p>This module provides functionality to blacklist JWT access tokens, enabling
+immediate token revocation for logout, security incidents, or administrative
+actions. Uses Valkey/Redis with automatic TTL expiry.</p>
+<h2 id="architecture"><a class="doc-anchor" href="#architecture">§</a>Architecture</h2>
+<ul>
+<li><strong>Key Format</strong>: <code>blacklist:{token}</code> stored with value <code>1</code></li>
+<li><strong>TTL Management</strong>: Tokens automatically expire when they would naturally expire</li>
+<li><strong>Fast Lookup</strong>: O(1) Redis GET operation for blacklist checks</li>
+<li><strong>Memory Efficient</strong>: Expired entries automatically removed by Redis</li>
+</ul>
+<h2 id="use-cases"><a class="doc-anchor" href="#use-cases">§</a>Use Cases</h2>
+<ul>
+<li><strong>User Logout</strong>: Immediately invalidate access token</li>
+<li><strong>Security Incidents</strong>: Revoke compromised tokens</li>
+<li><strong>Account Suspension</strong>: Block all user tokens</li>
+<li><strong>Password Change</strong>: Optionally invalidate existing sessions</li>
+</ul>
+<h2 id="security-notes"><a class="doc-anchor" href="#security-notes">§</a>Security Notes</h2>
+<ul>
+<li>Only blacklist access tokens, not refresh tokens (use database for refresh tokens)</li>
+<li>TTL must match access token expiry to prevent premature removal</li>
+<li>Blacklist checks add small latency to protected endpoints</li>
+<li>Consider connection pooling for high-traffic applications</li>
+</ul>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>cobalt_stack_backend::services::valkey::blacklist::{add_to_blacklist, is_blacklisted};
+<span class="kw">use </span>redis::Client;
+
+<span class="kw">let </span>client = Client::open(<span class="string">"redis://127.0.0.1/"</span>)<span class="question-mark">?</span>;
+<span class="kw">let </span><span class="kw-2">mut </span>conn = client.get_connection()<span class="question-mark">?</span>;
+
+<span class="comment">// Blacklist token for 30 minutes (1800 seconds)
+</span>add_to_blacklist(<span class="kw-2">&amp;mut </span>conn, <span class="string">"expired_token_123"</span>, <span class="number">1800</span>)<span class="question-mark">?</span>;
+
+<span class="comment">// Check if token is blacklisted
+</span><span class="macro">assert!</span>(is_blacklisted(<span class="kw-2">&amp;mut </span>conn, <span class="string">"expired_token_123"</span>)<span class="question-mark">?</span>);
+<span class="macro">assert!</span>(!is_blacklisted(<span class="kw-2">&amp;mut </span>conn, <span class="string">"valid_token_456"</span>)<span class="question-mark">?</span>);</code></pre></div>
+</div></details><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.add_to_blacklist.html" title="fn cobalt_stack_backend::services::valkey::blacklist::add_to_blacklist">add_<wbr>to_<wbr>blacklist</a></dt><dd>Add a JWT access token to the blacklist with automatic expiry.</dd><dt><a class="fn" href="fn.is_blacklisted.html" title="fn cobalt_stack_backend::services::valkey::blacklist::is_blacklisted">is_<wbr>blacklisted</a></dt><dd>Check if a JWT access token has been blacklisted.</dd></dl></section></div></main></body></html>

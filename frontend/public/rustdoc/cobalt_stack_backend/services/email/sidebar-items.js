@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["create_verification_token","verify_email_token"],"struct":["MockEmailSender"],"trait":["EmailSender"]};

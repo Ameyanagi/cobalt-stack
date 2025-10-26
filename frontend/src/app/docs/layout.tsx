@@ -34,12 +34,15 @@ export default function DocsLayout({
               <Link href="/">
                 <Button variant="ghost" size="sm">Home</Button>
               </Link>
+              <Link href="/api-docs">
+                <Button variant="ghost" size="sm">Rust API Docs</Button>
+              </Link>
               <a
                 href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/swagger-ui`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="ghost" size="sm">API Docs</Button>
+                <Button variant="ghost" size="sm">Swagger API</Button>
               </a>
               <a
                 href="https://github.com/Ameyanagi/cobalt-stack"

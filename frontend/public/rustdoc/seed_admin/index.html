@@ -1,0 +1,29 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Admin user seeding utility."><title>seed_admin - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="seed_admin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../static.files/storage-68b7e25d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../seed_admin/index.html">seed_<wbr>admin</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#usage" title="Usage">Usage</a></li><li><a href="#credentials" title="Credentials">Credentials</a></li><li><a href="#security-warning" title="Security Warning">Security Warning</a></li><li><a href="#idempotency" title="Idempotency">Idempotency</a></li><li><a href="#environment-variables" title="Environment Variables">Environment Variables</a></li><li><a href="#examples" title="Examples">Examples</a></li></ul><h3><a href="#functions">Crate Items</a></h3><ul class="block"><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>seed_admin</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/seed_admin/seed_admin.rs.html#1-106">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Admin user seeding utility.</p>
+<p>This binary creates an initial admin user in the database for bootstrapping
+the application. It’s designed to be run once during initial setup or when
+resetting the admin account.</p>
+<h2 id="usage"><a class="doc-anchor" href="#usage">§</a>Usage</h2><div class="example-wrap"><pre class="language-bash"><code>cargo run --bin seed_admin</code></pre></div><h2 id="credentials"><a class="doc-anchor" href="#credentials">§</a>Credentials</h2>
+<p>Creates an admin user with:</p>
+<ul>
+<li><strong>Email</strong>: admin@example.com</li>
+<li><strong>Username</strong>: admin</li>
+<li><strong>Password</strong>: admin123</li>
+<li><strong>Role</strong>: Admin</li>
+<li><strong>Email Verified</strong>: true (auto-verified)</li>
+</ul>
+<h2 id="security-warning"><a class="doc-anchor" href="#security-warning">§</a>Security Warning</h2>
+<p><strong>IMPORTANT</strong>: Change the default password immediately after first login!
+The default credentials are intentionally simple for initial setup but
+should never be used in production.</p>
+<h2 id="idempotency"><a class="doc-anchor" href="#idempotency">§</a>Idempotency</h2>
+<p>Safe to run multiple times - checks if admin exists before creating.
+If admin@example.com already exists, the script exits without changes.</p>
+<h2 id="environment-variables"><a class="doc-anchor" href="#environment-variables">§</a>Environment Variables</h2>
+<p>Requires <code>DATABASE_URL</code> to be set:</p>
+<div class="example-wrap"><pre class="language-bash"><code>DATABASE_URL=postgres://user:pass@localhost/cobalt_stack</code></pre></div><h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2><div class="example-wrap"><pre class="language-bash"><code># First time setup
+cargo run --bin seed_admin
+# Output: ✅ Admin user created successfully!
+
+# Running again (idempotent)
+cargo run --bin seed_admin
+# Output: ⚠️  Admin user already exists</code></pre></div></div></details><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.main.html" title="fn seed_admin::main">main</a><span title="Restricted Visibility">&nbsp;🔒</span> </dt></dl></section></div></main></body></html>

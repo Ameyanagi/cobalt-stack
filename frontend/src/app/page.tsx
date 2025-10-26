@@ -36,6 +36,12 @@ export default function Home() {
                   Docs
                 </Button>
               </Link>
+              <Link href="/api-docs">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Code2 className="h-4 w-4" />
+                  API Docs
+                </Button>
+              </Link>
               <ThemeSelector />
               <ThemeToggle />
               {isLoading ? (

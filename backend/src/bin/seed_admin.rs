@@ -1,4 +1,53 @@
-// Seed script to create an initial admin user
+//! Admin user seeding utility.
+//!
+//! This binary creates an initial admin user in the database for bootstrapping
+//! the application. It's designed to be run once during initial setup or when
+//! resetting the admin account.
+//!
+//! # Usage
+//!
+//! ```bash
+//! cargo run --bin seed_admin
+//! ```
+//!
+//! # Credentials
+//!
+//! Creates an admin user with:
+//! - **Email**: admin@example.com
+//! - **Username**: admin
+//! - **Password**: admin123
+//! - **Role**: Admin
+//! - **Email Verified**: true (auto-verified)
+//!
+//! # Security Warning
+//!
+//! **IMPORTANT**: Change the default password immediately after first login!
+//! The default credentials are intentionally simple for initial setup but
+//! should never be used in production.
+//!
+//! # Idempotency
+//!
+//! Safe to run multiple times - checks if admin exists before creating.
+//! If admin@example.com already exists, the script exits without changes.
+//!
+//! # Environment Variables
+//!
+//! Requires `DATABASE_URL` to be set:
+//! ```bash
+//! DATABASE_URL=postgres://user:pass@localhost/cobalt_stack
+//! ```
+//!
+//! # Examples
+//!
+//! ```bash
+//! # First time setup
+//! cargo run --bin seed_admin
+//! # Output: ✅ Admin user created successfully!
+//!
+//! # Running again (idempotent)
+//! cargo run --bin seed_admin
+//! # Output: ⚠️  Admin user already exists
+//! ```
 
 use cobalt_stack_backend::models::{prelude::*, sea_orm_active_enums::UserRole, users};
 use cobalt_stack_backend::services::auth::hash_password;

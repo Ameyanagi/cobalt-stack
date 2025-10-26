@@ -1,4 +1,47 @@
-// Admin authorization middleware - requires admin role
+//! Role-based authorization middleware for admin access control.
+//!
+//! This module provides middleware that restricts access to admin-only endpoints
+//! by verifying the authenticated user has the admin role. It must be used in
+//! combination with the auth middleware.
+//!
+//! # Security
+//!
+//! - Requires prior authentication via [`crate::middleware::auth::auth_middleware`]
+//! - Verifies user has [`UserRole::Admin`] role from database
+//! - Checks user account is not disabled
+//! - Returns 401/403 for unauthorized access attempts
+//!
+//! # Middleware Ordering
+//!
+//! **IMPORTANT**: This middleware must be applied AFTER auth_middleware in the layer stack:
+//!
+//! ```no_run
+//! use axum::{Router, routing::get, middleware};
+//! use cobalt_stack_backend::middleware::{auth::auth_middleware, admin::admin_middleware};
+//! use cobalt_stack_backend::services::auth::JwtConfig;
+//! use sea_orm::DatabaseConnection;
+//! use std::sync::Arc;
+//!
+//! # async fn example(db: Arc<DatabaseConnection>) {
+//! let jwt_config = JwtConfig::from_env();
+//!
+//! let admin_routes = Router::new()
+//!     .route("/admin/users", get(list_users))
+//!     // Admin middleware first (inner layer)
+//!     .layer(middleware::from_fn_with_state(db, admin_middleware))
+//!     // Auth middleware second (outer layer)
+//!     .layer(middleware::from_fn_with_state(jwt_config, auth_middleware));
+//! # }
+//! # async fn list_users() -> &'static str { "Users" }
+//! ```
+//!
+//! # Error Responses
+//!
+//! - **401 Unauthorized**: AuthUser not found in extensions (auth_middleware not run first)
+//! - **401 Unauthorized**: User not found in database (token valid but user deleted)
+//! - **403 Forbidden**: User exists but doesn't have admin role
+//! - **403 Forbidden**: User is an admin but account is disabled
+//! - **500 Internal Server Error**: Database connection/query failure
 
 use crate::middleware::auth::AuthUser;
 use crate::models::{prelude::*, sea_orm_active_enums::UserRole};
@@ -11,8 +54,60 @@ use axum::{
 use sea_orm::{DatabaseConnection, EntityTrait};
 use std::sync::Arc;
 
-/// Admin middleware that checks if authenticated user has admin role
-/// This middleware must be used AFTER auth_middleware
+/// Axum middleware that enforces admin role requirement.
+///
+/// This middleware verifies that the authenticated user (from auth_middleware)
+/// has admin privileges by checking their role in the database. Only users with
+/// [`UserRole::Admin`] and non-disabled accounts can access protected routes.
+///
+/// # Execution Flow
+///
+/// 1. Extract [`AuthUser`] from request extensions (injected by auth_middleware)
+/// 2. Query database to fetch full user record
+/// 3. Verify user has [`UserRole::Admin`] role
+/// 4. Verify user account is not disabled (`disabled_at` is NULL)
+/// 5. Pass request to next middleware/handler
+///
+/// # Arguments
+///
+/// * `db` - Database connection for user role verification
+/// * `req` - Incoming HTTP request with AuthUser in extensions
+/// * `next` - Next middleware/handler in chain
+///
+/// # Returns
+///
+/// - `Ok(Response)` - User is admin and not disabled, request processed
+/// - `Err(StatusCode::UNAUTHORIZED)` - AuthUser missing or user not found
+/// - `Err(StatusCode::FORBIDDEN)` - User is not admin or account disabled
+/// - `Err(StatusCode::INTERNAL_SERVER_ERROR)` - Database error
+///
+/// # Examples
+///
+/// ```no_run
+/// use axum::{Router, routing::patch, middleware};
+/// use cobalt_stack_backend::middleware::{auth::auth_middleware, admin::admin_middleware};
+/// use cobalt_stack_backend::services::auth::JwtConfig;
+/// use sea_orm::DatabaseConnection;
+/// use std::sync::Arc;
+///
+/// # async fn example(db: Arc<DatabaseConnection>) {
+/// let jwt_config = JwtConfig::from_env();
+///
+/// // Admin-only endpoint for disabling users
+/// let admin_routes = Router::new()
+///     .route("/admin/users/:id/disable", patch(disable_user))
+///     .layer(middleware::from_fn_with_state(db, admin_middleware))
+///     .layer(middleware::from_fn_with_state(jwt_config, auth_middleware));
+/// # }
+/// # async fn disable_user() -> &'static str { "Disabled" }
+/// ```
+///
+/// # Security Notes
+///
+/// - Always check role from database, never trust client-provided role claims
+/// - Disabled admin accounts cannot access admin endpoints
+/// - Database connection errors fail secure (return 500, block access)
+/// - This middleware performs a database query on each request (consider caching for high traffic)
 pub async fn admin_middleware(
     State(db): State<Arc<DatabaseConnection>>,
     req: Request,
