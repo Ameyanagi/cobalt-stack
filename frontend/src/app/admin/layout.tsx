@@ -1,10 +1,11 @@
 'use client'
 
 import { useAuth } from '@/contexts/auth-context'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { Shield, Users, BarChart3 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export default function AdminLayout({
   children,
@@ -13,6 +14,7 @@ export default function AdminLayout({
 }) {
   const { user, isLoading } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     if (!isLoading && (!user || user.role !== 'admin')) {
@@ -50,14 +52,20 @@ export default function AdminLayout({
             <nav className="flex items-center gap-6">
               <Link
                 href="/admin"
-                className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+                className={cn(
+                  "flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors",
+                  pathname === '/admin' && "text-primary"
+                )}
               >
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
               </Link>
               <Link
                 href="/admin/users"
-                className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+                className={cn(
+                  "flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors",
+                  pathname?.startsWith('/admin/users') && "text-primary"
+                )}
               >
                 <Users className="h-4 w-4" />
                 Users

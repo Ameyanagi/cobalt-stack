@@ -154,6 +154,125 @@ make seed-admin
 - Should only be used in development/testing environments
 - **Always change the default password after first login**
 
+## 📧 Email Verification
+
+The application includes a complete email verification system for user registration and account security.
+
+### How It Works
+
+1. **User Registration**:
+   - User registers with email and password
+   - Account is created with `email_verified = false`
+   - Verification email is sent automatically (or mocked in development)
+   - User is redirected to dashboard but shown an "unverified email" banner
+
+2. **Verification Token**:
+   - 32-byte cryptographically secure random token generated
+   - Token is hashed with SHA-256 before storage (fast, secure for single-use tokens)
+   - Expires after 24 hours (configurable via `EMAIL_VERIFICATION_EXPIRY_SECONDS`)
+   - Single-use: marked with `verified_at` timestamp when used
+
+3. **Verification Flow**:
+   - User clicks link in email: `/verify-email?token=<token>`
+   - Frontend sends token to `/api/auth/verify-email` endpoint
+   - Backend validates token (not expired, matches hash, not already used)
+   - User's `email_verified` field is set to `true`
+   - Success message shown, banner disappears
+
+4. **Resend Verification**:
+   - Unverified users see a banner with "Resend verification email" button
+   - Sends POST to `/api/auth/send-verification` (requires auth)
+   - Previous unexpired tokens remain valid, new token also works
+
+### Configuration
+
+Configure email verification in your environment:
+
+```bash
+# Email Verification Settings
+EMAIL_VERIFICATION_EXPIRY_SECONDS=86400  # 24 hours (default)
+EMAIL_MOCK=true  # Use mock email (logs to console) - set false for production
+
+# SMTP Configuration (only needed if EMAIL_MOCK=false)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@example.com
+SMTP_PASSWORD=your-app-password
+SMTP_FROM=noreply@example.com
+```
+
+### Development vs Production
+
+**Development (EMAIL_MOCK=true)**:
+- Verification emails are logged to console
+- Check backend logs for verification links
+- No SMTP server required
+- Perfect for testing and local development
+
+**Production (EMAIL_MOCK=false)**:
+- Real emails sent via SMTP
+- Requires valid SMTP credentials
+- Configure your email service (Gmail, SendGrid, AWS SES, etc.)
+- Monitor email delivery rates
+
+### API Endpoints
+
+- **POST /api/auth/send-verification**: Send/resend verification email (requires authentication)
+- **POST /api/auth/verify-email**: Verify email with token (public endpoint)
+
+See the OpenAPI schema at `/swagger-ui` for detailed request/response formats.
+
+## 👤 Role-Based Access Control & Admin System
+
+The application includes a complete role-based authorization system with admin capabilities.
+
+### User Roles
+
+- **user**: Standard user role (default for all registrations)
+- **admin**: Administrator role with access to admin dashboard and management endpoints
+
+Roles are stored as a PostgreSQL ENUM type for type safety and performance.
+
+### Admin Features
+
+**Admin Dashboard** (`/admin`):
+- Platform statistics (total users, verified users, admin count)
+- Quick actions and navigation
+
+**User Management** (`/admin/users`):
+- Paginated user list with filtering:
+  - Search by username or email
+  - Filter by role (all/admin/user)
+  - Filter by verification status (all/verified/unverified)
+- View user details (email, role, verification status, account status)
+- User actions:
+  - **Disable user**: Soft-delete with `disabled_at` timestamp (reversible)
+  - **Enable user**: Restore previously disabled account
+
+### Security
+
+**Protected Routes**:
+- Frontend checks user role before rendering admin pages
+- Non-admin users are automatically redirected to dashboard
+- All admin API endpoints require both authentication AND admin role
+
+**Admin Middleware**:
+- Layered authentication: JWT validation → role verification
+- Returns 403 Forbidden for non-admin users
+- Applied to all `/api/admin/*` routes
+
+### Admin API Endpoints
+
+All endpoints require Bearer token authentication with admin role:
+
+- **GET /api/admin/stats**: Platform statistics
+- **GET /api/admin/users**: List users with pagination and filters
+- **GET /api/admin/users/:id**: Get user details
+- **PATCH /api/admin/users/:id/disable**: Disable user account
+- **PATCH /api/admin/users/:id/enable**: Enable user account
+
+See the OpenAPI schema at `/swagger-ui` for detailed request/response formats.
+
 ## 📝 OpenAPI & Type Generation
 
 ```bash

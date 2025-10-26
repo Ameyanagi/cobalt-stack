@@ -78,22 +78,22 @@
 - [ ] 9.8 Test admin dashboard with Playwright
 
 ## 10. Documentation
-- [ ] 10.1 Document email verification flow in README
-- [ ] 10.2 Document admin user creation process
-- [ ] 10.3 Document SMTP configuration (optional)
-- [ ] 10.4 Update API documentation (Swagger/OpenAPI)
-- [ ] 10.5 Update authentication-implementation-summary.md
+- [x] 10.1 Document email verification flow in README
+- [x] 10.2 Document admin user creation process
+- [x] 10.3 Document SMTP configuration (optional)
+- [x] 10.4 Update API documentation (Swagger/OpenAPI)
+- [x] 10.5 Update authentication-implementation-summary.md
 
 ## 11. Configuration
-- [ ] 11.1 Add EMAIL_VERIFICATION_EXPIRY env var (default: 86400 seconds)
-- [ ] 11.2 Add SMTP_* env vars (host, port, user, password, from)
-- [ ] 11.3 Add EMAIL_MOCK env var (default: true)
-- [ ] 11.4 Update .env.example with new variables
-- [ ] 11.5 Update docker-compose.yml with environment variables
+- [x] 11.1 Add EMAIL_VERIFICATION_EXPIRY env var (default: 86400 seconds)
+- [x] 11.2 Add SMTP_* env vars (host, port, user, password, from)
+- [x] 11.3 Add EMAIL_MOCK env var (default: true)
+- [x] 11.4 Update .env.example with new variables
+- [x] 11.5 Update docker-compose.yml with environment variables
 
 ## 12. UI Polish
-- [ ] 12.1 Add loading states to verification page
-- [ ] 12.2 Add success/error messages
-- [ ] 12.3 Add admin dashboard navigation
-- [ ] 12.4 Add breadcrumbs for admin pages
-- [ ] 12.5 Add responsive design for admin tables
+- [x] 12.1 Add loading states to verification page
+- [x] 12.2 Add success/error messages
+- [x] 12.3 Add admin dashboard navigation
+- [x] 12.4 Add breadcrumbs for admin pages
+- [x] 12.5 Add responsive design for admin tables
