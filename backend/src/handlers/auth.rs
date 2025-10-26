@@ -573,7 +573,7 @@ pub async fn send_verification_email(
     let email_sender = MockEmailSender;
     email_sender
         .send_verification_email(&user.email, &token)
-        .map_err(|e| AuthError::InternalError)?;
+        .map_err(|_e| AuthError::InternalError)?;
 
     Ok((
         StatusCode::OK,

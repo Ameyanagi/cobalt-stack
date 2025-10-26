@@ -1,32 +1,151 @@
+//! JSON Web Token (JWT) creation and verification.
+//!
+//! This module provides JWT token generation and verification for authentication.
+//! It implements a dual-token system with short-lived access tokens and long-lived
+//! refresh tokens for secure, stateless authentication.
+//!
+//! # Token Types
+//!
+//! - **Access Token**: Short-lived (30 minutes), includes user ID and username
+//! - **Refresh Token**: Long-lived (7 days), includes user ID and token ID (jti)
+//!
+//! # Security
+//!
+//! - HMAC-SHA256 signature algorithm (HS256)
+//! - Configurable secret key from environment
+//! - Token expiration validation
+//! - Token rotation via jti tracking
+//!
+//! # Examples
+//!
+//! ```no_run
+//! use cobalt_stack::services::auth::jwt::{
+//!     JwtConfig, create_access_token, create_refresh_token,
+//!     verify_access_token, verify_refresh_token
+//! };
+//! use uuid::Uuid;
+//!
+//! # fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! // Load configuration
+//! let config = JwtConfig::from_env();
+//!
+//! // Create tokens
+//! let user_id = Uuid::new_v4();
+//! let access_token = create_access_token(user_id, "alice".to_string(), &config)?;
+//! let (refresh_token, jti) = create_refresh_token(user_id, &config)?;
+//!
+//! // Verify tokens
+//! let access_claims = verify_access_token(&access_token, &config)?;
+//! let refresh_claims = verify_refresh_token(&refresh_token, &config)?;
+//!
+//! assert_eq!(access_claims.sub, user_id);
+//! assert_eq!(refresh_claims.jti, jti);
+//! # Ok(())
+//! # }
+//! ```
+
 use super::{AuthError, Result};
 use chrono::{Duration, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-/// JWT Claims for access tokens
+/// JWT claims for access tokens.
+///
+/// Access tokens are short-lived (default 30 minutes) and include user identity
+/// for authentication. They are sent in Authorization headers for API requests.
+///
+/// # Fields
+///
+/// - `sub`: User ID (UUID) - standard JWT subject claim
+/// - `exp`: Expiration timestamp (Unix epoch) - standard JWT expiration claim
+/// - `iat`: Issued at timestamp (Unix epoch) - standard JWT issued-at claim
+/// - `username`: Username string for convenience (custom claim)
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AccessTokenClaims {
-    pub sub: Uuid,        // user_id
-    pub exp: i64,         // expiration time
-    pub iat: i64,         // issued at
-    pub username: String, // username for convenience
+    /// User ID (subject of the token).
+    pub sub: Uuid,
+
+    /// Expiration time as Unix timestamp.
+    /// Token is invalid after this time.
+    pub exp: i64,
+
+    /// Issued at time as Unix timestamp.
+    /// When the token was created.
+    pub iat: i64,
+
+    /// Username for convenience in handlers.
+    /// Avoids additional database lookups.
+    pub username: String,
 }
 
-/// JWT Claims for refresh tokens
+/// JWT claims for refresh tokens.
+///
+/// Refresh tokens are long-lived (default 7 days) and used to obtain new access tokens.
+/// They include a unique token ID (jti) for rotation tracking and revocation.
+///
+/// # Fields
+///
+/// - `sub`: User ID (UUID) - standard JWT subject claim
+/// - `exp`: Expiration timestamp (Unix epoch) - standard JWT expiration claim
+/// - `iat`: Issued at timestamp (Unix epoch) - standard JWT issued-at claim
+/// - `jti`: Token ID (UUID) for rotation/revocation - standard JWT ID claim
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct RefreshTokenClaims {
-    pub sub: Uuid, // user_id
-    pub exp: i64,  // expiration time
-    pub iat: i64,  // issued at
-    pub jti: Uuid, // token id for rotation tracking
+    /// User ID (subject of the token).
+    pub sub: Uuid,
+
+    /// Expiration time as Unix timestamp.
+    /// Token is invalid after this time.
+    pub exp: i64,
+
+    /// Issued at time as Unix timestamp.
+    /// When the token was created.
+    pub iat: i64,
+
+    /// Token ID for rotation tracking.
+    /// Matches refresh_tokens.id in database.
+    pub jti: Uuid,
 }
 
-/// JWT Configuration
+/// JWT configuration loaded from environment variables.
+///
+/// Controls token expiration times and signing secret.
+/// Can be loaded from environment or constructed manually for testing.
+///
+/// # Environment Variables
+///
+/// - `JWT_SECRET`: HMAC secret key (required in production)
+/// - `JWT_ACCESS_EXPIRY_MINUTES`: Access token lifetime (default: 30)
+/// - `JWT_REFRESH_EXPIRY_DAYS`: Refresh token lifetime (default: 7)
+///
+/// # Examples
+///
+/// ```no_run
+/// use cobalt_stack::services::auth::jwt::JwtConfig;
+///
+/// // Load from environment
+/// let config = JwtConfig::from_env();
+///
+/// // Or construct manually for testing
+/// let config = JwtConfig {
+///     secret: "test_secret".to_string(),
+///     access_token_expiry_minutes: 15,
+///     refresh_token_expiry_days: 7,
+/// };
+/// ```
 #[derive(Clone)]
 pub struct JwtConfig {
+    /// HMAC secret key for signing tokens.
+    /// Must be kept secure and never exposed to clients.
     pub secret: String,
+
+    /// Access token lifetime in minutes.
+    /// Shorter lifetimes increase security but require more refreshes.
     pub access_token_expiry_minutes: i64,
+
+    /// Refresh token lifetime in days.
+    /// Longer lifetimes improve UX but increase risk if compromised.
     pub refresh_token_expiry_days: i64,
 }
 
