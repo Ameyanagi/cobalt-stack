@@ -30,6 +30,12 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
+              <Link href="/docs">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Docs
+                </Button>
+              </Link>
               <ThemeSelector />
               <ThemeToggle />
               {isLoading ? (
@@ -352,16 +358,12 @@ export default function Home() {
                   View on GitHub
                 </Button>
               </a>
-              <a
-                href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/swagger-ui`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Link href="/docs">
                 <Button size="lg" variant="outline" className="gap-2">
                   <BookOpen className="h-4 w-4" />
-                  API Docs
+                  Documentation
                 </Button>
-              </a>
+              </Link>
             </div>
           </CardContent>
         </Card>
@@ -376,6 +378,9 @@ export default function Home() {
               <span>Cobalt Stack - Built with Rust & Next.js</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <Link href="/docs" className="hover:text-foreground transition-colors">
+                Documentation
+              </Link>
               <Link href="/health" className="hover:text-foreground transition-colors">
                 System Health
               </Link>
@@ -388,7 +393,7 @@ export default function Home() {
                 API Docs
               </a>
               <a
-                href="https://github.com"
+                href="https://github.com/Ameyanagi/cobalt-stack"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-foreground transition-colors"
