@@ -50,17 +50,17 @@
 - [x] 6.8 Add admin route group to main.rs
 
 ## 7. Admin Dashboard - Frontend
-- [ ] 7.1 Create /admin layout (frontend/src/app/admin/layout.tsx)
-- [ ] 7.2 Create /admin page (frontend/src/app/admin/page.tsx) with stats
-- [ ] 7.3 Create /admin/users page with user list table
-- [ ] 7.4 Add data table component (shadcn/ui)
-- [ ] 7.5 Add pagination controls
-- [ ] 7.6 Add filtering controls (verified, role, search)
-- [ ] 7.7 Add user detail modal/page
-- [ ] 7.8 Add disable/enable user actions
-- [ ] 7.9 Add role badge component
-- [ ] 7.10 Add protected route check (only admins)
-- [ ] 7.11 Generate TypeScript types for admin endpoints
+- [x] 7.1 Create /admin layout (frontend/src/app/admin/layout.tsx)
+- [x] 7.2 Create /admin page (frontend/src/app/admin/page.tsx) with stats
+- [x] 7.3 Create /admin/users page with user list table
+- [x] 7.4 Add data table component (shadcn/ui)
+- [x] 7.5 Add pagination controls
+- [x] 7.6 Add filtering controls (verified, role, search)
+- [x] 7.7 Add user detail modal/page
+- [x] 7.8 Add disable/enable user actions
+- [x] 7.9 Add role badge component
+- [x] 7.10 Add protected route check (only admins)
+- [x] 7.11 Generate TypeScript types for admin endpoints
 
 ## 8. Database Seeding
 - [x] 8.1 Create seed script to create initial admin user
