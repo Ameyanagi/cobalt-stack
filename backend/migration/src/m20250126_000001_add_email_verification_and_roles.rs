@@ -112,11 +112,7 @@ impl MigrationTrait for Migration {
                             .primary_key()
                             .extra("DEFAULT gen_random_uuid()".to_owned()),
                     )
-                    .col(
-                        ColumnDef::new(EmailVerifications::UserId)
-                            .uuid()
-                            .not_null(),
-                    )
+                    .col(ColumnDef::new(EmailVerifications::UserId).uuid().not_null())
                     .col(
                         ColumnDef::new(EmailVerifications::TokenHash)
                             .string_len(64)

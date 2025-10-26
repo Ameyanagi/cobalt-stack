@@ -60,8 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
 
     // Initialize database connection
-    let database_url = std::env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let db = Database::connect(&database_url).await?;
 
     println!("🌱 Seeding admin user...");
@@ -78,8 +77,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Create admin user
-    let password_hash = hash_password("admin123")
-        .map_err(|e| format!("Failed to hash password: {}", e))?;
+    let password_hash =
+        hash_password("admin123").map_err(|e| format!("Failed to hash password: {}", e))?;
 
     let admin = users::ActiveModel {
         id: Set(Uuid::new_v4()),

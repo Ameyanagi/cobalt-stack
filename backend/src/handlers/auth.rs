@@ -83,10 +83,10 @@ impl RegisterRequest {
             .into());
         }
         if self.password.len() > 128 {
-            return Err(
-                AuthError::InvalidInput("Password must not exceed 128 characters".to_string())
-                    .into(),
-            );
+            return Err(AuthError::InvalidInput(
+                "Password must not exceed 128 characters".to_string(),
+            )
+            .into());
         }
 
         Ok(())
@@ -111,10 +111,15 @@ impl LoginRequest {
 
 use crate::models::{prelude::*, users};
 use crate::services::auth::{
-    create_access_token, create_refresh_token, hash_password, verify_password, JwtConfig,
-    store_refresh_token,
+    create_access_token, create_refresh_token, hash_password, store_refresh_token, verify_password,
+    JwtConfig,
 };
-use axum::{extract::State, http::{header, StatusCode}, response::IntoResponse, Json};
+use axum::{
+    extract::State,
+    http::{header, StatusCode},
+    response::IntoResponse,
+    Json,
+};
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use chrono::Utc;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
@@ -150,7 +155,8 @@ pub async fn register(
     req.validate().map_err(|e| {
         // The validate() function already returns AuthError wrapped in anyhow::Error
         // Extract the AuthError from the anyhow chain
-        e.downcast::<AuthError>().unwrap_or(AuthError::InvalidInput("Validation failed".to_string()))
+        e.downcast::<AuthError>()
+            .unwrap_or(AuthError::InvalidInput("Validation failed".to_string()))
     })?;
 
     // Check if username already exists
@@ -228,7 +234,9 @@ pub async fn register(
         .secure(true)
         .same_site(SameSite::Strict)
         .path("/")
-        .max_age(time::Duration::days(state.jwt_config.refresh_token_expiry_days))
+        .max_age(time::Duration::days(
+            state.jwt_config.refresh_token_expiry_days,
+        ))
         .build();
 
     // Return response with cookie
@@ -269,7 +277,8 @@ pub async fn login(
     req.validate().map_err(|e| {
         // The validate() function already returns AuthError wrapped in anyhow::Error
         // Extract the AuthError from the anyhow chain
-        e.downcast::<AuthError>().unwrap_or(AuthError::InvalidInput("Validation failed".to_string()))
+        e.downcast::<AuthError>()
+            .unwrap_or(AuthError::InvalidInput("Validation failed".to_string()))
     })?;
 
     // Find user by username
@@ -311,7 +320,9 @@ pub async fn login(
         .secure(true)
         .same_site(SameSite::Strict)
         .path("/")
-        .max_age(time::Duration::days(state.jwt_config.refresh_token_expiry_days))
+        .max_age(time::Duration::days(
+            state.jwt_config.refresh_token_expiry_days,
+        ))
         .build();
 
     // Return response with cookie
@@ -345,8 +356,8 @@ pub async fn refresh_token(
     jar: axum_extra::extract::CookieJar,
 ) -> std::result::Result<impl IntoResponse, AuthError> {
     use crate::services::auth::{
-        verify_refresh_token, rotate_refresh_token, validate_refresh_token,
-        create_access_token, create_refresh_token,
+        create_access_token, create_refresh_token, rotate_refresh_token, validate_refresh_token,
+        verify_refresh_token,
     };
 
     // Extract refresh token from cookie
@@ -398,7 +409,9 @@ pub async fn refresh_token(
         .secure(true)
         .same_site(SameSite::Strict)
         .path("/")
-        .max_age(time::Duration::days(state.jwt_config.refresh_token_expiry_days))
+        .max_age(time::Duration::days(
+            state.jwt_config.refresh_token_expiry_days,
+        ))
         .build();
 
     // Return response with new access token
@@ -431,7 +444,7 @@ pub async fn logout(
     State(state): State<AppState>,
     jar: axum_extra::extract::CookieJar,
 ) -> std::result::Result<impl IntoResponse, AuthError> {
-    use crate::services::auth::{verify_refresh_token, revoke_refresh_token};
+    use crate::services::auth::{revoke_refresh_token, verify_refresh_token};
 
     // Extract refresh token from cookie
     let refresh_token = jar
@@ -458,10 +471,7 @@ pub async fn logout(
         .max_age(time::Duration::seconds(0)) // Expire immediately
         .build();
 
-    Ok((
-        StatusCode::OK,
-        [(header::SET_COOKIE, cookie.to_string())],
-    ))
+    Ok((StatusCode::OK, [(header::SET_COOKIE, cookie.to_string())]))
 }
 
 /// GET /api/auth/me - Get current user information
@@ -561,7 +571,9 @@ pub async fn send_verification_email(
 
     // Check if already verified
     if user.email_verified {
-        return Err(AuthError::InvalidInput("Email already verified".to_string()));
+        return Err(AuthError::InvalidInput(
+            "Email already verified".to_string(),
+        ));
     }
 
     // Create verification token

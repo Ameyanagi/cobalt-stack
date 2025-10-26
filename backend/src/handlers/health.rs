@@ -69,6 +69,10 @@ mod tests {
 
         // Assert: Should execute in less than 10ms
         let duration = start.elapsed();
-        assert!(duration.as_millis() < 10, "Health check took {:?}, expected < 10ms", duration);
+        assert!(
+            duration.as_millis() < 10,
+            "Health check took {:?}, expected < 10ms",
+            duration
+        );
     }
 }

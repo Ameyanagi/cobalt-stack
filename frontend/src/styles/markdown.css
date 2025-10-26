@@ -122,22 +122,81 @@
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
   font-size: 0.875rem;
-  font-family: ui-monospace, monospace;
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', monospace;
+  font-weight: 500;
 }
 
 .markdown-content pre {
-  background-color: oklch(var(--muted));
-  padding: 1rem;
+  position: relative;
+  background-color: oklch(var(--card));
+  padding: 1.25rem;
   border-radius: 0.5rem;
   overflow-x: auto;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   border: 1px solid oklch(var(--border));
+  box-shadow: 0 2px 8px oklch(var(--foreground) / 0.05);
 }
 
 .markdown-content pre code {
   background-color: transparent;
   padding: 0;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  font-weight: 400;
+  color: oklch(var(--foreground));
+}
+
+/* Code block with language label */
+.markdown-content pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: oklch(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Copy button container */
+.markdown-content .code-block-wrapper {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.markdown-content .copy-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  background-color: oklch(var(--primary));
+  color: oklch(var(--primary-foreground));
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0;
+  z-index: 10;
+}
+
+.markdown-content .code-block-wrapper:hover .copy-button {
+  opacity: 1;
+}
+
+.markdown-content .copy-button:hover {
+  background-color: oklch(var(--primary) / 0.9);
+  transform: translateY(-1px);
+}
+
+.markdown-content .copy-button:active {
+  transform: translateY(0);
+}
+
+.markdown-content .copy-button.copied {
+  background-color: oklch(var(--success) / 1);
 }
 
 /* Tables */

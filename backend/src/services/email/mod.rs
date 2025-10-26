@@ -29,8 +29,8 @@
 
 mod verification;
 
-pub use verification::{create_verification_token, verify_email_token};
 use anyhow::Result;
+pub use verification::{create_verification_token, verify_email_token};
 
 /// Abstraction for email sending implementations.
 ///
@@ -89,10 +89,7 @@ pub struct MockEmailSender;
 
 impl EmailSender for MockEmailSender {
     fn send_verification_email(&self, to: &str, token: &str) -> Result<()> {
-        tracing::info!(
-            "📧 [MOCK EMAIL] Sending verification email to: {}",
-            to
-        );
+        tracing::info!("📧 [MOCK EMAIL] Sending verification email to: {}", to);
         tracing::info!(
             "📧 [MOCK EMAIL] Verification link: http://localhost:2727/verify-email?token={}",
             token

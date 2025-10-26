@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -11,6 +11,26 @@ import '@/styles/highlight.css'
 
 interface MarkdownViewerProps {
   content: string
+}
+
+function CopyButton({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(code)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={`copy-button ${copied ? 'copied' : ''}`}
+      aria-label="Copy code"
+    >
+      {copied ? 'Copied!' : 'Copy'}
+    </button>
+  )
 }
 
 export function MarkdownViewer({ content }: MarkdownViewerProps) {
@@ -62,6 +82,7 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
             const inline = !('inline' in props) ? false : (props as any).inline
             const match = /language-(\w+)/.exec(className || '')
             const language = match ? match[1] : ''
+            const codeString = String(children).replace(/\n$/, '')
 
             if (!inline && language === 'mermaid') {
               // Mermaid diagrams are handled by useEffect
@@ -76,11 +97,14 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
 
             if (!inline) {
               return (
-                <pre className={className}>
-                  <code className={className} {...rest}>
-                    {children}
-                  </code>
-                </pre>
+                <div className="code-block-wrapper">
+                  <CopyButton code={codeString} />
+                  <pre className={className} data-language={language}>
+                    <code className={className} {...rest}>
+                      {children}
+                    </code>
+                  </pre>
+                </div>
               )
             }
 

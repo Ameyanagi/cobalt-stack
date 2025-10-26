@@ -132,7 +132,7 @@ fn extract_token_from_header(headers: &HeaderMap) -> Result<String, AuthError> {
     }
 
     let token = auth_header.trim_start_matches("Bearer ").to_string();
-    
+
     if token.is_empty() {
         return Err(AuthError::InvalidToken);
     }
@@ -197,12 +197,10 @@ pub async fn auth_middleware(
     next: Next,
 ) -> Result<Response, StatusCode> {
     // Extract token from header
-    let token = extract_token_from_header(req.headers())
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let token = extract_token_from_header(req.headers()).map_err(|_| StatusCode::UNAUTHORIZED)?;
 
     // Verify token
-    let claims = verify_access_token(&token, &jwt_config)
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let claims = verify_access_token(&token, &jwt_config).map_err(|_| StatusCode::UNAUTHORIZED)?;
 
     // Create AuthUser from claims
     let auth_user = AuthUser {
@@ -233,10 +231,7 @@ mod tests {
     #[test]
     fn test_extract_token_valid() {
         let mut headers = HeaderMap::new();
-        headers.insert(
-            "authorization",
-            "Bearer valid_token_here".parse().unwrap(),
-        );
+        headers.insert("authorization", "Bearer valid_token_here".parse().unwrap());
 
         let result = extract_token_from_header(&headers);
         assert!(result.is_ok());

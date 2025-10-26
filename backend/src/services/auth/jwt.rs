@@ -169,11 +169,7 @@ impl JwtConfig {
 }
 
 /// Create an access token
-pub fn create_access_token(
-    user_id: Uuid,
-    username: String,
-    config: &JwtConfig,
-) -> Result<String> {
+pub fn create_access_token(user_id: Uuid, username: String, config: &JwtConfig) -> Result<String> {
     let now = Utc::now();
     let exp = now + Duration::minutes(config.access_token_expiry_minutes);
 
@@ -408,7 +404,7 @@ mod tests {
         let claims = verify_refresh_token(&token, &config).unwrap();
 
         let expected_exp = Utc::now().timestamp() + 86400; // 1 day
-        // Allow 5 second tolerance
+                                                           // Allow 5 second tolerance
         assert!((claims.exp - expected_exp).abs() < 5);
     }
 }

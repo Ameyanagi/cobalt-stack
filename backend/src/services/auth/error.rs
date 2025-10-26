@@ -196,26 +196,23 @@ impl IntoResponse for AuthError {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Database operation failed",
             ),
-            AuthError::RedisError(_) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Cache operation failed",
-            ),
+            AuthError::RedisError(_) => {
+                (StatusCode::INTERNAL_SERVER_ERROR, "Cache operation failed")
+            }
             AuthError::PasswordHashError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Password processing failed",
             ),
-            AuthError::JwtEncodingError => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Token generation failed",
-            ),
+            AuthError::JwtEncodingError => {
+                (StatusCode::INTERNAL_SERVER_ERROR, "Token generation failed")
+            }
             AuthError::JwtDecodingError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Token verification failed",
             ),
-            AuthError::InternalError => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Internal server error",
-            ),
+            AuthError::InternalError => {
+                (StatusCode::INTERNAL_SERVER_ERROR, "Internal server error")
+            }
         };
 
         let body = Json(json!({

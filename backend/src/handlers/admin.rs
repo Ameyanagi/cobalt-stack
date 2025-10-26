@@ -13,7 +13,7 @@ use sea_orm::{
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use utoipa::{ToSchema, IntoParams};
+use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
 
 /// Application state for admin handlers
@@ -47,8 +47,12 @@ pub struct ListUsersQuery {
     pub search: Option<String>,
 }
 
-fn default_page() -> u64 { 1 }
-fn default_per_page() -> u64 { 20 }
+fn default_page() -> u64 {
+    1
+}
+fn default_per_page() -> u64 {
+    20
+}
 
 /// User response for admin view (includes all fields)
 #[derive(Debug, Serialize, ToSchema)]
@@ -137,8 +141,9 @@ pub async fn list_users(
     if let Some(search) = query.search {
         let search_pattern = format!("%{}%", search);
         select = select.filter(
-            users::Column::Username.like(&search_pattern)
-                .or(users::Column::Email.like(&search_pattern))
+            users::Column::Username
+                .like(&search_pattern)
+                .or(users::Column::Email.like(&search_pattern)),
         );
     }
 
@@ -146,7 +151,8 @@ pub async fn list_users(
     select = select.order_by_desc(users::Column::CreatedAt);
 
     // Get total count
-    let total = select.clone()
+    let total = select
+        .clone()
         .count(state.db.as_ref())
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -332,9 +338,7 @@ pub async fn enable_user(
     ),
     tag = "Admin"
 )]
-pub async fn get_stats(
-    State(state): State<AdminState>,
-) -> Result<impl IntoResponse, StatusCode> {
+pub async fn get_stats(State(state): State<AdminState>) -> Result<impl IntoResponse, StatusCode> {
     // Total users
     let total_users = Users::find()
         .count(state.db.as_ref())

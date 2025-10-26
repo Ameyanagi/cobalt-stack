@@ -8,10 +8,7 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, Qu
 use uuid::Uuid;
 
 /// Create a verification token for a user
-pub async fn create_verification_token(
-    db: &DatabaseConnection,
-    user_id: Uuid,
-) -> Result<String> {
+pub async fn create_verification_token(db: &DatabaseConnection, user_id: Uuid) -> Result<String> {
     // Generate token and hash it
     let token = generate_verification_token();
     let token_hash = hash_token(&token);

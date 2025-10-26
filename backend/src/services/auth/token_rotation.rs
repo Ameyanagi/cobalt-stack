@@ -126,10 +126,7 @@ pub async fn revoke_all_user_tokens(db: &DatabaseConnection, user_id: Uuid) -> R
 /// Clean up expired tokens (for maintenance tasks)
 ///
 /// Deletes tokens that have been expired for more than retention_days
-pub async fn cleanup_expired_tokens(
-    db: &DatabaseConnection,
-    retention_days: i64,
-) -> Result<u64> {
+pub async fn cleanup_expired_tokens(db: &DatabaseConnection, retention_days: i64) -> Result<u64> {
     let cutoff = Utc::now() - Duration::days(retention_days);
 
     let result = RefreshTokens::delete_many()
@@ -171,11 +168,7 @@ mod tests {
             } else {
                 (now + Duration::days(7)).into()
             },
-            revoked_at: if revoked {
-                Some(now.into())
-            } else {
-                None
-            },
+            revoked_at: if revoked { Some(now.into()) } else { None },
             created_at: now.into(),
         }
     }

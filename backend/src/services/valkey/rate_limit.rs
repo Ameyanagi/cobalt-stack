@@ -88,8 +88,8 @@ pub struct RateLimitConfig {
 impl Default for RateLimitConfig {
     fn default() -> Self {
         Self {
-            max_attempts: 5,      // 5 attempts
-            window_seconds: 900,  // 15 minutes
+            max_attempts: 5,     // 5 attempts
+            window_seconds: 900, // 15 minutes
         }
     }
 }
@@ -150,11 +150,7 @@ impl Default for RateLimitConfig {
 /// - Use `X-Forwarded-For` header carefully (can be spoofed)
 /// - Consider using real client IP from trusted proxy headers
 /// - Combine with other security measures (CAPTCHA after N failures)
-pub fn check_rate_limit(
-    conn: &mut Connection,
-    ip: &str,
-    config: &RateLimitConfig,
-) -> Result<bool> {
+pub fn check_rate_limit(conn: &mut Connection, ip: &str, config: &RateLimitConfig) -> Result<bool> {
     let key = format!("ratelimit:login:{}", ip);
 
     // Get current count
