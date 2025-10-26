@@ -11,6 +11,11 @@ use utoipa::OpenApi;
         crate::handlers::auth::get_current_user,
         crate::handlers::auth::send_verification_email,
         crate::handlers::auth::verify_email,
+        crate::handlers::admin::list_users,
+        crate::handlers::admin::get_user,
+        crate::handlers::admin::disable_user,
+        crate::handlers::admin::enable_user,
+        crate::handlers::admin::get_stats,
     ),
     components(
         schemas(
@@ -22,11 +27,17 @@ use utoipa::OpenApi;
             crate::handlers::auth::ErrorResponse,
             crate::handlers::auth::VerifyEmailRequest,
             crate::handlers::auth::MessageResponse,
+            crate::handlers::admin::AdminUserResponse,
+            crate::handlers::admin::UserListResponse,
+            crate::handlers::admin::AdminStatsResponse,
+            crate::handlers::admin::MessageResponse,
+            crate::models::sea_orm_active_enums::UserRole,
         )
     ),
     tags(
         (name = "health", description = "Health check endpoints"),
-        (name = "Authentication", description = "User authentication and email verification")
+        (name = "Authentication", description = "User authentication and email verification"),
+        (name = "Admin", description = "Admin user management endpoints")
     ),
     info(
         title = "Cobalt Stack API",

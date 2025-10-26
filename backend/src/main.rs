@@ -6,7 +6,7 @@ mod openapi;
 mod services;
 mod utils;
 
-use axum::{http::{header, HeaderValue, Method}, middleware as axum_middleware, routing::{get, post}, Router};
+use axum::{http::{header, HeaderValue, Method}, middleware as axum_middleware, routing::{get, patch, post}, Router};
 use std::{net::SocketAddr, sync::Arc};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -116,9 +116,16 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
         .with_state(state.clone());
 
     // Admin routes (protected - requires admin role)
-    // TODO: Add actual admin handlers in Phase 6
+    let admin_state = handlers::admin::AdminState {
+        db: state.db.clone(),
+    };
+
     let admin_routes = Router::new()
-        // Placeholder routes will be added in Phase 6
+        .route("/api/admin/users", get(handlers::admin::list_users))
+        .route("/api/admin/users/:id", get(handlers::admin::get_user))
+        .route("/api/admin/users/:id/disable", patch(handlers::admin::disable_user))
+        .route("/api/admin/users/:id/enable", patch(handlers::admin::enable_user))
+        .route("/api/admin/stats", get(handlers::admin::get_stats))
         .layer(axum_middleware::from_fn_with_state(
             state.db.clone(),
             middleware::admin::admin_middleware,
@@ -127,7 +134,7 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
             jwt_config,
             middleware::auth::auth_middleware,
         ))
-        .with_state(state);
+        .with_state(admin_state);
 
     // Build main router
     Router::new()

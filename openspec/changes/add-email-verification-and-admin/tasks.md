@@ -40,14 +40,14 @@
 - [x] 5.4 Add middleware to Axum router for admin routes
 
 ## 6. Admin Endpoints - Backend
-- [ ] 6.1 Create admin handlers module (backend/src/handlers/admin.rs)
-- [ ] 6.2 Add GET /api/admin/users (list with pagination, filtering)
-- [ ] 6.3 Add GET /api/admin/users/:id (view user details)
-- [ ] 6.4 Add PATCH /api/admin/users/:id/disable (soft delete)
-- [ ] 6.5 Add PATCH /api/admin/users/:id/enable (restore)
-- [ ] 6.6 Add GET /api/admin/stats (user count, verified count, admin count)
-- [ ] 6.7 Add OpenAPI annotations for admin endpoints
-- [ ] 6.8 Add admin route group to main.rs
+- [x] 6.1 Create admin handlers module (backend/src/handlers/admin.rs)
+- [x] 6.2 Add GET /api/admin/users (list with pagination, filtering)
+- [x] 6.3 Add GET /api/admin/users/:id (view user details)
+- [x] 6.4 Add PATCH /api/admin/users/:id/disable (soft delete)
+- [x] 6.5 Add PATCH /api/admin/users/:id/enable (restore)
+- [x] 6.6 ADD GET /api/admin/stats (user count, verified count, admin count)
+- [x] 6.7 Add OpenAPI annotations for admin endpoints
+- [x] 6.8 Add admin route group to main.rs
 
 ## 7. Admin Dashboard - Frontend
 - [ ] 7.1 Create /admin layout (frontend/src/app/admin/layout.tsx)
