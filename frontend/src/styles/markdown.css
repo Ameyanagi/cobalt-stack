@@ -123,23 +123,7 @@
   margin-bottom: 0.5rem;
 }
 
-/* Links */
-.markdown-content a {
-  color: oklch(var(--primary));
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  transition: color 0.2s;
-}
-
-.markdown-content a:hover {
-  color: oklch(var(--primary) / 0.8);
-}
-
-.markdown-content .external-link-icon {
-  display: inline-block;
-  margin-left: 0.25rem;
-  font-size: 0.75rem;
-}
+/* Links - now styled via component className */
 
 /* Code */
 .markdown-content code {
@@ -186,104 +170,21 @@
   }
 }
 
-/* Code block with language label */
-.markdown-content pre[data-language]::before {
-  content: attr(data-language);
-  position: absolute;
-  top: 0.5rem;
-  right: 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: oklch(var(--muted-foreground));
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+/* Code blocks now use shadcn Card component */
 
-/* Copy button container */
-.markdown-content .code-block-wrapper {
-  position: relative;
-  margin-bottom: 1.5rem;
-}
+/* Tables now use shadcn Card component */
 
-.markdown-content .copy-button {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  padding: 0.3rem 0.5rem; /* Smaller on mobile */
-  background-color: oklch(var(--primary));
-  color: oklch(var(--primary-foreground));
-  border: none;
-  border-radius: 0.375rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  opacity: 0;
-  z-index: 10;
-}
-
-@media (min-width: 768px) {
-  .markdown-content .copy-button {
-    top: 0.75rem;
-    right: 0.75rem;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.75rem;
-  }
-}
-
-/* Always visible on touch devices (mobile) */
-@media (max-width: 768px) {
-  .markdown-content .copy-button {
-    opacity: 1;
-  }
-}
-
-.markdown-content .code-block-wrapper:hover .copy-button {
-  opacity: 1;
-}
-
-.markdown-content .copy-button:hover {
-  background-color: oklch(var(--primary) / 0.9);
-  transform: translateY(-1px);
-}
-
-.markdown-content .copy-button:active {
-  transform: translateY(0);
-}
-
-.markdown-content .copy-button.copied {
-  background-color: oklch(var(--success) / 1);
-}
-
-/* Tables */
-.markdown-content .table-wrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom: 1rem;
-  position: relative;
-}
-
-/* Shadow indicator for table overflow */
-.markdown-content .table-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 2rem;
-  background: linear-gradient(to right, transparent, oklch(var(--background) / 0.1));
-  pointer-events: none;
-}
-
-@media (max-width: 768px) {
-  .markdown-content table {
-    min-width: 640px; /* Ensure table doesn't get too cramped */
-  }
-}
-
+/* Tables - inside Card component */
 .markdown-content table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 640px; /* Ensure table doesn't get too cramped on mobile */
+}
+
+@media (min-width: 768px) {
+  .markdown-content table {
+    min-width: 100%;
+  }
 }
 
 .markdown-content thead {
@@ -306,20 +207,7 @@
   background-color: oklch(var(--muted) / 0.5);
 }
 
-/* Blockquotes */
-.markdown-content blockquote {
-  border-left: 4px solid oklch(var(--primary));
-  padding-left: 1rem;
-  font-style: italic;
-  margin: 1rem 0;
-  color: oklch(var(--muted-foreground));
-}
-
-/* Horizontal Rule */
-.markdown-content hr {
-  margin: 2rem 0;
-  border-color: oklch(var(--border));
-}
+/* Blockquotes and HR now use shadcn components (Card, Separator) */
 
 /* Images */
 .markdown-content img {

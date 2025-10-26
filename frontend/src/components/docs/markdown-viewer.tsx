@@ -6,6 +6,10 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
 import mermaid from 'mermaid'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Check, Copy } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
 import '@/styles/markdown.css'
 import '@/styles/highlight.css'
 
@@ -23,13 +27,25 @@ function CopyButton({ code }: { code: string }) {
   }
 
   return (
-    <button
+    <Button
       onClick={handleCopy}
-      className={`copy-button ${copied ? 'copied' : ''}`}
+      variant={copied ? "default" : "secondary"}
+      size="sm"
+      className="absolute top-2 right-2 h-8 px-3 gap-1.5 z-10"
       aria-label="Copy code"
     >
-      {copied ? 'Copied!' : 'Copy'}
-    </button>
+      {copied ? (
+        <>
+          <Check className="h-3.5 w-3.5" />
+          <span className="text-xs">Copied!</span>
+        </>
+      ) : (
+        <>
+          <Copy className="h-3.5 w-3.5" />
+          <span className="text-xs hidden sm:inline">Copy</span>
+        </>
+      )}
+    </Button>
   )
 }
 
@@ -97,14 +113,23 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
 
             if (!inline) {
               return (
-                <div className="code-block-wrapper">
+                <Card className="relative my-6 overflow-hidden">
+                  {language && (
+                    <div className="flex items-center justify-between px-4 py-2 bg-muted/50 border-b">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        {language}
+                      </span>
+                    </div>
+                  )}
                   <CopyButton code={codeString} />
-                  <pre className={className} data-language={language}>
-                    <code className={className} {...rest}>
-                      {children}
-                    </code>
-                  </pre>
-                </div>
+                  <div className="overflow-x-auto">
+                    <pre className={className}>
+                      <code className={className} {...rest}>
+                        {children}
+                      </code>
+                    </pre>
+                  </div>
+                </Card>
               )
             }
 
@@ -129,9 +154,11 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
           },
           // Style tables
           table: ({ children, ...props }) => (
-            <div className="table-wrapper">
-              <table {...props}>{children}</table>
-            </div>
+            <Card className="my-6 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table {...props}>{children}</table>
+              </div>
+            </Card>
           ),
           // Style links
           a: ({ href, children, ...props }) => {
@@ -140,13 +167,24 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
               <a
                 href={href}
                 {...props}
+                className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
                 {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
               >
                 {children}
-                {isExternal && <span className="external-link-icon">↗</span>}
+                {isExternal && <span className="ml-1 inline-block text-xs">↗</span>}
               </a>
             )
           },
+          // Style blockquotes
+          blockquote: ({ children, ...props }) => (
+            <Card className="my-6 border-l-4 border-l-primary bg-muted/30">
+              <div className="p-4 italic">
+                {children}
+              </div>
+            </Card>
+          ),
+          // Style horizontal rules
+          hr: () => <Separator className="my-8" />,
         }}
       >
         {content}
