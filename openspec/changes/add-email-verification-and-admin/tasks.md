@@ -20,7 +20,7 @@
 - [x] 3.4 Create verification token generation utility
 - [x] 3.5 Add POST /api/auth/send-verification endpoint
 - [x] 3.6 Add POST /api/auth/verify-email endpoint
-- [ ] 3.7 Modify registration to send verification email
+- [x] 3.7 Modify registration to send verification email
 - [x] 3.8 Add verification token validation logic
 - [x] 3.9 Update email_verified field on successful verification
 - [x] 3.10 Add OpenAPI annotations for verification endpoints

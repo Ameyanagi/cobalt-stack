@@ -188,6 +188,22 @@ pub async fn register(
 
     let user = user.insert(state.db.as_ref()).await?;
 
+    // Send verification email
+    {
+        use crate::services::email::{create_verification_token, EmailSender, MockEmailSender};
+
+        // Create verification token
+        let token = create_verification_token(state.db.as_ref(), user.id)
+            .await
+            .map_err(|e| AuthError::DatabaseError(format!("Failed to create token: {}", e)))?;
+
+        // Send verification email
+        let email_sender = MockEmailSender;
+        email_sender
+            .send_verification_email(&user.email, &token)
+            .map_err(|_| AuthError::InternalError)?;
+    }
+
     // Generate tokens
     let access_token = create_access_token(user.id, user.username.clone(), &state.jwt_config)
         .map_err(|_| AuthError::JwtEncodingError)?;
