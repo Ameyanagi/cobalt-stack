@@ -135,6 +135,25 @@ cd backend
 sea-orm-cli migrate generate create_users_table
 ```
 
+### Creating Initial Admin User
+
+After running migrations, create an initial admin user for testing and development:
+
+```bash
+# Create admin user
+make seed-admin
+
+# Default credentials (CHANGE IN PRODUCTION):
+# Email: admin@example.com
+# Password: admin123
+```
+
+**⚠️ IMPORTANT:** The seed script:
+- Creates a user with admin role and verified email
+- Will skip if an admin user already exists with `admin@example.com`
+- Should only be used in development/testing environments
+- **Always change the default password after first login**
+
 ## 📝 OpenAPI & Type Generation
 
 ```bash

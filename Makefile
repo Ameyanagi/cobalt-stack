@@ -1,4 +1,4 @@
-.PHONY: setup dev dev-backend dev-frontend test build build-frontend docker-build clean help migrate generate-openapi generate-types
+.PHONY: setup dev dev-backend dev-frontend test build build-frontend docker-build clean help migrate seed-admin generate-openapi generate-types
 
 ## Default target
 .DEFAULT_GOAL := help
@@ -26,6 +26,7 @@ help:
 	@echo ""
 	@echo "Database:"
 	@echo "  make migrate        - Run database migrations"
+	@echo "  make seed-admin     - Create initial admin user"
 	@echo ""
 	@echo "OpenAPI:"
 	@echo "  make generate-openapi - Generate OpenAPI schema"
@@ -118,10 +119,15 @@ migrate:
 	fi
 	@cd backend && sea-orm-cli migrate up
 
+## seed-admin: Create initial admin user
+seed-admin:
+	@echo "🌱 Creating admin user..."
+	@cd backend && cargo run --bin seed-admin
+
 ## generate-openapi: Generate OpenAPI schema
 generate-openapi:
 	@echo "📝 Generating OpenAPI schema..."
-	@cd backend && cargo run
+	@cd backend && cargo run --bin cobalt-stack-backend
 	@echo "✅ OpenAPI schema generated at openapi/schema.json"
 
 ## generate-types: Generate TypeScript types from OpenAPI schema

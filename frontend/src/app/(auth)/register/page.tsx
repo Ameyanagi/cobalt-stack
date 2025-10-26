@@ -35,6 +35,7 @@ export default function RegisterPage() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false)
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -87,8 +88,13 @@ export default function RegisterPage() {
       // Update auth context
       login(result.access_token, user)
 
-      // Redirect to home
-      router.push('/')
+      // Show verification message
+      setShowVerificationMessage(true)
+
+      // Redirect to dashboard after a moment
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 3000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {
@@ -105,6 +111,17 @@ export default function RegisterPage() {
         </CardHeader>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
+            {showVerificationMessage && (
+              <div className="rounded-md bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-900 p-4 text-sm">
+                <p className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                  Account created successfully!
+                </p>
+                <p className="text-blue-700 dark:text-blue-300">
+                  A verification email has been sent to your email address. Please check your inbox and click the verification link to activate all features.
+                </p>
+              </div>
+            )}
+
             {error && (
               <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
                 {error}

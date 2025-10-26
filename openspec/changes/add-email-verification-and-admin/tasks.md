@@ -26,12 +26,12 @@
 - [x] 3.10 Add OpenAPI annotations for verification endpoints
 
 ## 4. Email Verification - Frontend
-- [ ] 4.1 Create /verify-email page (frontend/src/app/verify-email/page.tsx)
-- [ ] 4.2 Add email verification UI component
-- [ ] 4.3 Add resend verification button to dashboard/profile
-- [ ] 4.4 Add unverified email warning banner component
-- [ ] 4.5 Update registration flow to show verification message
-- [ ] 4.6 Generate TypeScript types for verification endpoints
+- [x] 4.1 Create /verify-email page (frontend/src/app/verify-email/page.tsx)
+- [x] 4.2 Add email verification UI component
+- [x] 4.3 Add resend verification button to dashboard/profile
+- [x] 4.4 Add unverified email warning banner component
+- [x] 4.5 Update registration flow to show verification message
+- [x] 4.6 Generate TypeScript types for verification endpoints
 
 ## 5. Admin Middleware & Authorization
 - [x] 5.1 Create admin middleware (backend/src/middleware/admin.rs)
@@ -63,9 +63,9 @@
 - [ ] 7.11 Generate TypeScript types for admin endpoints
 
 ## 8. Database Seeding
-- [ ] 8.1 Create seed script to create initial admin user
-- [ ] 8.2 Add Makefile/script command: make seed-admin
-- [ ] 8.3 Document admin user creation in README
+- [x] 8.1 Create seed script to create initial admin user
+- [x] 8.2 Add Makefile/script command: make seed-admin
+- [x] 8.3 Document admin user creation in README
 
 ## 9. Testing
 - [ ] 9.1 Write unit tests for verification token generation
