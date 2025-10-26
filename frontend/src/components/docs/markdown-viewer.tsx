@@ -31,13 +31,13 @@ function CopyButton({ code }: { code: string }) {
       onClick={handleCopy}
       variant={copied ? "default" : "secondary"}
       size="sm"
-      className="absolute top-2 right-2 h-8 px-3 gap-1.5 z-10"
+      className="absolute top-2 right-2 h-7 px-2 gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity sm:h-8 sm:px-3"
       aria-label="Copy code"
     >
       {copied ? (
         <>
           <Check className="h-3.5 w-3.5" />
-          <span className="text-xs">Copied!</span>
+          <span className="text-xs hidden sm:inline">Copied!</span>
         </>
       ) : (
         <>
@@ -113,23 +113,25 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
 
             if (!inline) {
               return (
-                <Card className="relative my-6 overflow-hidden">
-                  {language && (
-                    <div className="flex items-center justify-between px-4 py-2 bg-muted/50 border-b">
-                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        {language}
-                      </span>
-                    </div>
-                  )}
+                <div className="relative my-4 group">
                   <CopyButton code={codeString} />
-                  <div className="overflow-x-auto">
-                    <pre className={className}>
-                      <code className={className} {...rest}>
-                        {children}
-                      </code>
-                    </pre>
-                  </div>
-                </Card>
+                  <Card className="overflow-hidden">
+                    {language && (
+                      <div className="flex items-center px-3 py-1.5 bg-muted/30 border-b">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          {language}
+                        </span>
+                      </div>
+                    )}
+                    <div className="overflow-x-auto">
+                      <pre className={className}>
+                        <code className={className} {...rest}>
+                          {children}
+                        </code>
+                      </pre>
+                    </div>
+                  </Card>
+                </div>
               )
             }
 
