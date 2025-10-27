@@ -56,6 +56,7 @@ use sha2::{Digest, Sha256};
 /// - Tokens are cryptographically random, suitable for security-sensitive operations
 /// - Each token should be used only once and stored as a hash
 /// - Tokens should expire after a reasonable time period (typically 24 hours)
+#[must_use]
 pub fn generate_verification_token() -> String {
     let mut rng = rand::thread_rng();
     let mut bytes = [0u8; 32];
@@ -98,6 +99,7 @@ pub fn generate_verification_token() -> String {
 /// - Same input always produces the same hash (deterministic)
 /// - Database stores hashes, not plaintext tokens
 /// - To verify a token, hash it and compare with stored hash
+#[must_use]
 pub fn hash_token(token: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(token.as_bytes());

@@ -104,7 +104,7 @@ pub struct RefreshTokenClaims {
     pub iat: i64,
 
     /// Token ID for rotation tracking.
-    /// Matches refresh_tokens.id in database.
+    /// Matches `refresh_tokens.id` in database.
     pub jti: Uuid,
 }
 
@@ -150,6 +150,7 @@ pub struct JwtConfig {
 }
 
 impl JwtConfig {
+    #[must_use]
     pub fn from_env() -> Self {
         Self {
             secret: std::env::var("JWT_SECRET").unwrap_or_else(|_| {
@@ -271,11 +272,10 @@ mod tests {
         let user_id = Uuid::new_v4();
         let username = "testuser".to_string();
 
-        let token = create_access_token(user_id, username.clone(), &config).unwrap();
+        let token = create_access_token(user_id, username, &config).unwrap();
 
         // JWT should have 3 parts separated by dots
-        let parts: Vec<&str> = token.split('.').collect();
-        assert_eq!(parts.len(), 3);
+        assert_eq!(token.split('.').count(), 3);
     }
 
     #[test]
@@ -328,8 +328,7 @@ mod tests {
         let (token, jti) = create_refresh_token(user_id, &config).unwrap();
 
         // JWT should have 3 parts
-        let parts: Vec<&str> = token.split('.').collect();
-        assert_eq!(parts.len(), 3);
+        assert_eq!(token.split('.').count(), 3);
 
         // jti should be valid UUID
         assert_ne!(jti, Uuid::nil());

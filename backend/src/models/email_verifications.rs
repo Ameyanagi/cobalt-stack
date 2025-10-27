@@ -78,10 +78,10 @@ pub struct Model {
     pub created_at: DateTimeWithTimeZone,
 }
 
-/// Entity relations for the EmailVerification model.
+/// Entity relations for the `EmailVerification` model.
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    /// EmailVerification belongs to a User.
+    /// `EmailVerification` belongs to a User.
     /// Cascades on delete: deleting user removes verification records.
     #[sea_orm(
         belongs_to = "super::users::Entity",

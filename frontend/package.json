@@ -6,9 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
+    "lint": "bunx --bun biome check .",
+    "lint:fix": "bunx --bun biome check --write .",
+    "format": "bunx --bun biome format --write .",
     "typecheck": "tsc --noEmit",
     "check": "bun run typecheck && bun run lint",
     "generate-types": "openapi-typescript ../openapi/schema.json -o src/types/api.ts"

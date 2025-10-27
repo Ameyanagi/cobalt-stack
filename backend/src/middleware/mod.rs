@@ -12,8 +12,8 @@
 //!
 //! Middleware is applied in layers with specific ordering requirements:
 //!
-//! 1. **auth_middleware** - First layer: validates JWT token, injects AuthUser
-//! 2. **admin_middleware** - Second layer: checks admin role (requires auth_middleware)
+//! 1. **`auth_middleware`** - First layer: validates JWT token, injects `AuthUser`
+//! 2. **`admin_middleware`** - Second layer: checks admin role (requires `auth_middleware`)
 //!
 //! # Usage Example
 //!

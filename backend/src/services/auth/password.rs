@@ -16,7 +16,7 @@
 //! # Password Requirements
 //!
 //! - Minimum length: 8 characters
-//! - Maximum length: 128 characters (DoS prevention)
+//! - Maximum length: 128 characters (`DoS` prevention)
 //! - No complexity requirements (length-based security)
 //!
 //! # Examples
@@ -160,7 +160,7 @@ pub fn verify_password(password: &str, password_hash: &str) -> Result<bool> {
 ///
 /// Requirements:
 /// - Minimum 8 characters
-/// - Maximum 128 characters (prevent DoS)
+/// - Maximum 128 characters (prevent `DoS`)
 fn validate_password_strength(password: &str) -> Result<()> {
     let len = password.len();
 

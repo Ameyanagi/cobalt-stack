@@ -13,24 +13,24 @@ use serde_json::json;
 ///
 /// # Error Categories
 ///
-/// - **Authentication**: InvalidCredentials, TokenExpired, InvalidToken
-/// - **Authorization**: EmailNotVerified, TokenBlacklisted
-/// - **User Management**: UserAlreadyExists, UserNotFound
-/// - **Input Validation**: InvalidInput, WeakPassword
-/// - **Infrastructure**: DatabaseError, RedisError, InternalError
-/// - **Rate Limiting**: RateLimitExceeded
+/// - **Authentication**: `InvalidCredentials`, `TokenExpired`, `InvalidToken`
+/// - **Authorization**: `EmailNotVerified`, `TokenBlacklisted`
+/// - **User Management**: `UserAlreadyExists`, `UserNotFound`
+/// - **Input Validation**: `InvalidInput`, `WeakPassword`
+/// - **Infrastructure**: `DatabaseError`, `RedisError`, `InternalError`
+/// - **Rate Limiting**: `RateLimitExceeded`
 ///
 /// # HTTP Status Mapping
 ///
 /// | Error | HTTP Status |
 /// |-------|-------------|
-/// | InvalidCredentials | 401 Unauthorized |
-/// | UserAlreadyExists | 409 Conflict |
-/// | UserNotFound | 404 Not Found |
-/// | EmailNotVerified | 403 Forbidden |
-/// | RateLimitExceeded | 429 Too Many Requests |
-/// | InvalidInput | 400 Bad Request |
-/// | DatabaseError | 500 Internal Server Error |
+/// | `InvalidCredentials` | 401 Unauthorized |
+/// | `UserAlreadyExists` | 409 Conflict |
+/// | `UserNotFound` | 404 Not Found |
+/// | `EmailNotVerified` | 403 Forbidden |
+/// | `RateLimitExceeded` | 429 Too Many Requests |
+/// | `InvalidInput` | 400 Bad Request |
+/// | `DatabaseError` | 500 Internal Server Error |
 ///
 /// # Examples
 ///
@@ -132,7 +132,7 @@ pub enum AuthError {
 
     /// Database operation failed.
     ///
-    /// Wraps SeaORM database errors. Details are logged but not exposed to client.
+    /// Wraps `SeaORM` database errors. Details are logged but not exposed to client.
     /// Maps to HTTP 500 Internal Server Error.
     #[error("Database error: {0}")]
     DatabaseError(String),
@@ -173,46 +173,40 @@ pub enum AuthError {
     InternalError,
 }
 
-/// Implement Axum's IntoResponse for automatic HTTP status mapping
+/// Implement Axum's `IntoResponse` for automatic HTTP status mapping
 impl IntoResponse for AuthError {
     fn into_response(self) -> Response {
         let (status, message) = match self {
-            AuthError::InvalidCredentials => (StatusCode::UNAUTHORIZED, "Invalid credentials"),
-            AuthError::UserAlreadyExists => (StatusCode::CONFLICT, "User already exists"),
-            AuthError::UserNotFound => (StatusCode::NOT_FOUND, "User not found"),
-            AuthError::TokenExpired => (StatusCode::UNAUTHORIZED, "Token expired"),
-            AuthError::InvalidToken => (StatusCode::UNAUTHORIZED, "Invalid token"),
-            AuthError::TokenBlacklisted => (StatusCode::UNAUTHORIZED, "Token has been revoked"),
-            AuthError::RateLimitExceeded => {
-                (StatusCode::TOO_MANY_REQUESTS, "Too many login attempts")
-            }
-            AuthError::EmailNotVerified => (StatusCode::FORBIDDEN, "Email not verified"),
-            AuthError::WeakPassword => (
+            Self::InvalidCredentials => (StatusCode::UNAUTHORIZED, "Invalid credentials"),
+            Self::UserAlreadyExists => (StatusCode::CONFLICT, "User already exists"),
+            Self::UserNotFound => (StatusCode::NOT_FOUND, "User not found"),
+            Self::TokenExpired => (StatusCode::UNAUTHORIZED, "Token expired"),
+            Self::InvalidToken => (StatusCode::UNAUTHORIZED, "Invalid token"),
+            Self::TokenBlacklisted => (StatusCode::UNAUTHORIZED, "Token has been revoked"),
+            Self::RateLimitExceeded => (StatusCode::TOO_MANY_REQUESTS, "Too many login attempts"),
+            Self::EmailNotVerified => (StatusCode::FORBIDDEN, "Email not verified"),
+            Self::WeakPassword => (
                 StatusCode::BAD_REQUEST,
                 "Password does not meet security requirements",
             ),
-            AuthError::InvalidInput(ref msg) => (StatusCode::BAD_REQUEST, msg.as_str()),
-            AuthError::DatabaseError(_) => (
+            Self::InvalidInput(ref msg) => (StatusCode::BAD_REQUEST, msg.as_str()),
+            Self::DatabaseError(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Database operation failed",
             ),
-            AuthError::RedisError(_) => {
-                (StatusCode::INTERNAL_SERVER_ERROR, "Cache operation failed")
-            }
-            AuthError::PasswordHashError => (
+            Self::RedisError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Cache operation failed"),
+            Self::PasswordHashError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Password processing failed",
             ),
-            AuthError::JwtEncodingError => {
+            Self::JwtEncodingError => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "Token generation failed")
             }
-            AuthError::JwtDecodingError => (
+            Self::JwtDecodingError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Token verification failed",
             ),
-            AuthError::InternalError => {
-                (StatusCode::INTERNAL_SERVER_ERROR, "Internal server error")
-            }
+            Self::InternalError => (StatusCode::INTERNAL_SERVER_ERROR, "Internal server error"),
         };
 
         let body = Json(json!({
@@ -223,11 +217,11 @@ impl IntoResponse for AuthError {
     }
 }
 
-/// Convert database errors to AuthError
+/// Convert database errors to `AuthError`
 impl From<sea_orm::DbErr> for AuthError {
     fn from(err: sea_orm::DbErr) -> Self {
         tracing::error!("Database error: {:?}", err);
-        AuthError::DatabaseError(err.to_string())
+        Self::DatabaseError(err.to_string())
     }
 }
 

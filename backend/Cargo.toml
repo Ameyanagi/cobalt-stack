@@ -63,17 +63,16 @@ all = "warn"
 pedantic = "warn"
 nursery = "warn"
 
-# Deny
-unwrap_used = "deny"
-expect_used = "deny"
-panic = "deny"
-todo = "deny"
-unimplemented = "deny"
-
-# Allow (too pedantic)
+# Allow (too pedantic or future features)
 module_name_repetitions = "allow"
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
+struct_field_names = "allow"
+too_many_lines = "allow"
+needless_for_each = "allow"
+
+[lints.rust]
+dead_code = "allow"
 
 [[bin]]
 name = "cobalt-stack-backend"

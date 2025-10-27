@@ -150,7 +150,7 @@ fn extract_token_from_header(headers: &HeaderMap) -> Result<String, AuthError> {
 ///
 /// 1. Extract token from `Authorization: Bearer <token>` header
 /// 2. Verify token signature and validate expiration
-/// 3. Extract user claims (user_id, username) from token
+/// 3. Extract user claims (`user_id`, username) from token
 /// 4. Create [`AuthUser`] and inject into request extensions
 /// 5. Pass request to next middleware/handler
 ///

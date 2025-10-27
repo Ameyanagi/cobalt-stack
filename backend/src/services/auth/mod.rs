@@ -12,7 +12,7 @@
 //! - **error**: Domain-specific error types and HTTP mapping
 //! - **jwt**: JSON Web Token creation and verification
 //! - **password**: Secure password hashing and verification with Argon2
-//! - **token_rotation**: Refresh token rotation and revocation
+//! - **`token_rotation`**: Refresh token rotation and revocation
 //!
 //! # Security Features
 //!
@@ -67,11 +67,9 @@ pub mod token_rotation;
 
 pub use error::{AuthError, Result};
 pub use jwt::{
-    create_access_token, create_refresh_token, verify_access_token, verify_refresh_token,
-    AccessTokenClaims, JwtConfig, RefreshTokenClaims,
+    create_access_token, create_refresh_token, verify_access_token, verify_refresh_token, JwtConfig,
 };
 pub use password::{hash_password, verify_password};
 pub use token_rotation::{
-    cleanup_expired_tokens, revoke_all_user_tokens, revoke_refresh_token, rotate_refresh_token,
-    store_refresh_token, validate_refresh_token,
+    revoke_refresh_token, rotate_refresh_token, store_refresh_token, validate_refresh_token,
 };

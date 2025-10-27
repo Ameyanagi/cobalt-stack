@@ -90,10 +90,10 @@ pub struct Model {
     pub created_at: DateTimeWithTimeZone,
 }
 
-/// Entity relations for the OAuthAccount model.
+/// Entity relations for the `OAuthAccount` model.
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    /// OAuthAccount belongs to a User.
+    /// `OAuthAccount` belongs to a User.
     /// Cascades on delete: deleting user removes OAuth linkages.
     #[sea_orm(
         belongs_to = "super::users::Entity",

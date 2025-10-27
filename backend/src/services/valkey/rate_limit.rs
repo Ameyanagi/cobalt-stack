@@ -151,7 +151,7 @@ impl Default for RateLimitConfig {
 /// - Consider using real client IP from trusted proxy headers
 /// - Combine with other security measures (CAPTCHA after N failures)
 pub fn check_rate_limit(conn: &mut Connection, ip: &str, config: &RateLimitConfig) -> Result<bool> {
-    let key = format!("ratelimit:login:{}", ip);
+    let key = format!("ratelimit:login:{ip}");
 
     // Get current count
     let count: Option<u32> = conn.get(&key)?;
@@ -168,6 +168,7 @@ pub fn check_rate_limit(conn: &mut Connection, ip: &str, config: &RateLimitConfi
         }
         None => {
             // First attempt - set counter and TTL
+            #[allow(clippy::cast_sign_loss)]
             conn.set_ex::<_, _, ()>(&key, 1, config.window_seconds as u64)?;
             Ok(false)
         }
@@ -216,7 +217,7 @@ pub fn check_rate_limit(conn: &mut Connection, ip: &str, config: &RateLimitConfi
 /// - **False Positive**: Clear counter for legitimate users
 /// - **Testing**: Reset between test cases
 pub fn reset_rate_limit(conn: &mut Connection, ip: &str) -> Result<()> {
-    let key = format!("ratelimit:login:{}", ip);
+    let key = format!("ratelimit:login:{ip}");
     conn.del::<_, ()>(&key)?;
     Ok(())
 }
@@ -261,7 +262,7 @@ pub fn reset_rate_limit(conn: &mut Connection, ip: &str) -> Result<()> {
 /// - **UI Display**: Show "X attempts remaining" message
 /// - **Analytics**: Collect rate limit statistics
 pub fn get_attempt_count(conn: &mut Connection, ip: &str) -> Result<u32> {
-    let key = format!("ratelimit:login:{}", ip);
+    let key = format!("ratelimit:login:{ip}");
     let count: Option<u32> = conn.get(&key)?;
     Ok(count.unwrap_or(0))
 }
@@ -281,7 +282,7 @@ mod tests {
     fn test_rate_limit_key_format() {
         let ip = "192.168.1.1";
         let expected_key = "ratelimit:login:192.168.1.1";
-        let key = format!("ratelimit:login:{}", ip);
+        let key = format!("ratelimit:login:{ip}");
         assert_eq!(key, expected_key);
     }
 
@@ -289,8 +290,8 @@ mod tests {
     fn test_rate_limit_key_uniqueness() {
         let ip1 = "192.168.1.1";
         let ip2 = "192.168.1.2";
-        let key1 = format!("ratelimit:login:{}", ip1);
-        let key2 = format!("ratelimit:login:{}", ip2);
+        let key1 = format!("ratelimit:login:{ip1}");
+        let key2 = format!("ratelimit:login:{ip2}");
         assert_ne!(key1, key2);
     }
 

@@ -1,6 +1,6 @@
-//! SeaORM active enums for database enum types.
+//! `SeaORM` active enums for database enum types.
 //!
-//! This module defines Rust enums that map to PostgreSQL ENUM types.
+//! This module defines Rust enums that map to `PostgreSQL` ENUM types.
 //! These enums are used in entity fields to provide type-safe access
 //! to database enum values.
 
@@ -20,7 +20,7 @@ use utoipa::ToSchema;
 ///
 /// # Database Mapping
 ///
-/// Maps to PostgreSQL ENUM `user_role` with values:
+/// Maps to `PostgreSQL` ENUM `user_role` with values:
 /// - `"user"` → [`UserRole::User`]
 /// - `"admin"` → [`UserRole::Admin`]
 ///

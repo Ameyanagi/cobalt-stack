@@ -17,7 +17,5 @@
 //! # }
 //! ```
 
-pub use super::email_verifications::Entity as EmailVerifications;
-pub use super::o_auth_accounts::Entity as OAuthAccounts;
 pub use super::refresh_tokens::Entity as RefreshTokens;
 pub use super::users::Entity as Users;

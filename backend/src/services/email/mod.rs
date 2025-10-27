@@ -6,8 +6,8 @@
 //!
 //! # Architecture
 //!
-//! - **EmailSender trait**: Abstraction for different email backends
-//! - **MockEmailSender**: Development implementation that logs to console
+//! - **`EmailSender` trait**: Abstraction for different email backends
+//! - **`MockEmailSender`**: Development implementation that logs to console
 //! - **verification**: Email verification token management
 //!
 //! # Usage
