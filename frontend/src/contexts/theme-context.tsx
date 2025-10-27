@@ -1,7 +1,7 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { ThemeName, ThemeMode } from '@/lib/theme-config'
+import { createContext, type ReactNode, useContext, useEffect, useState } from 'react'
+import type { ThemeMode, ThemeName } from '@/lib/theme-config'
 
 interface ThemeContextType {
   theme: ThemeName
@@ -24,7 +24,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const savedTheme = localStorage.getItem('theme') as ThemeName | null
     const savedMode = localStorage.getItem('mode') as ThemeMode | null
 
-    if (savedTheme && (savedTheme === 'default' || savedTheme === 'nature' || savedTheme === 'violet-bloom')) {
+    if (
+      savedTheme &&
+      (savedTheme === 'default' || savedTheme === 'nature' || savedTheme === 'violet-bloom')
+    ) {
       setThemeState(savedTheme)
     }
     if (savedMode && (savedMode === 'light' || savedMode === 'dark')) {

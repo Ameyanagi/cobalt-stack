@@ -1,9 +1,27 @@
-(function() {
-    var implementors = Object.fromEntries([["cobalt_stack_backend",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.90.0/core/str/traits/trait.FromStr.html\" title=\"trait core::str::traits::FromStr\">FromStr</a> for <a class=\"enum\" href=\"cobalt_stack_backend/models/email_verifications/enum.Column.html\" title=\"enum cobalt_stack_backend::models::email_verifications::Column\">Column</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.90.0/core/str/traits/trait.FromStr.html\" title=\"trait core::str::traits::FromStr\">FromStr</a> for <a class=\"enum\" href=\"cobalt_stack_backend/models/o_auth_accounts/enum.Column.html\" title=\"enum cobalt_stack_backend::models::o_auth_accounts::Column\">Column</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.90.0/core/str/traits/trait.FromStr.html\" title=\"trait core::str::traits::FromStr\">FromStr</a> for <a class=\"enum\" href=\"cobalt_stack_backend/models/refresh_tokens/enum.Column.html\" title=\"enum cobalt_stack_backend::models::refresh_tokens::Column\">Column</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.90.0/core/str/traits/trait.FromStr.html\" title=\"trait core::str::traits::FromStr\">FromStr</a> for <a class=\"enum\" href=\"cobalt_stack_backend/models/users/enum.Column.html\" title=\"enum cobalt_stack_backend::models::users::Column\">Column</a>"]]]]);
-    if (window.register_implementors) {
-        window.register_implementors(implementors);
-    } else {
-        window.pending_implementors = implementors;
-    }
+;(() => {
+  var implementors = Object.fromEntries([
+    [
+      'cobalt_stack_backend',
+      [
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/str/traits/trait.FromStr.html" title="trait core::str::traits::FromStr">FromStr</a> for <a class="enum" href="cobalt_stack_backend/models/email_verifications/enum.Column.html" title="enum cobalt_stack_backend::models::email_verifications::Column">Column</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/str/traits/trait.FromStr.html" title="trait core::str::traits::FromStr">FromStr</a> for <a class="enum" href="cobalt_stack_backend/models/o_auth_accounts/enum.Column.html" title="enum cobalt_stack_backend::models::o_auth_accounts::Column">Column</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/str/traits/trait.FromStr.html" title="trait core::str::traits::FromStr">FromStr</a> for <a class="enum" href="cobalt_stack_backend/models/refresh_tokens/enum.Column.html" title="enum cobalt_stack_backend::models::refresh_tokens::Column">Column</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/str/traits/trait.FromStr.html" title="trait core::str::traits::FromStr">FromStr</a> for <a class="enum" href="cobalt_stack_backend/models/users/enum.Column.html" title="enum cobalt_stack_backend::models::users::Column">Column</a>',
+        ],
+      ],
+    ],
+  ])
+  if (window.register_implementors) {
+    window.register_implementors(implementors)
+  } else {
+    window.pending_implementors = implementors
+  }
 })()
 //{"start":57,"fragment_lengths":[1340]}

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["MaybePoolConnection"]};
+window.SIDEBAR_ITEMS = { enum: ['MaybePoolConnection'] }

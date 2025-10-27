@@ -1,29 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { BookOpen, Github, Menu, MoreVertical, Zap } from 'lucide-react'
 import Link from 'next/link'
-import { ThemeToggle } from '@/components/theme/theme-toggle'
-import { ThemeSelector } from '@/components/theme/theme-selector'
+import { useState } from 'react'
 import { DocsSidebar, DocsSidebarContent } from '@/components/docs/docs-sidebar'
-import { BookOpen, Github, Zap, Menu, MoreVertical } from 'lucide-react'
+import { ThemeSelector } from '@/components/theme/theme-selector'
+import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { Button } from '@/components/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from '@/components/ui/sheet'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 
-export default function DocsLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -63,17 +55,23 @@ export default function DocsLayout({
               {/* Desktop: Full header */}
               <div className="hidden lg:flex items-center gap-2">
                 <Link href="/">
-                  <Button variant="ghost" size="sm">Home</Button>
+                  <Button variant="ghost" size="sm">
+                    Home
+                  </Button>
                 </Link>
                 <Link href="/api-docs">
-                  <Button variant="ghost" size="sm">Rust API Docs</Button>
+                  <Button variant="ghost" size="sm">
+                    Rust API Docs
+                  </Button>
                 </Link>
                 <a
                   href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/swagger-ui`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Button variant="ghost" size="sm">Swagger API</Button>
+                  <Button variant="ghost" size="sm">
+                    Swagger API
+                  </Button>
                 </a>
                 <a
                   href="https://github.com/Ameyanagi/cobalt-stack"
@@ -91,10 +89,14 @@ export default function DocsLayout({
               {/* Tablet: Partial header + overflow menu */}
               <div className="hidden md:flex lg:hidden items-center gap-2">
                 <Link href="/">
-                  <Button variant="ghost" size="sm">Home</Button>
+                  <Button variant="ghost" size="sm">
+                    Home
+                  </Button>
                 </Link>
                 <Link href="/api-docs">
-                  <Button variant="ghost" size="sm">API Docs</Button>
+                  <Button variant="ghost" size="sm">
+                    API Docs
+                  </Button>
                 </Link>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -140,10 +142,14 @@ export default function DocsLayout({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href="/" className="cursor-pointer">Home</Link>
+                      <Link href="/" className="cursor-pointer">
+                        Home
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/api-docs" className="cursor-pointer">Rust API Docs</Link>
+                      <Link href="/api-docs" className="cursor-pointer">
+                        Rust API Docs
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <a
@@ -177,9 +183,7 @@ export default function DocsLayout({
       {/* Main Content with Sidebar */}
       <div className="flex flex-1">
         <DocsSidebar />
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   )

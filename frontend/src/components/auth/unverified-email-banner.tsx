@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import { AlertCircle, X } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { env } from '@/lib/env'
 import { useAuth } from '@/contexts/auth-context'
+import { env } from '@/lib/env'
 
 export function UnverifiedEmailBanner() {
   const { user, accessToken } = useAuth()
@@ -25,26 +25,26 @@ export function UnverifiedEmailBanner() {
       const response = await fetch(`${env.apiUrl}/api/v1/auth/send-verification`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       })
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({
-          error: 'Failed to send verification email'
+          error: 'Failed to send verification email',
         }))
         throw new Error(errorData.error || 'Failed to send verification email')
       }
 
       setMessage({
         type: 'success',
-        text: 'Verification email sent! Please check your inbox.'
+        text: 'Verification email sent! Please check your inbox.',
       })
     } catch (err) {
       setMessage({
         type: 'error',
-        text: err instanceof Error ? err.message : 'Failed to send verification email'
+        text: err instanceof Error ? err.message : 'Failed to send verification email',
       })
     } finally {
       setIsResending(false)
@@ -65,11 +65,13 @@ export function UnverifiedEmailBanner() {
                 Please verify your email address to access all features.
               </p>
               {message && (
-                <p className={`text-sm mt-1 ${
-                  message.type === 'success'
-                    ? 'text-green-700 dark:text-green-400'
-                    : 'text-red-700 dark:text-red-400'
-                }`}>
+                <p
+                  className={`text-sm mt-1 ${
+                    message.type === 'success'
+                      ? 'text-green-700 dark:text-green-400'
+                      : 'text-red-700 dark:text-red-400'
+                  }`}
+                >
                   {message.text}
                 </p>
               )}

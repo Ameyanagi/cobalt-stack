@@ -2,15 +2,13 @@
  * Type-safe API client for Cobalt Stack backend
  */
 
+import type { components, paths } from '@/types/api'
 import { env } from './env'
-import type { paths, components } from '@/types/api'
 
 /**
  * API response type helper
  */
-export type ApiResponse<T> =
-  | { success: true; data: T }
-  | { success: false; error: string }
+export type ApiResponse<T> = { success: true; data: T } | { success: false; error: string }
 
 /**
  * Health check response type from OpenAPI schema

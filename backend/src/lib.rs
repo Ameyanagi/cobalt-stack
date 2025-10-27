@@ -48,8 +48,11 @@
 //! - Token rotation and revocation
 //! - Rate limiting on authentication endpoints
 
+pub mod application;
 pub mod config;
+pub mod domain;
 pub mod handlers;
+pub mod infrastructure;
 pub mod middleware;
 pub mod models;
 pub mod openapi;

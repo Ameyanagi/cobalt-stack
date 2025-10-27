@@ -1,9 +1,19 @@
 'use client'
 
+import {
+  CheckCircle2,
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Mail,
+  Shield,
+  User,
+  XCircle,
+} from 'lucide-react'
 import Link from 'next/link'
-import { useAuth } from '@/contexts/auth-context'
-import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,17 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Badge } from '@/components/ui/badge'
-import {
-  User,
-  LogOut,
-  LayoutDashboard,
-  ChevronDown,
-  Shield,
-  Mail,
-  CheckCircle2,
-  XCircle
-} from 'lucide-react'
+import { useAuth } from '@/contexts/auth-context'
 
 export function UserMenu() {
   const { user, isAuthenticated, isLoading, logout } = useAuth()
@@ -60,10 +60,7 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex items-center gap-2 h-auto py-2 px-3"
-        >
+        <Button variant="ghost" className="flex items-center gap-2 h-auto py-2 px-3">
           <Avatar className="h-8 w-8">
             <AvatarFallback className="bg-primary text-primary-foreground font-medium">
               {userInitial}
@@ -71,9 +68,7 @@ export function UserMenu() {
           </Avatar>
 
           {/* Username - hidden on mobile */}
-          <span className="hidden sm:inline-flex text-sm font-medium">
-            {user.username}
-          </span>
+          <span className="hidden sm:inline-flex text-sm font-medium">{user.username}</span>
 
           {/* Role badge - hidden on mobile */}
           <Badge
@@ -100,10 +95,7 @@ export function UserMenu() {
               <span className="truncate">{user.email}</span>
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <Badge
-                variant={isAdmin ? 'destructive' : 'secondary'}
-                className="text-xs"
-              >
+              <Badge variant={isAdmin ? 'destructive' : 'secondary'} className="text-xs">
                 <Shield className="h-3 w-3 mr-1" />
                 {user.role}
               </Badge>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Braced","Hyphenated","Simple","Urn"]};
+window.SIDEBAR_ITEMS = { struct: ['Braced', 'Hyphenated', 'Simple', 'Urn'] }

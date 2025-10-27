@@ -1,22 +1,30 @@
-import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { docsNav } from '@/lib/docs-nav'
 import {
-  BookOpen, Code2, Server, Palette, Shield, Wrench,
-  FileCode, Users, AlertCircle, ArrowRight
+  AlertCircle,
+  ArrowRight,
+  BookOpen,
+  Code2,
+  FileCode,
+  Palette,
+  Server,
+  Shield,
+  Users,
+  Wrench,
 } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { docsNav } from '@/lib/docs-nav'
 
 const sectionIcons: Record<string, any> = {
   'getting-started': BookOpen,
-  'backend': Server,
-  'frontend': Code2,
-  'guides': Wrench,
-  'architecture': FileCode,
-  'api': Shield,
-  'deployment': Server,
-  'contributing': Users,
-  'troubleshooting': AlertCircle,
+  backend: Server,
+  frontend: Code2,
+  guides: Wrench,
+  architecture: FileCode,
+  api: Shield,
+  deployment: Server,
+  contributing: Users,
+  troubleshooting: AlertCircle,
 }
 
 export default function DocsIndexPage() {
@@ -54,9 +62,7 @@ export default function DocsIndexPage() {
                 Quick Start
                 <ArrowRight className="h-4 w-4" />
               </CardTitle>
-              <CardDescription>
-                Get up and running in under 10 minutes
-              </CardDescription>
+              <CardDescription>Get up and running in under 10 minutes</CardDescription>
             </CardHeader>
           </Card>
         </Link>
@@ -71,9 +77,7 @@ export default function DocsIndexPage() {
                 Backend Docs
                 <ArrowRight className="h-4 w-4" />
               </CardTitle>
-              <CardDescription>
-                Rust, Axum, and Domain-Driven Design
-              </CardDescription>
+              <CardDescription>Rust, Axum, and Domain-Driven Design</CardDescription>
             </CardHeader>
           </Card>
         </Link>
@@ -88,9 +92,7 @@ export default function DocsIndexPage() {
                 Frontend Docs
                 <ArrowRight className="h-4 w-4" />
               </CardTitle>
-              <CardDescription>
-                Next.js 15, React 19, and TypeScript
-              </CardDescription>
+              <CardDescription>Next.js 15, React 19, and TypeScript</CardDescription>
             </CardHeader>
           </Card>
         </Link>

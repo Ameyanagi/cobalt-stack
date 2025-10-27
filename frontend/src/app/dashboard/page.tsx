@@ -1,14 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { LogoutButton } from '@/components/auth/logout-button'
+import { ProtectedRoute } from '@/components/auth/protected-route'
+import { ThemeSelector } from '@/components/theme/theme-selector'
+import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ProtectedRoute } from '@/components/auth/protected-route'
 import { useAuth } from '@/contexts/auth-context'
-import { LogoutButton } from '@/components/auth/logout-button'
 import { env } from '@/lib/env'
-import { ThemeToggle } from '@/components/theme/theme-toggle'
-import { ThemeSelector } from '@/components/theme/theme-selector'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -21,9 +21,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground mt-1">
-                Welcome back, {user?.username}!
-              </p>
+              <p className="text-muted-foreground mt-1">Welcome back, {user?.username}!</p>
             </div>
             <div className="flex gap-2">
               <ThemeSelector />
@@ -93,11 +91,7 @@ export default function Dashboard() {
                 <CardDescription>Explore the API endpoints</CardDescription>
               </CardHeader>
               <CardContent>
-                <a
-                  href={`${env.apiUrl}/swagger-ui`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={`${env.apiUrl}/swagger-ui`} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="w-full">
                     Open API Docs
                   </Button>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["SchemaStatement"],"trait":["SchemaStatementBuilder"]};
+window.SIDEBAR_ITEMS = { enum: ['SchemaStatement'], trait: ['SchemaStatementBuilder'] }

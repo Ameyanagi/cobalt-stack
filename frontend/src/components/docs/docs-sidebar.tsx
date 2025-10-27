@@ -1,12 +1,12 @@
 'use client'
 
+import { ChevronDown, ChevronRight, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ChevronDown, ChevronRight, FileText } from 'lucide-react'
 import { useState } from 'react'
-import { docsNav, type DocSection } from '@/lib/docs-nav'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { type DocSection, docsNav } from '@/lib/docs-nav'
 import { cn } from '@/lib/utils'
 
 // Sidebar content component (shared between desktop and mobile)
@@ -18,7 +18,7 @@ export function DocsSidebarContent({ onLinkClick }: { onLinkClick?: () => void }
   )
 
   const toggleSection = (slug: string) => {
-    setOpenSections(prev => ({...prev, [slug]: !prev[slug] }))
+    setOpenSections((prev) => ({ ...prev, [slug]: !prev[slug] }))
   }
 
   return (

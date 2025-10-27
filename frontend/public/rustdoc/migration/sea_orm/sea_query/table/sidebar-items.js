@@ -1,1 +1,25 @@
-window.SIDEBAR_ITEMS = {"enum":["ColumnSpec","ColumnType","PgDateTruncUnit","PgInterval","StringLen","TableAlterOption","TableDropOpt","TableOpt","TablePartition","TableStatement"],"struct":["AddColumnOption","ColumnDef","Table","TableAlterStatement","TableCreateStatement","TableDropStatement","TableRenameStatement","TableTruncateStatement"],"trait":["IntoColumnDef"]};
+window.SIDEBAR_ITEMS = {
+  enum: [
+    'ColumnSpec',
+    'ColumnType',
+    'PgDateTruncUnit',
+    'PgInterval',
+    'StringLen',
+    'TableAlterOption',
+    'TableDropOpt',
+    'TableOpt',
+    'TablePartition',
+    'TableStatement',
+  ],
+  struct: [
+    'AddColumnOption',
+    'ColumnDef',
+    'Table',
+    'TableAlterStatement',
+    'TableCreateStatement',
+    'TableDropStatement',
+    'TableRenameStatement',
+    'TableTruncateStatement',
+  ],
+  trait: ['IntoColumnDef'],
+}

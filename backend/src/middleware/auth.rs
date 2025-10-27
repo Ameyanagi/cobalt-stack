@@ -84,6 +84,26 @@ pub struct AuthUser {
     pub username: String,
 }
 
+// Implement FromRequestParts to allow AuthUser to be used as an axum extractor
+#[axum::async_trait]
+impl<S> axum::extract::FromRequestParts<S> for AuthUser
+where
+    S: Send + Sync,
+{
+    type Rejection = (StatusCode, &'static str);
+
+    async fn from_request_parts(
+        parts: &mut axum::http::request::Parts,
+        _state: &S,
+    ) -> Result<Self, Self::Rejection> {
+        parts
+            .extensions
+            .get::<AuthUser>()
+            .cloned()
+            .ok_or((StatusCode::UNAUTHORIZED, "Unauthorized"))
+    }
+}
+
 /// Extract JWT token from Authorization header.
 ///
 /// Parses the Authorization header and extracts the JWT token.

@@ -1,14 +1,14 @@
 'use client'
 
+import { Check, Copy } from 'lucide-react'
+import mermaid from 'mermaid'
 import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
-import mermaid from 'mermaid'
-import { Card } from '@/components/ui/card'
+import remarkGfm from 'remark-gfm'
 import { Button } from '@/components/ui/button'
-import { Check, Copy } from 'lucide-react'
+import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import '@/styles/markdown.css'
 import '@/styles/highlight.css'
@@ -29,7 +29,7 @@ function CopyButton({ code }: { code: string }) {
   return (
     <Button
       onClick={handleCopy}
-      variant={copied ? "default" : "secondary"}
+      variant={copied ? 'default' : 'secondary'}
       size="sm"
       className="absolute top-2 right-2 h-7 px-2 gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity sm:h-8 sm:px-3"
       aria-label="Copy code"
@@ -75,12 +75,15 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
           div.className = 'mermaid-diagram'
           parent.replaceWith(div)
 
-          mermaid.render(id, code).then(({ svg }) => {
-            div.innerHTML = svg
-          }).catch((error) => {
-            console.error('Mermaid rendering error:', error)
-            div.innerHTML = `<pre class="mermaid-error">Failed to render diagram</pre>`
-          })
+          mermaid
+            .render(id, code)
+            .then(({ svg }) => {
+              div.innerHTML = svg
+            })
+            .catch((error) => {
+              console.error('Mermaid rendering error:', error)
+              div.innerHTML = `<pre class="mermaid-error">Failed to render diagram</pre>`
+            })
         }
       })
     }
@@ -143,16 +146,43 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
           },
           // Add anchor links to headings
           h1: ({ children, ...props }) => {
-            const id = String(children).toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
-            return <h1 id={id} {...props}><a href={`#${id}`} className="heading-anchor">{children}</a></h1>
+            const id = String(children)
+              .toLowerCase()
+              .replace(/\s+/g, '-')
+              .replace(/[^\w-]/g, '')
+            return (
+              <h1 id={id} {...props}>
+                <a href={`#${id}`} className="heading-anchor">
+                  {children}
+                </a>
+              </h1>
+            )
           },
           h2: ({ children, ...props }) => {
-            const id = String(children).toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
-            return <h2 id={id} {...props}><a href={`#${id}`} className="heading-anchor">{children}</a></h2>
+            const id = String(children)
+              .toLowerCase()
+              .replace(/\s+/g, '-')
+              .replace(/[^\w-]/g, '')
+            return (
+              <h2 id={id} {...props}>
+                <a href={`#${id}`} className="heading-anchor">
+                  {children}
+                </a>
+              </h2>
+            )
           },
           h3: ({ children, ...props }) => {
-            const id = String(children).toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
-            return <h3 id={id} {...props}><a href={`#${id}`} className="heading-anchor">{children}</a></h3>
+            const id = String(children)
+              .toLowerCase()
+              .replace(/\s+/g, '-')
+              .replace(/[^\w-]/g, '')
+            return (
+              <h3 id={id} {...props}>
+                <a href={`#${id}`} className="heading-anchor">
+                  {children}
+                </a>
+              </h3>
+            )
           },
           // Style tables
           table: ({ children, ...props }) => (
@@ -180,9 +210,7 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
           // Style blockquotes
           blockquote: ({ children, ...props }) => (
             <Card className="my-6 border-l-4 border-l-primary bg-muted/30">
-              <div className="p-4 italic">
-                {children}
-              </div>
+              <div className="p-4 italic">{children}</div>
             </Card>
           ),
           // Style horizontal rules

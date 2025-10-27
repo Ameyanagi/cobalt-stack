@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { env } from '@/lib/env'
 
 // Types for authentication state
@@ -118,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Fetch user info with new access token
       const userResponse = await fetch(`${env.apiUrl}/api/v1/auth/me`, {
         headers: {
-          'Authorization': `Bearer ${data.access_token}`,
+          Authorization: `Bearer ${data.access_token}`,
         },
       })
 
@@ -153,7 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Update user information
    */
   const updateUser = useCallback((user: User) => {
-    setAuthState(prev => ({
+    setAuthState((prev) => ({
       ...prev,
       user,
     }))

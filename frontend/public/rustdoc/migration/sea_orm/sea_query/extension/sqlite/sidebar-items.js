@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["SqliteBinOper"],"trait":["SqliteExpr"]};
+window.SIDEBAR_ITEMS = { enum: ['SqliteBinOper'], trait: ['SqliteExpr'] }

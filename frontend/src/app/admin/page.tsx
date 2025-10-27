@@ -1,10 +1,10 @@
 'use client'
 
+import { Loader2, Shield, UserCheck, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/contexts/auth-context'
 import { env } from '@/lib/env'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, UserCheck, Shield, Loader2 } from 'lucide-react'
 
 interface AdminStats {
   total_users: number
@@ -23,7 +23,7 @@ export default function AdminDashboardPage() {
       try {
         const response = await fetch(`${env.apiUrl}/api/v1/admin/stats`, {
           headers: {
-            'Authorization': `Bearer ${accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         })
 
@@ -54,11 +54,7 @@ export default function AdminDashboardPage() {
   }
 
   if (error) {
-    return (
-      <div className="rounded-md bg-destructive/15 p-4 text-sm text-destructive">
-        {error}
-      </div>
-    )
+    return <div className="rounded-md bg-destructive/15 p-4 text-sm text-destructive">{error}</div>
   }
 
   const verificationRate = stats
@@ -70,37 +66,35 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard</h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          Overview of your platform statistics
-        </p>
+        <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+          Dashboard
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400">Overview of your platform statistics</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Users
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.total_users || 0}</div>
-            <p className="text-xs text-gray-600 dark:text-gray-400">
-              All registered users
-            </p>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {stats?.total_users || 0}
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">All registered users</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Verified Users
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Verified Users</CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.verified_users || 0}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {stats?.verified_users || 0}
+            </div>
             <p className="text-xs text-gray-600 dark:text-gray-400">
               {verificationRate}% verification rate
             </p>
@@ -109,16 +103,14 @@ export default function AdminDashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Administrators
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Administrators</CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.admin_users || 0}</div>
-            <p className="text-xs text-gray-600 dark:text-gray-400">
-              Users with admin access
-            </p>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {stats?.admin_users || 0}
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">Users with admin access</p>
           </CardContent>
         </Card>
       </div>
@@ -126,9 +118,7 @@ export default function AdminDashboardPage() {
       <Card>
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>
-            Common administrative tasks
-          </CardDescription>
+          <CardDescription>Common administrative tasks</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
           <a

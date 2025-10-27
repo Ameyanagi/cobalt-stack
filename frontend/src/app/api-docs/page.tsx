@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { ArrowLeft, BookOpen, Code2, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import Link from 'next/link'
-import { ExternalLink, BookOpen, Code2, ArrowLeft } from 'lucide-react'
 
 export default function ApiDocsPage() {
   const router = useRouter()
@@ -41,9 +41,7 @@ export default function ApiDocsPage() {
               <Code2 className="h-4 w-4" />
               <span>Rust API Documentation</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold">
-              Backend API Reference
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold">Backend API Reference</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Complete Rust documentation for all backend modules, types, and functions
             </p>
@@ -57,7 +55,8 @@ export default function ApiDocsPage() {
                 Rustdoc API Documentation
               </CardTitle>
               <CardDescription>
-                Comprehensive auto-generated documentation from Rust doc comments following RFC 1574 standards
+                Comprehensive auto-generated documentation from Rust doc comments following RFC 1574
+                standards
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

@@ -1,1 +1,26 @@
-window.SIDEBAR_ITEMS = {"enum":["BinOper","ColumnRef","JoinOn","JoinType","Keyword","LogicalChainOper","NullOrdering","Order","SubQueryOper","TableRef","UnOper"],"struct":["Alias","Asterisk","LikeExpr","NullAlias","OrderExpr","Quote","SeaRc"],"trait":["Iden","IdenList","IdenStatic","IntoColumnRef","IntoIden","IntoLikeExpr","IntoTableRef"],"type":["DynIden","RcOrArc"]};
+window.SIDEBAR_ITEMS = {
+  enum: [
+    'BinOper',
+    'ColumnRef',
+    'JoinOn',
+    'JoinType',
+    'Keyword',
+    'LogicalChainOper',
+    'NullOrdering',
+    'Order',
+    'SubQueryOper',
+    'TableRef',
+    'UnOper',
+  ],
+  struct: ['Alias', 'Asterisk', 'LikeExpr', 'NullAlias', 'OrderExpr', 'Quote', 'SeaRc'],
+  trait: [
+    'Iden',
+    'IdenList',
+    'IdenStatic',
+    'IntoColumnRef',
+    'IntoIden',
+    'IntoLikeExpr',
+    'IntoTableRef',
+  ],
+  type: ['DynIden', 'RcOrArc'],
+}

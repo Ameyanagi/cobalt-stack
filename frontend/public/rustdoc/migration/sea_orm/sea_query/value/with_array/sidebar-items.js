@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":["NotU8"]};
+window.SIDEBAR_ITEMS = { trait: ['NotU8'] }

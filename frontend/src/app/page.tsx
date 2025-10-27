@@ -1,17 +1,25 @@
 'use client'
 
+import {
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  Code2,
+  Database,
+  Github,
+  Layers,
+  Palette,
+  Shield,
+  Zap,
+} from 'lucide-react'
 import Link from 'next/link'
+import { UserMenu } from '@/components/layout/user-menu'
+import { ThemeSelector } from '@/components/theme/theme-selector'
+import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { ThemeToggle } from '@/components/theme/theme-toggle'
-import { ThemeSelector } from '@/components/theme/theme-selector'
-import { UserMenu } from '@/components/layout/user-menu'
 import { useAuth } from '@/contexts/auth-context'
-import {
-  Zap, Shield, Database, Code2, Layers, Palette,
-  CheckCircle2, ArrowRight, Github, BookOpen
-} from 'lucide-react'
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth()
@@ -67,8 +75,8 @@ export default function Home() {
           </h1>
 
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Build modern web applications with confidence using Rust's performance
-            and Next.js's developer experience. Everything you need to ship faster.
+            Build modern web applications with confidence using Rust's performance and Next.js's
+            developer experience. Everything you need to ship faster.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -102,8 +110,8 @@ export default function Home() {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Why Cobalt Stack?</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            A modern, opinionated stack that combines the best tools for building
-            scalable, maintainable applications.
+            A modern, opinionated stack that combines the best tools for building scalable,
+            maintainable applications.
           </p>
         </div>
 
@@ -324,8 +332,8 @@ export default function Home() {
           <CardContent className="p-12 text-center space-y-6">
             <h2 className="text-3xl font-bold">Ready to Build Something Amazing?</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Start with a solid foundation and focus on your unique features.
-              Cobalt Stack handles the boring stuff so you can ship faster.
+              Start with a solid foundation and focus on your unique features. Cobalt Stack handles
+              the boring stuff so you can ship faster.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               {!isAuthenticated && (

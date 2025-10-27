@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Token"],"struct":["Tokenizer"]};
+window.SIDEBAR_ITEMS = { enum: ['Token'], struct: ['Tokenizer'] }

@@ -12,6 +12,275 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/chat/sessions": {
+      "get": {
+        "tags": [
+          "chat"
+        ],
+        "summary": "List user's chat sessions with pagination",
+        "description": "# Errors\nReturns HTTP error if:\n- Database error occurs (500)",
+        "operationId": "list_user_sessions",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Items per page (default: 20)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sessions retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListSessionsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "chat"
+        ],
+        "summary": "Create a new chat session",
+        "description": "# Errors\nReturns HTTP error if:\n- Title validation fails (400)\n- Database error occurs (500)",
+        "operationId": "create_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Session created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/chat/sessions/{id}": {
+      "delete": {
+        "tags": [
+          "chat"
+        ],
+        "summary": "Delete a chat session (soft delete)",
+        "description": "# Errors\nReturns HTTP error if:\n- Session not found (404)\n- User not authorized (403)\n- Database error (500)",
+        "operationId": "delete_session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteSessionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - user does not own this session"
+          },
+          "404": {
+            "description": "Session not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/chat/sessions/{id}/messages": {
+      "get": {
+        "tags": [
+          "chat"
+        ],
+        "summary": "Get chat session message history",
+        "description": "# Errors\nReturns HTTP error if:\n- Session not found (404)\n- User not authorized (403)\n- Database error (500)",
+        "operationId": "get_session_history",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of messages to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Message history retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetHistoryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Session not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "chat"
+        ],
+        "summary": "Send a message in a chat session and stream LLM response",
+        "description": "Returns Server-Sent Events (SSE) stream with message chunks\n\n# Errors\nReturns HTTP error if:\n- Session not found (404)\n- User not authorized (403)\n- Message validation fails (400)\n- Database error (500)",
+        "operationId": "send_message",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "SSE stream of message chunks",
+            "content": {
+              "text/event-stream": {}
+            }
+          },
+          "400": {
+            "description": "Invalid message content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - user does not own this session"
+          },
+          "404": {
+            "description": "Session not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/v1/admin/stats": {
       "get": {
         "tags": [
@@ -701,6 +970,58 @@
           }
         }
       },
+      "CreateSessionRequest": {
+        "type": "object",
+        "description": "Request to create a new chat session",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Session title",
+            "example": "My Chat Session"
+          }
+        }
+      },
+      "CreateSessionResponse": {
+        "type": "object",
+        "description": "Response containing created session details",
+        "required": [
+          "session_id",
+          "title"
+        ],
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Session ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Session title"
+          }
+        }
+      },
+      "DeleteSessionResponse": {
+        "type": "object",
+        "description": "Response confirming deletion",
+        "required": [
+          "session_id",
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Confirmation message"
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Deleted session ID"
+          }
+        }
+      },
       "ErrorResponse": {
         "type": "object",
         "required": [
@@ -709,6 +1030,22 @@
         "properties": {
           "error": {
             "type": "string"
+          }
+        }
+      },
+      "GetHistoryResponse": {
+        "type": "object",
+        "description": "Response containing message history",
+        "required": [
+          "messages"
+        ],
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageDto"
+            },
+            "description": "Messages in chronological order"
           }
         }
       },
@@ -725,10 +1062,47 @@
           }
         }
       },
+      "ListSessionsResponse": {
+        "type": "object",
+        "description": "Response containing paginated sessions",
+        "required": [
+          "sessions",
+          "total",
+          "page",
+          "per_page"
+        ],
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Current page number (0-indexed)",
+            "minimum": 0
+          },
+          "per_page": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Items per page",
+            "minimum": 0
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionDto"
+            },
+            "description": "Sessions for the current page"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total number of sessions",
+            "minimum": 0
+          }
+        }
+      },
       "LoginRequest": {
         "type": "object",
         "required": [
-          "username",
+          "username_or_email",
           "password"
         ],
         "properties": {
@@ -736,9 +1110,48 @@
             "type": "string",
             "example": "SecurePass123!"
           },
-          "username": {
+          "username_or_email": {
             "type": "string",
+            "description": "Username or email address",
             "example": "alice"
+          }
+        }
+      },
+      "MessageDto": {
+        "type": "object",
+        "description": "Message details",
+        "required": [
+          "id",
+          "role",
+          "content",
+          "created_at"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Message content"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Message ID"
+          },
+          "role": {
+            "type": "string",
+            "description": "Message role"
+          },
+          "token_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Token count (if available)"
           }
         }
       },
@@ -773,6 +1186,51 @@
           "username": {
             "type": "string",
             "example": "alice"
+          }
+        }
+      },
+      "SendMessageRequest": {
+        "type": "object",
+        "description": "Request to send a message",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Message content",
+            "example": "Hello, how are you?"
+          }
+        }
+      },
+      "SessionDto": {
+        "type": "object",
+        "description": "Session details",
+        "required": [
+          "id",
+          "title",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Session ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Session title"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
           }
         }
       },
@@ -845,7 +1303,7 @@
       },
       "UserRole": {
         "type": "string",
-        "description": "User role enum for role-based access control (RBAC).\n\nDefines the authorization level for a user account.\nUsed in middleware to enforce access control policies.\n\n# Variants\n\n- `User`: Standard user with access to their own resources\n- `Admin`: Administrator with elevated privileges\n\n# Database Mapping\n\nMaps to PostgreSQL ENUM `user_role` with values:\n- `\"user\"` → [`UserRole::User`]\n- `\"admin\"` → [`UserRole::Admin`]\n\n# Examples\n\n```\nuse cobalt_stack::models::sea_orm_active_enums::UserRole;\n\nlet role = UserRole::User;\nassert_eq!(serde_json::to_string(&role).unwrap(), \"\\\"user\\\"\");\n\nlet admin = UserRole::Admin;\nassert_eq!(serde_json::to_string(&admin).unwrap(), \"\\\"admin\\\"\");\n```",
+        "description": "User role enum for role-based access control (RBAC).\n\nDefines the authorization level for a user account.\nUsed in middleware to enforce access control policies.\n\n# Variants\n\n- `User`: Standard user with access to their own resources\n- `Admin`: Administrator with elevated privileges\n\n# Database Mapping\n\nMaps to `PostgreSQL` ENUM `user_role` with values:\n- `\"user\"` → [`UserRole::User`]\n- `\"admin\"` → [`UserRole::Admin`]\n\n# Examples\n\n```\nuse cobalt_stack::models::sea_orm_active_enums::UserRole;\n\nlet role = UserRole::User;\nassert_eq!(serde_json::to_string(&role).unwrap(), \"\\\"user\\\"\");\n\nlet admin = UserRole::Admin;\nassert_eq!(serde_json::to_string(&admin).unwrap(), \"\\\"admin\\\"\");\n```",
         "enum": [
           "user",
           "admin"
@@ -883,6 +1341,10 @@
     {
       "name": "Admin",
       "description": "Admin user management endpoints"
+    },
+    {
+      "name": "chat",
+      "description": "LLM chat session and message management"
     }
   ]
 }

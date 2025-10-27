@@ -14,11 +14,7 @@ export function ThemeToggle() {
       onClick={toggleMode}
       aria-label={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}
     >
-      {mode === 'light' ? (
-        <Moon className="h-5 w-5" />
-      ) : (
-        <Sun className="h-5 w-5" />
-      )}
+      {mode === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
     </Button>
   )
 }

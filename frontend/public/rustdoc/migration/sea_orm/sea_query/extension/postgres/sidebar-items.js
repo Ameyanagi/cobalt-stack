@@ -1,1 +1,25 @@
-window.SIDEBAR_ITEMS = {"enum":["PgBinOper","PgFunction","SampleMethod","TypeAlterAddOpt","TypeAlterOpt","TypeAs","TypeDropOpt","TypeRef"],"struct":["Extension","ExtensionCreateStatement","ExtensionDropStatement","PgFunc","PgLTree","TableSample","Type","TypeAlterStatement","TypeCreateStatement","TypeDropStatement"],"trait":["ExtensionBuilder","IntoTypeRef","PgExpr","PostgresSelectStatementExt","TypeBuilder"]};
+window.SIDEBAR_ITEMS = {
+  enum: [
+    'PgBinOper',
+    'PgFunction',
+    'SampleMethod',
+    'TypeAlterAddOpt',
+    'TypeAlterOpt',
+    'TypeAs',
+    'TypeDropOpt',
+    'TypeRef',
+  ],
+  struct: [
+    'Extension',
+    'ExtensionCreateStatement',
+    'ExtensionDropStatement',
+    'PgFunc',
+    'PgLTree',
+    'TableSample',
+    'Type',
+    'TypeAlterStatement',
+    'TypeCreateStatement',
+    'TypeDropStatement',
+  ],
+  trait: ['ExtensionBuilder', 'IntoTypeRef', 'PgExpr', 'PostgresSelectStatementExt', 'TypeBuilder'],
+}

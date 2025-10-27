@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge'
 import { Shield, User } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 interface RoleBadgeProps {
   role: 'admin' | 'user'

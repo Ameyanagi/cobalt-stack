@@ -1,6 +1,7 @@
 'use client'
 
 import { Palette } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
 import { useTheme } from '@/contexts/theme-context'
-import { themes, type ThemeName } from '@/lib/theme-config'
+import { type ThemeName, themes } from '@/lib/theme-config'
 
 export function ThemeSelector() {
   const { theme: currentTheme, setTheme } = useTheme()
@@ -49,13 +49,9 @@ export function ThemeSelector() {
               </div>
               <div className="flex-1">
                 <div className="font-medium">{theme.name}</div>
-                <div className="text-xs text-muted-foreground">
-                  {theme.description}
-                </div>
+                <div className="text-xs text-muted-foreground">{theme.description}</div>
               </div>
-              {currentTheme === theme.id && (
-                <div className="text-primary">✓</div>
-              )}
+              {currentTheme === theme.id && <div className="text-primary">✓</div>}
             </div>
           </DropdownMenuItem>
         ))}

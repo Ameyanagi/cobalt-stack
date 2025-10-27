@@ -8,6 +8,7 @@
 //!
 //! - **blacklist**: JWT access token revocation via blacklist
 //! - **`rate_limit`**: Login attempt rate limiting by IP address
+//! - **`chat_rate_limit`**: Chat message rate limiting and daily quotas
 //!
 //! # Connection Management
 //!
@@ -43,6 +44,7 @@
 //! - **Future-proof**: Active development and community support
 
 pub mod blacklist;
+pub mod chat_rate_limit;
 pub mod rate_limit;
 
 use redis::Client;
@@ -69,6 +71,7 @@ use std::sync::Arc;
 /// # Ok(())
 /// # }
 /// ```
+#[derive(Clone)]
 pub struct ValkeyManager {
     client: Arc<Client>,
 }

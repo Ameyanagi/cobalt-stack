@@ -54,6 +54,8 @@
 
 pub mod prelude;
 
+pub mod chat_messages;
+pub mod chat_sessions;
 pub mod email_verifications;
 pub mod o_auth_accounts;
 pub mod refresh_tokens;

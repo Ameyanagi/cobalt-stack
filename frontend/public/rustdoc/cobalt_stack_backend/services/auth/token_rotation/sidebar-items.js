@@ -1,1 +1,10 @@
-window.SIDEBAR_ITEMS = {"fn":["cleanup_expired_tokens","revoke_all_user_tokens","revoke_refresh_token","rotate_refresh_token","store_refresh_token","validate_refresh_token"]};
+window.SIDEBAR_ITEMS = {
+  fn: [
+    'cleanup_expired_tokens',
+    'revoke_all_user_tokens',
+    'revoke_refresh_token',
+    'rotate_refresh_token',
+    'store_refresh_token',
+    'validate_refresh_token',
+  ],
+}

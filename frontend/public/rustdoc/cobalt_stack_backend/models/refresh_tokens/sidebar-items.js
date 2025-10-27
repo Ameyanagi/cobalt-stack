@@ -1,1 +1,4 @@
-window.SIDEBAR_ITEMS = {"enum":["Column","PrimaryKey","Relation"],"struct":["ActiveModel","ColumnIter","Entity","Model","PrimaryKeyIter","RelationIter"]};
+window.SIDEBAR_ITEMS = {
+  enum: ['Column', 'PrimaryKey', 'Relation'],
+  struct: ['ActiveModel', 'ColumnIter', 'Entity', 'Model', 'PrimaryKeyIter', 'RelationIter'],
+}

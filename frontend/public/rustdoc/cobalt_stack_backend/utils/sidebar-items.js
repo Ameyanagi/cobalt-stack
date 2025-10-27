@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["token"]};
+window.SIDEBAR_ITEMS = { mod: ['token'] }

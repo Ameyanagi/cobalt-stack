@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Map","Query","QueryAs","QueryScalar"]};
+window.SIDEBAR_ITEMS = { struct: ['Map', 'Query', 'QueryAs', 'QueryScalar'] }

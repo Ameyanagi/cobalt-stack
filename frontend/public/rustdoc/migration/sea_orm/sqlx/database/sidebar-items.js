@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":["Database","HasStatementCache"]};
+window.SIDEBAR_ITEMS = { trait: ['Database', 'HasStatementCache'] }

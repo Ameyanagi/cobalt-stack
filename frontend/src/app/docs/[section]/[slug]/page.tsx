@@ -1,11 +1,11 @@
-import { notFound } from 'next/navigation'
 import { readFile } from 'fs/promises'
+import { ChevronLeft, ChevronRight, Edit, Github } from 'lucide-react'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { join } from 'path'
 import { MarkdownViewer } from '@/components/docs/markdown-viewer'
-import { getDocBySlug, allDocs } from '@/lib/docs-nav'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { ChevronLeft, ChevronRight, Github, Edit } from 'lucide-react'
+import { allDocs, getDocBySlug } from '@/lib/docs-nav'
 
 interface DocPageProps {
   params: Promise<{
@@ -50,7 +50,7 @@ async function getDocContent(filePath: string): Promise<string | null> {
 
 function getAdjacentDocs(currentSection: string, currentSlug: string) {
   const currentIndex = allDocs.findIndex(
-    doc => doc.sectionSlug === currentSection && doc.slug === currentSlug
+    (doc) => doc.sectionSlug === currentSection && doc.slug === currentSlug
   )
 
   const previousDoc = currentIndex > 0 ? allDocs[currentIndex - 1] : null
@@ -95,9 +95,13 @@ export default async function DocPage({ params }: DocPageProps) {
           Docs
         </Link>
         <span className="hidden sm:inline">/</span>
-        <span className="hidden sm:inline text-foreground font-medium whitespace-nowrap">{doc.section}</span>
+        <span className="hidden sm:inline text-foreground font-medium whitespace-nowrap">
+          {doc.section}
+        </span>
         <span className="hidden sm:inline">/</span>
-        <span className="text-foreground font-medium truncate max-w-[200px] sm:max-w-none">{doc.title}</span>
+        <span className="text-foreground font-medium truncate max-w-[200px] sm:max-w-none">
+          {doc.title}
+        </span>
       </div>
 
       {/* Edit on GitHub Link */}
@@ -135,7 +139,9 @@ export default async function DocPage({ params }: DocPageProps) {
               <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
               <div className="text-left">
                 <div className="text-xs text-muted-foreground">Previous</div>
-                <div className="font-medium truncate max-w-[150px] md:max-w-none">{previousDoc.title}</div>
+                <div className="font-medium truncate max-w-[150px] md:max-w-none">
+                  {previousDoc.title}
+                </div>
               </div>
             </Button>
           </Link>
@@ -156,7 +162,9 @@ export default async function DocPage({ params }: DocPageProps) {
             <Button variant="outline" size="lg" className="gap-2 hidden sm:flex">
               <div className="text-right">
                 <div className="text-xs text-muted-foreground">Next</div>
-                <div className="font-medium truncate max-w-[150px] md:max-w-none">{nextDoc.title}</div>
+                <div className="font-medium truncate max-w-[150px] md:max-w-none">
+                  {nextDoc.title}
+                </div>
               </div>
               <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>

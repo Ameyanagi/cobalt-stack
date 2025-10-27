@@ -1,1 +1,4 @@
-window.SIDEBAR_ITEMS = {"fn":["check_rate_limit","get_attempt_count","reset_rate_limit"],"struct":["RateLimitConfig"]};
+window.SIDEBAR_ITEMS = {
+  fn: ['check_rate_limit', 'get_attempt_count', 'reset_rate_limit'],
+  struct: ['RateLimitConfig'],
+}

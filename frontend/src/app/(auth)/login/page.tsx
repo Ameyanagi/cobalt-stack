@@ -1,16 +1,23 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useAuth } from '@/contexts/auth-context'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import Link from 'next/link'
+import { useAuth } from '@/contexts/auth-context'
 import { env } from '@/lib/env'
 
 const loginSchema = z.object({
@@ -58,7 +65,7 @@ export default function LoginPage() {
       // Fetch user info with access token
       const userResponse = await fetch(`${env.apiUrl}/api/v1/auth/me`, {
         headers: {
-          'Authorization': `Bearer ${result.access_token}`,
+          Authorization: `Bearer ${result.access_token}`,
         },
       })
 
@@ -104,7 +111,9 @@ export default function LoginPage() {
                 disabled={isLoading}
               />
               {form.formState.errors.username_or_email && (
-                <p className="text-sm text-destructive">{form.formState.errors.username_or_email.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.username_or_email.message}
+                </p>
               )}
             </div>
 

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["IsNull"],"trait":["Encode"]};
+window.SIDEBAR_ITEMS = { enum: ['IsNull'], trait: ['Encode'] }

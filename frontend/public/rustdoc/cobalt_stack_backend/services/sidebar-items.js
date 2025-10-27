@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["auth","email","valkey"]};
+window.SIDEBAR_ITEMS = { mod: ['auth', 'email', 'valkey'] }

@@ -7,6 +7,7 @@
 //!
 //! - **auth**: JWT authentication middleware that validates tokens
 //! - **admin**: Role-based authorization middleware for admin-only endpoints
+//! - **chat_rate_limit**: Rate limiting middleware for chat endpoints
 //!
 //! # Middleware Chain
 //!
@@ -47,3 +48,4 @@
 
 pub mod admin;
 pub mod auth;
+pub mod chat_rate_limit;

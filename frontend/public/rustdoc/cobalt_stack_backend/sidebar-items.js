@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["config","handlers","middleware","models","services","utils"]};
+window.SIDEBAR_ITEMS = { mod: ['config', 'handlers', 'middleware', 'models', 'services', 'utils'] }

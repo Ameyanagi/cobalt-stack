@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["add_to_blacklist","is_blacklisted"]};
+window.SIDEBAR_ITEMS = { fn: ['add_to_blacklist', 'is_blacklisted'] }

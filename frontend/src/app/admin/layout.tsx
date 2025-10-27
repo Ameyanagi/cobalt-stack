@@ -1,19 +1,15 @@
 'use client'
 
-import { useAuth } from '@/contexts/auth-context'
-import { useRouter, usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { BarChart3, Shield, Users } from 'lucide-react'
 import Link from 'next/link'
-import { Shield, Users, BarChart3 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { ThemeSelector } from '@/components/theme/theme-selector'
+import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { useAuth } from '@/contexts/auth-context'
+import { cn } from '@/lib/utils'
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
@@ -55,8 +51,8 @@ export default function AdminLayout({
               <Link
                 href="/admin"
                 className={cn(
-                  "flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors",
-                  pathname === '/admin' && "text-primary"
+                  'flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors',
+                  pathname === '/admin' && 'text-primary'
                 )}
               >
                 <BarChart3 className="h-4 w-4" />
@@ -65,8 +61,8 @@ export default function AdminLayout({
               <Link
                 href="/admin/users"
                 className={cn(
-                  "flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors",
-                  pathname?.startsWith('/admin/users') && "text-primary"
+                  'flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors',
+                  pathname?.startsWith('/admin/users') && 'text-primary'
                 )}
               >
                 <Users className="h-4 w-4" />
@@ -88,9 +84,7 @@ export default function AdminLayout({
       </header>
 
       {/* Admin Content */}
-      <main className="container mx-auto px-4 py-8">
-        {children}
-      </main>
+      <main className="container mx-auto px-4 py-8">{children}</main>
     </div>
   )
 }

@@ -18,6 +18,12 @@ sea-orm = { workspace = true }
 # Valkey (Redis-compatible) - required for auth
 redis = { workspace = true }
 
+# LLM / AI
+async-openai = { workspace = true }
+async-trait = { workspace = true }
+async-stream = { workspace = true }
+futures = { workspace = true }
+
 # Serialization
 serde = { workspace = true }
 serde_json = { workspace = true }

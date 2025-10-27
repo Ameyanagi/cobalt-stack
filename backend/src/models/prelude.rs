@@ -17,5 +17,7 @@
 //! # }
 //! ```
 
+pub use super::chat_messages::Entity as ChatMessages;
+pub use super::chat_sessions::Entity as ChatSessions;
 pub use super::refresh_tokens::Entity as RefreshTokens;
 pub use super::users::Entity as Users;

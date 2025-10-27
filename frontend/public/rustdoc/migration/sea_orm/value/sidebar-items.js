@@ -1,1 +1,3 @@
-window.SIDEBAR_ITEMS = {"trait":["DefaultActiveValue","DefaultActiveValueNone","DefaultActiveValueNotSet"]};
+window.SIDEBAR_ITEMS = {
+  trait: ['DefaultActiveValue', 'DefaultActiveValueNone', 'DefaultActiveValueNotSet'],
+}

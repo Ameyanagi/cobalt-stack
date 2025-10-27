@@ -1,1 +1,4 @@
-window.SIDEBAR_ITEMS = {"struct":["DateTime","FixedOffset","Local","NaiveDate","NaiveDateTime","NaiveTime","Utc"],"trait":["TimeZone"]};
+window.SIDEBAR_ITEMS = {
+  struct: ['DateTime', 'FixedOffset', 'Local', 'NaiveDate', 'NaiveDateTime', 'NaiveTime', 'Utc'],
+  trait: ['TimeZone'],
+}

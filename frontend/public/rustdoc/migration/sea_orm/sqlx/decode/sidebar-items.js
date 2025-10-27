@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":["Decode"]};
+window.SIDEBAR_ITEMS = { trait: ['Decode'] }

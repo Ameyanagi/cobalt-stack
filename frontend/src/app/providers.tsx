@@ -6,8 +6,8 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
-import { AuthProvider } from '@/contexts/auth-context'
 import { UnverifiedEmailBanner } from '@/components/auth/unverified-email-banner'
+import { AuthProvider } from '@/contexts/auth-context'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // Create QueryClient instance per-request to avoid state sharing

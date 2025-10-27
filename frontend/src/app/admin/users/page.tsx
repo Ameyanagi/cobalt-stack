@@ -1,14 +1,14 @@
 'use client'
 
+import { Ban, CheckCircle, ChevronLeft, ChevronRight, Loader2, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { RoleBadge } from '@/components/admin/role-badge'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { useAuth } from '@/contexts/auth-context'
 import { env } from '@/lib/env'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { RoleBadge } from '@/components/admin/role-badge'
-import { Loader2, Search, Ban, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 
 interface User {
   id: string
@@ -58,7 +58,7 @@ export default function AdminUsersPage() {
 
       const response = await fetch(`${env.apiUrl}/api/v1/admin/users?${params}`, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       })
 
@@ -92,7 +92,7 @@ export default function AdminUsersPage() {
       const response = await fetch(`${env.apiUrl}/api/v1/admin/users/${userId}/${endpoint}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       })
 
@@ -108,20 +108,14 @@ export default function AdminUsersPage() {
   }
 
   if (error) {
-    return (
-      <div className="rounded-md bg-destructive/15 p-4 text-sm text-destructive">
-        {error}
-      </div>
-    )
+    return <div className="rounded-md bg-destructive/15 p-4 text-sm text-destructive">{error}</div>
   }
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">User Management</h2>
-        <p className="text-muted-foreground">
-          Manage user accounts and permissions
-        </p>
+        <p className="text-muted-foreground">Manage user accounts and permissions</p>
       </div>
 
       {/* Filters */}
@@ -199,12 +193,8 @@ export default function AdminUsersPage() {
       {/* Users Table */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            Users {data && `(${data.total})`}
-          </CardTitle>
-          <CardDescription>
-            {data && `Page ${data.page} of ${data.total_pages}`}
-          </CardDescription>
+          <CardTitle>Users {data && `(${data.total})`}</CardTitle>
+          <CardDescription>{data && `Page ${data.page} of ${data.total_pages}`}</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -241,7 +231,9 @@ export default function AdminUsersPage() {
                     {user.disabled_at ? (
                       <Badge variant="destructive">Disabled</Badge>
                     ) : (
-                      <Badge variant="default" className="bg-green-600">Active</Badge>
+                      <Badge variant="default" className="bg-green-600">
+                        Active
+                      </Badge>
                     )}
                   </div>
 
@@ -278,14 +270,14 @@ export default function AdminUsersPage() {
               {/* Pagination */}
               <div className="flex items-center justify-between pt-4">
                 <div className="text-sm text-muted-foreground">
-                  Showing {((data.page - 1) * data.per_page) + 1} to{' '}
+                  Showing {(data.page - 1) * data.per_page + 1} to{' '}
                   {Math.min(data.page * data.per_page, data.total)} of {data.total} users
                 </div>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={data.page === 1}
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" />
@@ -294,7 +286,7 @@ export default function AdminUsersPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setPage(p => p + 1)}
+                    onClick={() => setPage((p) => p + 1)}
                     disabled={data.page >= data.total_pages}
                   >
                     Next
@@ -304,9 +296,7 @@ export default function AdminUsersPage() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              No users found
-            </div>
+            <div className="text-center py-12 text-muted-foreground">No users found</div>
           )}
         </CardContent>
       </Card>

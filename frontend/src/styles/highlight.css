@@ -61,19 +61,19 @@
 /* Meta, Params */
 .hljs-meta,
 .hljs-params {
-  color: oklch(0.55 0.10 250); /* Muted Blue */
+  color: oklch(0.55 0.1 250); /* Muted Blue */
 }
 
 /* Deletion */
 .hljs-deletion {
-  background-color: oklch(0.90 0.10 15 / 0.3);
+  background-color: oklch(0.9 0.1 15 / 0.3);
   color: oklch(0.45 0.15 15);
 }
 
 /* Addition */
 .hljs-addition {
-  background-color: oklch(0.90 0.10 150 / 0.3);
-  color: oklch(0.40 0.15 150);
+  background-color: oklch(0.9 0.1 150 / 0.3);
+  color: oklch(0.4 0.15 150);
 }
 
 /* Emphasis */
@@ -135,7 +135,7 @@
 @media (prefers-color-scheme: dark) {
   .hljs-comment,
   .hljs-quote {
-    color: oklch(0.60 0.05 250);
+    color: oklch(0.6 0.05 250);
   }
 
   .hljs-keyword,

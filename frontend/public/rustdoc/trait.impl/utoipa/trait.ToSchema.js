@@ -1,9 +1,54 @@
-(function() {
-    var implementors = Object.fromEntries([["cobalt_stack_backend",[["impl ToSchema for <a class=\"enum\" href=\"cobalt_stack_backend/models/sea_orm_active_enums/enum.UserRole.html\" title=\"enum cobalt_stack_backend::models::sea_orm_active_enums::UserRole\">UserRole</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/admin/struct.AdminStatsResponse.html\" title=\"struct cobalt_stack_backend::handlers::admin::AdminStatsResponse\">AdminStatsResponse</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/admin/struct.AdminUserResponse.html\" title=\"struct cobalt_stack_backend::handlers::admin::AdminUserResponse\">AdminUserResponse</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/admin/struct.MessageResponse.html\" title=\"struct cobalt_stack_backend::handlers::admin::MessageResponse\">MessageResponse</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/admin/struct.UserListResponse.html\" title=\"struct cobalt_stack_backend::handlers::admin::UserListResponse\">UserListResponse</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/auth/struct.AuthResponse.html\" title=\"struct cobalt_stack_backend::handlers::auth::AuthResponse\">AuthResponse</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/auth/struct.ErrorResponse.html\" title=\"struct cobalt_stack_backend::handlers::auth::ErrorResponse\">ErrorResponse</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/auth/struct.LoginRequest.html\" title=\"struct cobalt_stack_backend::handlers::auth::LoginRequest\">LoginRequest</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/auth/struct.MessageResponse.html\" title=\"struct cobalt_stack_backend::handlers::auth::MessageResponse\">MessageResponse</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/auth/struct.RegisterRequest.html\" title=\"struct cobalt_stack_backend::handlers::auth::RegisterRequest\">RegisterRequest</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/auth/struct.UserResponse.html\" title=\"struct cobalt_stack_backend::handlers::auth::UserResponse\">UserResponse</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/auth/struct.VerifyEmailRequest.html\" title=\"struct cobalt_stack_backend::handlers::auth::VerifyEmailRequest\">VerifyEmailRequest</a>"],["impl ToSchema for <a class=\"struct\" href=\"cobalt_stack_backend/handlers/health/struct.HealthResponse.html\" title=\"struct cobalt_stack_backend::handlers::health::HealthResponse\">HealthResponse</a>"]]]]);
-    if (window.register_implementors) {
-        window.register_implementors(implementors);
-    } else {
-        window.pending_implementors = implementors;
-    }
+;(() => {
+  var implementors = Object.fromEntries([
+    [
+      'cobalt_stack_backend',
+      [
+        [
+          'impl ToSchema for <a class="enum" href="cobalt_stack_backend/models/sea_orm_active_enums/enum.UserRole.html" title="enum cobalt_stack_backend::models::sea_orm_active_enums::UserRole">UserRole</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/admin/struct.AdminStatsResponse.html" title="struct cobalt_stack_backend::handlers::admin::AdminStatsResponse">AdminStatsResponse</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/admin/struct.AdminUserResponse.html" title="struct cobalt_stack_backend::handlers::admin::AdminUserResponse">AdminUserResponse</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/admin/struct.MessageResponse.html" title="struct cobalt_stack_backend::handlers::admin::MessageResponse">MessageResponse</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/admin/struct.UserListResponse.html" title="struct cobalt_stack_backend::handlers::admin::UserListResponse">UserListResponse</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/auth/struct.AuthResponse.html" title="struct cobalt_stack_backend::handlers::auth::AuthResponse">AuthResponse</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/auth/struct.ErrorResponse.html" title="struct cobalt_stack_backend::handlers::auth::ErrorResponse">ErrorResponse</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/auth/struct.LoginRequest.html" title="struct cobalt_stack_backend::handlers::auth::LoginRequest">LoginRequest</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/auth/struct.MessageResponse.html" title="struct cobalt_stack_backend::handlers::auth::MessageResponse">MessageResponse</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/auth/struct.RegisterRequest.html" title="struct cobalt_stack_backend::handlers::auth::RegisterRequest">RegisterRequest</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/auth/struct.UserResponse.html" title="struct cobalt_stack_backend::handlers::auth::UserResponse">UserResponse</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/auth/struct.VerifyEmailRequest.html" title="struct cobalt_stack_backend::handlers::auth::VerifyEmailRequest">VerifyEmailRequest</a>',
+        ],
+        [
+          'impl ToSchema for <a class="struct" href="cobalt_stack_backend/handlers/health/struct.HealthResponse.html" title="struct cobalt_stack_backend::handlers::health::HealthResponse">HealthResponse</a>',
+        ],
+      ],
+    ],
+  ])
+  if (window.register_implementors) {
+    window.register_implementors(implementors)
+  } else {
+    window.pending_implementors = implementors
+  }
 })()
 //{"start":57,"fragment_lengths":[2695]}

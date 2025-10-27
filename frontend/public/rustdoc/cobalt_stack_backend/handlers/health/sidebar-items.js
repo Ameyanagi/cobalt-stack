@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["health_check"],"struct":["HealthResponse"]};
+window.SIDEBAR_ITEMS = { fn: ['health_check'], struct: ['HealthResponse'] }

@@ -1,61 +1,61 @@
 [data-theme="default"] {
   /* Background colors - Crisp white with subtle cobalt tint */
-  --background: oklch(0.9900 0.0020 250.0000);
-  --foreground: oklch(0.1500 0.0100 250.0000);
+  --background: oklch(0.99 0.002 250);
+  --foreground: oklch(0.15 0.01 250);
 
   /* Card colors - Elevated surfaces with subtle depth */
-  --card: oklch(0.9950 0.0015 250.0000);
-  --card-foreground: oklch(0.1500 0.0100 250.0000);
+  --card: oklch(0.995 0.0015 250);
+  --card-foreground: oklch(0.15 0.01 250);
 
   /* Popover colors - Floating elements with emphasis */
-  --popover: oklch(1.0000 0 0);
-  --popover-foreground: oklch(0.1500 0.0100 250.0000);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 250);
 
   /* Primary colors - Rich Cobalt Blue (#0047AB) */
-  --primary: oklch(0.4600 0.1950 250.0000);
-  --primary-foreground: oklch(1.0000 0 0);
+  --primary: oklch(0.46 0.195 250);
+  --primary-foreground: oklch(1 0 0);
 
   /* Secondary colors - Soft cobalt with better contrast */
-  --secondary: oklch(0.9300 0.0150 250.0000);
-  --secondary-foreground: oklch(0.2000 0.0200 250.0000);
+  --secondary: oklch(0.93 0.015 250);
+  --secondary-foreground: oklch(0.2 0.02 250);
 
   /* Muted colors - Subtle backgrounds with cobalt tint */
-  --muted: oklch(0.9500 0.0080 250.0000);
-  --muted-foreground: oklch(0.4800 0.0150 250.0000);
+  --muted: oklch(0.95 0.008 250);
+  --muted-foreground: oklch(0.48 0.015 250);
 
   /* Accent colors - Vibrant cobalt for highlights */
-  --accent: oklch(0.9200 0.0400 248.0000);
-  --accent-foreground: oklch(0.3800 0.1800 250.0000);
+  --accent: oklch(0.92 0.04 248);
+  --accent-foreground: oklch(0.38 0.18 250);
 
   /* Destructive colors - Enhanced red with better visibility */
-  --destructive: oklch(0.5500 0.2200 25.0000);
-  --destructive-foreground: oklch(1.0000 0 0);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
 
   /* Border colors - Subtle definition with cobalt hint */
-  --border: oklch(0.9000 0.0120 250.0000);
-  --input: oklch(0.9700 0.0050 250.0000);
-  --ring: oklch(0.4600 0.1950 250.0000);
+  --border: oklch(0.9 0.012 250);
+  --input: oklch(0.97 0.005 250);
+  --ring: oklch(0.46 0.195 250);
 
   /* Chart colors - Cohesive cobalt palette */
-  --chart-1: oklch(0.5000 0.1800 250.0000);
-  --chart-2: oklch(0.6000 0.1600 245.0000);
-  --chart-3: oklch(0.5500 0.2000 255.0000);
-  --chart-4: oklch(0.6500 0.1400 270.0000);
-  --chart-5: oklch(0.7000 0.1200 235.0000);
+  --chart-1: oklch(0.5 0.18 250);
+  --chart-2: oklch(0.6 0.16 245);
+  --chart-3: oklch(0.55 0.2 255);
+  --chart-4: oklch(0.65 0.14 270);
+  --chart-5: oklch(0.7 0.12 235);
 
   /* Sidebar colors - Unified cobalt experience */
-  --sidebar: oklch(0.9700 0.0080 250.0000);
-  --sidebar-foreground: oklch(0.2000 0.0150 250.0000);
-  --sidebar-primary: oklch(0.4600 0.1950 250.0000);
-  --sidebar-primary-foreground: oklch(1.0000 0 0);
-  --sidebar-accent: oklch(0.9300 0.0150 250.0000);
-  --sidebar-accent-foreground: oklch(0.2500 0.0200 250.0000);
-  --sidebar-border: oklch(0.9000 0.0120 250.0000);
-  --sidebar-ring: oklch(0.4600 0.1950 250.0000);
+  --sidebar: oklch(0.97 0.008 250);
+  --sidebar-foreground: oklch(0.2 0.015 250);
+  --sidebar-primary: oklch(0.46 0.195 250);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.93 0.015 250);
+  --sidebar-accent-foreground: oklch(0.25 0.02 250);
+  --sidebar-border: oklch(0.9 0.012 250);
+  --sidebar-ring: oklch(0.46 0.195 250);
 
   /* Typography */
   --font-sans: var(--font-geist-sans);
-  --font-serif: 'Georgia', 'Cambria', 'Times New Roman', serif;
+  --font-serif: "Georgia", "Cambria", "Times New Roman", serif;
   --font-mono: var(--font-geist-mono);
 
   /* Borders */
@@ -64,56 +64,56 @@
 
 [data-theme="default"].dark {
   /* Background colors - Deep cobalt night with rich saturation */
-  --background: oklch(0.1600 0.0200 250.0000);
-  --foreground: oklch(0.9700 0.0050 250.0000);
+  --background: oklch(0.16 0.02 250);
+  --foreground: oklch(0.97 0.005 250);
 
   /* Card colors - Elevated surfaces with depth */
-  --card: oklch(0.2200 0.0250 250.0000);
-  --card-foreground: oklch(0.9700 0.0050 250.0000);
+  --card: oklch(0.22 0.025 250);
+  --card-foreground: oklch(0.97 0.005 250);
 
   /* Popover colors - Floating elements stand out */
-  --popover: oklch(0.2400 0.0280 250.0000);
-  --popover-foreground: oklch(0.9700 0.0050 250.0000);
+  --popover: oklch(0.24 0.028 250);
+  --popover-foreground: oklch(0.97 0.005 250);
 
   /* Primary colors - Bright cobalt blue for dark mode */
-  --primary: oklch(0.6200 0.2100 250.0000);
-  --primary-foreground: oklch(0.1200 0.0150 250.0000);
+  --primary: oklch(0.62 0.21 250);
+  --primary-foreground: oklch(0.12 0.015 250);
 
   /* Secondary colors - Muted cobalt with good contrast */
-  --secondary: oklch(0.3000 0.0300 250.0000);
-  --secondary-foreground: oklch(0.9200 0.0080 250.0000);
+  --secondary: oklch(0.3 0.03 250);
+  --secondary-foreground: oklch(0.92 0.008 250);
 
   /* Muted colors - Subtle backgrounds */
-  --muted: oklch(0.2800 0.0250 250.0000);
-  --muted-foreground: oklch(0.7000 0.0150 250.0000);
+  --muted: oklch(0.28 0.025 250);
+  --muted-foreground: oklch(0.7 0.015 250);
 
   /* Accent colors - Vibrant highlights for interaction */
-  --accent: oklch(0.3500 0.0600 248.0000);
-  --accent-foreground: oklch(0.7500 0.1500 250.0000);
+  --accent: oklch(0.35 0.06 248);
+  --accent-foreground: oklch(0.75 0.15 250);
 
   /* Destructive colors - Warm red with visibility */
-  --destructive: oklch(0.6000 0.2000 25.0000);
-  --destructive-foreground: oklch(0.9800 0.0050 25.0000);
+  --destructive: oklch(0.6 0.2 25);
+  --destructive-foreground: oklch(0.98 0.005 25);
 
   /* Border colors - Clear definition */
-  --border: oklch(0.3500 0.0300 250.0000);
-  --input: oklch(0.2600 0.0250 250.0000);
-  --ring: oklch(0.6200 0.2100 250.0000);
+  --border: oklch(0.35 0.03 250);
+  --input: oklch(0.26 0.025 250);
+  --ring: oklch(0.62 0.21 250);
 
   /* Chart colors - Luminous cobalt spectrum */
-  --chart-1: oklch(0.6500 0.2000 250.0000);
-  --chart-2: oklch(0.7000 0.1800 245.0000);
-  --chart-3: oklch(0.6800 0.2200 255.0000);
-  --chart-4: oklch(0.7200 0.1600 270.0000);
-  --chart-5: oklch(0.7500 0.1400 235.0000);
+  --chart-1: oklch(0.65 0.2 250);
+  --chart-2: oklch(0.7 0.18 245);
+  --chart-3: oklch(0.68 0.22 255);
+  --chart-4: oklch(0.72 0.16 270);
+  --chart-5: oklch(0.75 0.14 235);
 
   /* Sidebar colors - Cohesive dark experience */
-  --sidebar: oklch(0.1400 0.0180 250.0000);
-  --sidebar-foreground: oklch(0.9500 0.0080 250.0000);
-  --sidebar-primary: oklch(0.6200 0.2100 250.0000);
-  --sidebar-primary-foreground: oklch(0.1200 0.0150 250.0000);
-  --sidebar-accent: oklch(0.2800 0.0300 250.0000);
-  --sidebar-accent-foreground: oklch(0.7000 0.1800 250.0000);
-  --sidebar-border: oklch(0.3200 0.0300 250.0000);
-  --sidebar-ring: oklch(0.6200 0.2100 250.0000);
+  --sidebar: oklch(0.14 0.018 250);
+  --sidebar-foreground: oklch(0.95 0.008 250);
+  --sidebar-primary: oklch(0.62 0.21 250);
+  --sidebar-primary-foreground: oklch(0.12 0.015 250);
+  --sidebar-accent: oklch(0.28 0.03 250);
+  --sidebar-accent-foreground: oklch(0.7 0.18 250);
+  --sidebar-border: oklch(0.32 0.03 250);
+  --sidebar-ring: oklch(0.62 0.21 250);
 }

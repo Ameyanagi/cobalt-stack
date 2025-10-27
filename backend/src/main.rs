@@ -86,8 +86,11 @@
 //! └─────────────┘
 //! ```
 
+mod application;
 mod config;
+mod domain;
 mod handlers;
+mod infrastructure;
 mod middleware;
 mod models;
 mod openapi;
@@ -144,20 +147,56 @@ async fn main() -> anyhow::Result<()> {
 
     // Initialize database connection
     let database_url = std::env::var("DATABASE_URL")?;
-    let db = Database::connect(&database_url).await?;
+    let db = Arc::new(Database::connect(&database_url).await?);
     tracing::info!("Database connected");
 
     // Initialize JWT config
     let jwt_config = services::auth::JwtConfig::from_env();
 
+    // Initialize chat config (if enabled)
+    let chat_config = config::ChatConfig::from_env();
+
+    // Initialize Valkey/Redis connection (if chat enabled)
+    let valkey_manager = if chat_config.enabled {
+        let valkey_url = std::env::var("VALKEY_URL")
+            .unwrap_or_else(|_| "redis://127.0.0.1:6379".to_string());
+        let manager = services::valkey::ValkeyManager::new(&valkey_url)?;
+        tracing::info!("Valkey connected for chat rate limiting");
+        Some(manager)
+    } else {
+        None
+    };
+
     // Create application state
     let state = handlers::auth::AppState {
-        db: Arc::new(db),
+        db: Arc::clone(&db),
         jwt_config: jwt_config.clone(),
     };
 
+    // Create chat state (if enabled)
+    let chat_state = if chat_config.enabled {
+        let chat_repository = infrastructure::persistence::SeaOrmChatRepository::new(Arc::clone(&db));
+        Some(handlers::chat::ChatState {
+            repository: Arc::new(chat_repository),
+            llm_config: chat_config.llm.clone(),
+        })
+    } else {
+        None
+    };
+
+    // Create rate limit state (if chat enabled)
+    let rate_limit_state = valkey_manager.map(|manager| {
+        middleware::chat_rate_limit::ChatRateLimitState {
+            valkey: manager,
+            config: services::valkey::chat_rate_limit::ChatRateLimitConfig {
+                rate_limit_per_minute: chat_config.rate_limit_per_minute,
+                daily_message_quota: chat_config.daily_message_quota,
+            },
+        }
+    });
+
     // Build application router with state
-    let app = create_app(state, jwt_config);
+    let app = create_app(state, jwt_config, chat_state, rate_limit_state);
 
     // Get port from environment or use default
     let port = std::env::var("PORT")
@@ -197,7 +236,12 @@ async fn main() -> anyhow::Result<()> {
 /// Allows requests from origins ending with `:2727` (frontend port) for development.
 /// In production, configure specific allowed origins via environment variables.
 #[allow(clippy::too_many_lines)]
-fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtConfig) -> Router {
+fn create_app(
+    state: handlers::auth::AppState,
+    jwt_config: services::auth::JwtConfig,
+    chat_state: Option<handlers::chat::ChatState>,
+    rate_limit_state: Option<middleware::chat_rate_limit::ChatRateLimitState>,
+) -> Router {
     // Configure CORS with credentials support
 
     // Get allowed origins from environment variable
@@ -300,18 +344,37 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
             middleware::admin::admin_middleware,
         ))
         .layer(axum_middleware::from_fn_with_state(
-            jwt_config,
+            jwt_config.clone(),
             middleware::auth::auth_middleware,
         ))
         .with_state(admin_state);
 
-    // Build main router
-    Router::new()
+    // Chat routes (protected - if feature enabled)
+    let mut app = Router::new()
         .route("/health", get(handlers::health::health_check))
         .merge(auth_public_routes)
         .merge(auth_protected_routes)
-        .merge(admin_routes)
-        .merge(SwaggerUi::new("/swagger-ui").url("/openapi.json", openapi::ApiDoc::openapi()))
+        .merge(admin_routes);
+
+    // Add chat routes if feature is enabled
+    if let (Some(chat_state), Some(rate_limit_state)) = (chat_state, rate_limit_state) {
+        tracing::info!("Chat feature enabled - mounting chat routes with rate limiting");
+        let chat_routes = handlers::chat::routes(chat_state)
+            .layer(axum_middleware::from_fn_with_state(
+                rate_limit_state,
+                middleware::chat_rate_limit::chat_rate_limit_middleware,
+            ))
+            .layer(axum_middleware::from_fn_with_state(
+                jwt_config.clone(),
+                middleware::auth::auth_middleware,
+            ));
+        app = app.nest(&format!("{API_PREFIX}/chat"), chat_routes);
+    } else {
+        tracing::info!("Chat feature disabled");
+    }
+
+    // Build main router
+    app.merge(SwaggerUi::new("/swagger-ui").url("/openapi.json", openapi::ApiDoc::openapi()))
         .layer(cors)
         .layer(tower_http::trace::TraceLayer::new_for_http())
 }

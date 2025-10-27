@@ -85,6 +85,11 @@ use utoipa::OpenApi;
         crate::handlers::admin::disable_user,
         crate::handlers::admin::enable_user,
         crate::handlers::admin::get_stats,
+        crate::handlers::chat::create_session,
+        crate::handlers::chat::send_message,
+        crate::handlers::chat::get_session_history,
+        crate::handlers::chat::list_user_sessions,
+        crate::handlers::chat::delete_session,
     ),
     components(
         schemas(
@@ -100,13 +105,22 @@ use utoipa::OpenApi;
             crate::handlers::admin::UserListResponse,
             crate::handlers::admin::AdminStatsResponse,
             crate::handlers::admin::MessageResponse,
+            crate::handlers::chat::dto::CreateSessionRequest,
+            crate::handlers::chat::dto::CreateSessionResponse,
+            crate::handlers::chat::dto::SendMessageRequest,
+            crate::handlers::chat::dto::SessionDto,
+            crate::handlers::chat::dto::MessageDto,
+            crate::handlers::chat::dto::GetHistoryResponse,
+            crate::handlers::chat::dto::ListSessionsResponse,
+            crate::handlers::chat::dto::DeleteSessionResponse,
             crate::models::sea_orm_active_enums::UserRole,
         )
     ),
     tags(
         (name = "health", description = "Health check endpoints"),
         (name = "Authentication", description = "User authentication and email verification"),
-        (name = "Admin", description = "Admin user management endpoints")
+        (name = "Admin", description = "Admin user management endpoints"),
+        (name = "chat", description = "LLM chat session and message management")
     ),
     info(
         title = "Cobalt Stack API",

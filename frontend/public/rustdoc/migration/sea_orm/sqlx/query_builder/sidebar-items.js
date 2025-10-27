@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["QueryBuilder","Separated"]};
+window.SIDEBAR_ITEMS = { struct: ['QueryBuilder', 'Separated'] }

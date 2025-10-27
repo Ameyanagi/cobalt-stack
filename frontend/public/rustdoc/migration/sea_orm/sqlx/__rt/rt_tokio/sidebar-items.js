@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["available"]};
+window.SIDEBAR_ITEMS = { fn: ['available'] }

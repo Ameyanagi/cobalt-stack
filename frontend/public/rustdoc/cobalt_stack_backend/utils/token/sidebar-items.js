@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["generate_verification_token","hash_token"]};
+window.SIDEBAR_ITEMS = { fn: ['generate_verification_token', 'hash_token'] }

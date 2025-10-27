@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["admin_middleware"]};
+window.SIDEBAR_ITEMS = { fn: ['admin_middleware'] }
