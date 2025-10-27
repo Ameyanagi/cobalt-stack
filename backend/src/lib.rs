@@ -10,7 +10,7 @@
 //!
 //! - **Handlers**: HTTP request/response handling and routing
 //! - **Services**: Business logic and domain operations
-//! - **Models**: Database entities and domain models (SeaORM)
+//! - **Models**: Database entities and domain models (`SeaORM`)
 //! - **Middleware**: Cross-cutting concerns (authentication, authorization)
 //! - **Config**: Application configuration management
 //! - **Utils**: Shared utilities and helpers
@@ -22,7 +22,7 @@
 //! - Email verification workflow
 //! - Role-based access control (RBAC)
 //! - Rate limiting and token blacklisting
-//! - PostgreSQL database with SeaORM
+//! - `PostgreSQL` database with `SeaORM`
 //! - Valkey/Redis for caching and session management
 //!
 //! # Examples
@@ -42,7 +42,7 @@
 //! # Security
 //!
 //! This library implements security best practices:
-//! - HttpOnly cookies for refresh tokens
+//! - `HttpOnly` cookies for refresh tokens
 //! - Secure password hashing with Argon2
 //! - JWT signature verification
 //! - Token rotation and revocation

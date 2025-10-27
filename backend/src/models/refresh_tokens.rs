@@ -76,10 +76,10 @@ pub struct Model {
     pub created_at: DateTimeWithTimeZone,
 }
 
-/// Entity relations for the RefreshToken model.
+/// Entity relations for the `RefreshToken` model.
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    /// RefreshToken belongs to a User.
+    /// `RefreshToken` belongs to a User.
     /// Cascades on delete: deleting user removes all their tokens.
     #[sea_orm(
         belongs_to = "super::users::Entity",

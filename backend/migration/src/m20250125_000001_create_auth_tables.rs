@@ -115,7 +115,7 @@ impl MigrationTrait for Migration {
                             .extra("DEFAULT NOW()".to_owned()),
                     )
                     .foreign_key(
-                        &mut ForeignKey::create()
+                        ForeignKey::create()
                             .name("fk_refresh_tokens_user_id")
                             .from(RefreshTokens::Table, RefreshTokens::UserId)
                             .to(Users::Table, Users::Id)
@@ -199,7 +199,7 @@ impl MigrationTrait for Migration {
                             .extra("DEFAULT NOW()".to_owned()),
                     )
                     .foreign_key(
-                        &mut ForeignKey::create()
+                        ForeignKey::create()
                             .name("fk_oauth_accounts_user_id")
                             .from(OAuthAccounts::Table, OAuthAccounts::UserId)
                             .to(Users::Table, Users::Id)

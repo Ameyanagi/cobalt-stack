@@ -19,9 +19,9 @@
 //!
 //! # Relations
 //!
-//! - `has_many` RefreshTokens: User's active refresh tokens
-//! - `has_many` EmailVerifications: Email verification history
-//! - `has_many` OAuthAccounts: Linked OAuth provider accounts
+//! - `has_many` `RefreshTokens`: User's active refresh tokens
+//! - `has_many` `EmailVerifications`: Email verification history
+//! - `has_many` `OAuthAccounts`: Linked OAuth provider accounts
 //!
 //! # Examples
 //!

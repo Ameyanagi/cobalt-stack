@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "bunx --bun biome check .",
+    "lint:fix": "bunx --bun biome check --write .",
+    "format": "bunx --bun biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "check": "bun run typecheck && bun run lint",
     "generate-types": "openapi-typescript ../openapi/schema.json -o src/types/api.ts"
   },
   "dependencies": {

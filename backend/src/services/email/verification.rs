@@ -73,13 +73,12 @@ pub async fn verify_email_token(db: &DatabaseConnection, token: &str) -> Result<
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     // Note: These tests would require a test database setup
     // For now, we define the test structure but won't run them without DB
 
     #[test]
-    #[ignore] // Ignore until we have test database setup
+    #[ignore = "Requires test database setup"]
     fn test_create_verification_token_structure() {
         // Test would verify:
         // 1. Token is generated correctly
@@ -89,7 +88,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_verify_email_token_success() {
         // Test would verify:
         // 1. Valid token verifies successfully
@@ -98,21 +97,21 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_verify_email_token_already_verified() {
         // Test would verify:
         // 1. Already verified token returns error
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_verify_email_token_expired() {
         // Test would verify:
         // 1. Expired token returns error
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_verify_email_token_invalid() {
         // Test would verify:
         // 1. Invalid token returns error

@@ -47,10 +47,10 @@ pub struct ListUsersQuery {
     pub search: Option<String>,
 }
 
-fn default_page() -> u64 {
+const fn default_page() -> u64 {
     1
 }
-fn default_per_page() -> u64 {
+const fn default_per_page() -> u64 {
     20
 }
 
@@ -79,6 +79,7 @@ pub struct UserListResponse {
 }
 
 /// Admin statistics
+#[allow(clippy::struct_field_names)]
 #[derive(Debug, Serialize, ToSchema)]
 pub struct AdminStatsResponse {
     pub total_users: u64,
@@ -139,7 +140,7 @@ pub async fn list_users(
 
     // Search by username or email
     if let Some(search) = query.search {
-        let search_pattern = format!("%{}%", search);
+        let search_pattern = format!("%{search}%");
         select = select.filter(
             users::Column::Username
                 .like(&search_pattern)
@@ -180,7 +181,7 @@ pub async fn list_users(
         })
         .collect();
 
-    let total_pages = (total + per_page - 1) / per_page;
+    let total_pages = total.div_ceil(per_page);
 
     Ok(Json(UserListResponse {
         users,
@@ -429,28 +430,28 @@ mod tests {
         // 0 users, 20 per page = 0 pages
         let total: u64 = 0;
         let per_page: u64 = 20;
-        let total_pages = (total + per_page - 1) / per_page;
+        let total_pages = total.div_ceil(per_page);
         assert_eq!(total_pages, 0);
 
         // 20 users, 20 per page = 1 page
         let total: u64 = 20;
-        let total_pages = (total + per_page - 1) / per_page;
+        let total_pages = total.div_ceil(per_page);
         assert_eq!(total_pages, 1);
 
         // 21 users, 20 per page = 2 pages
         let total: u64 = 21;
-        let total_pages = (total + per_page - 1) / per_page;
+        let total_pages = total.div_ceil(per_page);
         assert_eq!(total_pages, 2);
 
         // 40 users, 20 per page = 2 pages
         let total: u64 = 40;
-        let total_pages = (total + per_page - 1) / per_page;
+        let total_pages = total.div_ceil(per_page);
         assert_eq!(total_pages, 2);
     }
 
     // Integration tests (require database)
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_list_users_pagination() {
         // Test would verify:
         // 1. Correct number of users returned per page
@@ -459,7 +460,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_list_users_role_filter() {
         // Test would verify:
         // 1. Filter by role='admin' returns only admin users
@@ -467,7 +468,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_list_users_search() {
         // Test would verify:
         // 1. Search matches username
@@ -476,7 +477,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_disable_user_sets_timestamp() {
         // Test would verify:
         // 1. disabled_at is set to current timestamp
@@ -484,7 +485,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_enable_user_clears_timestamp() {
         // Test would verify:
         // 1. disabled_at is set to NULL
@@ -492,7 +493,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_get_stats_counts() {
         // Test would verify:
         // 1. All counts are accurate

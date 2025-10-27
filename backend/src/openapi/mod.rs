@@ -1,6 +1,6 @@
-//! OpenAPI specification and documentation generation.
+//! `OpenAPI` specification and documentation generation.
 //!
-//! This module defines the OpenAPI 3.0 specification for the entire API
+//! This module defines the `OpenAPI` 3.0 specification for the entire API
 //! using the `utoipa` crate. The spec is used for Swagger UI documentation
 //! and can be exported for frontend TypeScript type generation.
 //!
@@ -20,7 +20,7 @@
 //!
 //! # Frontend Integration
 //!
-//! OpenAPI schema is written to `openapi/schema.json` at startup for
+//! `OpenAPI` schema is written to `openapi/schema.json` at startup for
 //! frontend type generation:
 //!
 //! ```bash
@@ -51,7 +51,7 @@
 
 use utoipa::OpenApi;
 
-/// OpenAPI 3.0 specification for the Cobalt Stack API.
+/// `OpenAPI` 3.0 specification for the Cobalt Stack API.
 ///
 /// This struct defines the complete API documentation including all endpoints,
 /// request/response schemas, security schemes, and metadata. The specification
@@ -59,8 +59,8 @@ use utoipa::OpenApi;
 ///
 /// # Accessing the Spec
 ///
-/// - **Swagger UI**: http://localhost:3000/swagger-ui
-/// - **JSON Spec**: http://localhost:3000/openapi.json
+/// - **Swagger UI**: <http://localhost:3000/swagger-ui>
+/// - **JSON Spec**: <http://localhost:3000/openapi.json>
 /// - **File Export**: `openapi/schema.json` (generated at startup)
 ///
 /// # Sections
@@ -68,6 +68,7 @@ use utoipa::OpenApi;
 /// - **Health**: Health check endpoints
 /// - **Authentication**: User auth and email verification
 /// - **Admin**: Admin user management endpoints
+#[allow(clippy::needless_for_each)]
 #[derive(OpenApi)]
 #[openapi(
     paths(
@@ -124,7 +125,7 @@ use utoipa::Modify;
 /// Security scheme modifier that adds Bearer token authentication.
 ///
 /// This struct implements the `Modify` trait to add JWT Bearer authentication
-/// to the OpenAPI specification. The security scheme is referenced by protected
+/// to the `OpenAPI` specification. The security scheme is referenced by protected
 /// endpoints using the `security(("bearer_auth" = []))` attribute.
 struct SecurityAddon;
 
@@ -138,14 +139,14 @@ impl Modify for SecurityAddon {
                         utoipa::openapi::security::HttpAuthScheme::Bearer,
                     ),
                 ),
-            )
+            );
         }
     }
 }
 
-/// Write OpenAPI schema to file for frontend type generation.
+/// Write `OpenAPI` schema to file for frontend type generation.
 ///
-/// Generates the OpenAPI specification as JSON and writes it to
+/// Generates the `OpenAPI` specification as JSON and writes it to
 /// `openapi/schema.json`. This file can be used by frontend tools
 /// like `openapi-typescript` to generate TypeScript types.
 ///

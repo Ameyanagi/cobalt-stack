@@ -13,7 +13,7 @@
 //!
 //! # Middleware Ordering
 //!
-//! **IMPORTANT**: This middleware must be applied AFTER auth_middleware in the layer stack:
+//! **IMPORTANT**: This middleware must be applied AFTER `auth_middleware` in the layer stack:
 //!
 //! ```no_run
 //! use axum::{Router, routing::get, middleware};
@@ -37,7 +37,7 @@
 //!
 //! # Error Responses
 //!
-//! - **401 Unauthorized**: AuthUser not found in extensions (auth_middleware not run first)
+//! - **401 Unauthorized**: `AuthUser` not found in extensions (`auth_middleware` not run first)
 //! - **401 Unauthorized**: User not found in database (token valid but user deleted)
 //! - **403 Forbidden**: User exists but doesn't have admin role
 //! - **403 Forbidden**: User is an admin but account is disabled
@@ -56,13 +56,13 @@ use std::sync::Arc;
 
 /// Axum middleware that enforces admin role requirement.
 ///
-/// This middleware verifies that the authenticated user (from auth_middleware)
+/// This middleware verifies that the authenticated user (from `auth_middleware`)
 /// has admin privileges by checking their role in the database. Only users with
 /// [`UserRole::Admin`] and non-disabled accounts can access protected routes.
 ///
 /// # Execution Flow
 ///
-/// 1. Extract [`AuthUser`] from request extensions (injected by auth_middleware)
+/// 1. Extract [`AuthUser`] from request extensions (injected by `auth_middleware`)
 /// 2. Query database to fetch full user record
 /// 3. Verify user has [`UserRole::Admin`] role
 /// 4. Verify user account is not disabled (`disabled_at` is NULL)
@@ -71,13 +71,13 @@ use std::sync::Arc;
 /// # Arguments
 ///
 /// * `db` - Database connection for user role verification
-/// * `req` - Incoming HTTP request with AuthUser in extensions
+/// * `req` - Incoming HTTP request with `AuthUser` in extensions
 /// * `next` - Next middleware/handler in chain
 ///
 /// # Returns
 ///
 /// - `Ok(Response)` - User is admin and not disabled, request processed
-/// - `Err(StatusCode::UNAUTHORIZED)` - AuthUser missing or user not found
+/// - `Err(StatusCode::UNAUTHORIZED)` - `AuthUser` missing or user not found
 /// - `Err(StatusCode::FORBIDDEN)` - User is not admin or account disabled
 /// - `Err(StatusCode::INTERNAL_SERVER_ERROR)` - Database error
 ///
@@ -152,7 +152,7 @@ mod tests {
         // Test that middleware returns UNAUTHORIZED when AuthUser is not in extensions
         // This would require mocking Request and Extensions
         // For now, we document the expected behavior
-        assert!(true, "Admin middleware must be used after auth_middleware");
+        // Note: This test documents the requirement that admin_middleware must be used after auth_middleware
     }
 
     #[tokio::test]
@@ -180,7 +180,7 @@ mod tests {
 
     // Integration tests would go here (require database)
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_admin_middleware_allows_admin_user() {
         // Test would verify:
         // 1. User with admin role passes through middleware
@@ -188,7 +188,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_admin_middleware_blocks_regular_user() {
         // Test would verify:
         // 1. User with 'user' role gets 403 FORBIDDEN
@@ -196,7 +196,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_admin_middleware_blocks_disabled_admin() {
         // Test would verify:
         // 1. Admin user with disabled_at set gets 403 FORBIDDEN
@@ -204,7 +204,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
+    #[ignore = "Requires test database setup"]
     fn test_admin_middleware_handles_missing_user() {
         // Test would verify:
         // 1. If user_id doesn't exist in database, return 401 UNAUTHORIZED

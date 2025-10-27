@@ -7,7 +7,7 @@
 //! # Modules
 //!
 //! - **blacklist**: JWT access token revocation via blacklist
-//! - **rate_limit**: Login attempt rate limiting by IP address
+//! - **`rate_limit`**: Login attempt rate limiting by IP address
 //!
 //! # Connection Management
 //!
@@ -45,9 +45,6 @@
 pub mod blacklist;
 pub mod rate_limit;
 
-pub use blacklist::{add_to_blacklist, is_blacklisted};
-pub use rate_limit::{check_rate_limit, reset_rate_limit};
-
 use redis::Client;
 use std::sync::Arc;
 
@@ -81,7 +78,7 @@ impl ValkeyManager {
     ///
     /// # Arguments
     ///
-    /// * `url` - Redis connection URL (e.g., "redis://localhost:6379")
+    /// * `url` - Redis connection URL (e.g., "<redis://localhost:6379>")
     ///
     /// # Returns
     ///

@@ -48,7 +48,7 @@ pub async fn validate_refresh_token(
     let stored_token = RefreshTokens::find_by_id(jti)
         .one(db)
         .await?
-        .ok_or_else(|| AuthError::InvalidToken)?;
+        .ok_or(AuthError::InvalidToken)?;
 
     // Check if token hash matches
     if stored_token.token_hash != token_hash {
@@ -77,7 +77,7 @@ pub async fn revoke_refresh_token(db: &DatabaseConnection, jti: Uuid) -> Result<
     let stored_token = RefreshTokens::find_by_id(jti)
         .one(db)
         .await?
-        .ok_or_else(|| AuthError::InvalidToken)?;
+        .ok_or(AuthError::InvalidToken)?;
 
     let mut active_token: refresh_tokens::ActiveModel = stored_token.into();
     active_token.revoked_at = Set(Some(Utc::now().into()));
@@ -125,7 +125,7 @@ pub async fn revoke_all_user_tokens(db: &DatabaseConnection, user_id: Uuid) -> R
 
 /// Clean up expired tokens (for maintenance tasks)
 ///
-/// Deletes tokens that have been expired for more than retention_days
+/// Deletes tokens that have been expired for more than `retention_days`
 pub async fn cleanup_expired_tokens(db: &DatabaseConnection, retention_days: i64) -> Result<u64> {
     let cutoff = Utc::now() - Duration::days(retention_days);
 

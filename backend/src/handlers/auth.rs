@@ -97,7 +97,9 @@ impl RegisterRequest {
 impl LoginRequest {
     pub fn validate(&self) -> Result<()> {
         if self.username_or_email.is_empty() {
-            return Err(AuthError::InvalidInput("Username or email cannot be empty".to_string()).into());
+            return Err(
+                AuthError::InvalidInput("Username or email cannot be empty".to_string()).into(),
+            );
         }
         if self.password.is_empty() {
             return Err(AuthError::InvalidInput("Password cannot be empty".to_string()).into());
@@ -157,7 +159,7 @@ pub async fn register(
         // The validate() function already returns AuthError wrapped in anyhow::Error
         // Extract the AuthError from the anyhow chain
         e.downcast::<AuthError>()
-            .unwrap_or(AuthError::InvalidInput("Validation failed".to_string()))
+            .unwrap_or_else(|_| AuthError::InvalidInput("Validation failed".to_string()))
     })?;
 
     // Check if username already exists
@@ -203,7 +205,7 @@ pub async fn register(
         // Create verification token
         let token = create_verification_token(state.db.as_ref(), user.id)
             .await
-            .map_err(|e| AuthError::DatabaseError(format!("Failed to create token: {}", e)))?;
+            .map_err(|e| AuthError::DatabaseError(format!("Failed to create token: {e}")))?;
 
         // Send verification email
         let email_sender = MockEmailSender;
@@ -279,14 +281,15 @@ pub async fn login(
         // The validate() function already returns AuthError wrapped in anyhow::Error
         // Extract the AuthError from the anyhow chain
         e.downcast::<AuthError>()
-            .unwrap_or(AuthError::InvalidInput("Validation failed".to_string()))
+            .unwrap_or_else(|_| AuthError::InvalidInput("Validation failed".to_string()))
     })?;
 
     // Find user by username or email
     let user = Users::find()
         .filter(
-            users::Column::Username.eq(&req.username_or_email)
-                .or(users::Column::Email.eq(&req.username_or_email))
+            users::Column::Username
+                .eq(&req.username_or_email)
+                .or(users::Column::Email.eq(&req.username_or_email)),
         )
         .one(state.db.as_ref())
         .await?
@@ -583,7 +586,7 @@ pub async fn send_verification_email(
     // Create verification token
     let token = create_verification_token(state.db.as_ref(), user.id)
         .await
-        .map_err(|e| AuthError::DatabaseError(format!("Failed to create token: {}", e)))?;
+        .map_err(|e| AuthError::DatabaseError(format!("Failed to create token: {e}")))?;
 
     // Send verification email
     let email_sender = MockEmailSender;
@@ -621,7 +624,7 @@ pub async fn verify_email(
     // Verify the token
     verify_email_token(state.db.as_ref(), &req.token)
         .await
-        .map_err(|e| AuthError::InvalidInput(format!("Verification failed: {}", e)))?;
+        .map_err(|e| AuthError::InvalidInput(format!("Verification failed: {e}")))?;
 
     Ok((
         StatusCode::OK,
@@ -690,7 +693,7 @@ mod tests {
     #[test]
     fn test_register_request_validation_empty_username() {
         let req = RegisterRequest {
-            username: "".to_string(),
+            username: String::new(),
             email: "alice@example.com".to_string(),
             password: "SecurePass123!".to_string(),
         };
@@ -775,7 +778,7 @@ mod tests {
     #[test]
     fn test_login_request_validation_empty_username() {
         let req = LoginRequest {
-            username_or_email: "".to_string(),
+            username_or_email: String::new(),
             password: "SecurePass123!".to_string(),
         };
         assert!(req.validate().is_err());
@@ -785,7 +788,7 @@ mod tests {
     fn test_login_request_validation_empty_password() {
         let req = LoginRequest {
             username_or_email: "alice".to_string(),
-            password: "".to_string(),
+            password: String::new(),
         };
         assert!(req.validate().is_err());
     }

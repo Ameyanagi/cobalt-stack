@@ -136,7 +136,7 @@ impl MigrationTrait for Migration {
                             .extra("DEFAULT NOW()".to_owned()),
                     )
                     .foreign_key(
-                        &mut ForeignKey::create()
+                        ForeignKey::create()
                             .name("fk_email_verifications_user_id")
                             .from(EmailVerifications::Table, EmailVerifications::UserId)
                             .to(Users::Table, Users::Id)

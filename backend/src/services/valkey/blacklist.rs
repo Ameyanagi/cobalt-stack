@@ -89,7 +89,8 @@ use redis::{Commands, Connection};
 /// - Setting TTL too long wastes Redis memory unnecessarily
 /// - Use this for access tokens only (refresh tokens use database revocation)
 pub fn add_to_blacklist(conn: &mut Connection, token: &str, ttl: i64) -> Result<()> {
-    let key = format!("blacklist:{}", token);
+    let key = format!("blacklist:{token}");
+    #[allow(clippy::cast_sign_loss)]
     conn.set_ex::<_, _, ()>(&key, 1, ttl as u64)?;
     Ok(())
 }
@@ -146,7 +147,7 @@ pub fn add_to_blacklist(conn: &mut Connection, token: &str, ttl: i64) -> Result<
 /// - Fail secure: reject all requests if blacklist check fails
 /// - Fail open: allow requests if blacklist check fails (risky)
 pub fn is_blacklisted(conn: &mut Connection, token: &str) -> Result<bool> {
-    let key = format!("blacklist:{}", token);
+    let key = format!("blacklist:{token}");
     let exists: bool = conn.exists(&key)?;
     Ok(exists)
 }
@@ -163,7 +164,7 @@ mod tests {
         // Unit test: verify key format without Valkey connection
         let token = "test_token_123";
         let expected_key = "blacklist:test_token_123";
-        let key = format!("blacklist:{}", token);
+        let key = format!("blacklist:{token}");
         assert_eq!(key, expected_key);
     }
 
@@ -172,8 +173,8 @@ mod tests {
         // Unit test: verify different tokens create different keys
         let token1 = "token_abc";
         let token2 = "token_xyz";
-        let key1 = format!("blacklist:{}", token1);
-        let key2 = format!("blacklist:{}", token2);
+        let key1 = format!("blacklist:{token1}");
+        let key2 = format!("blacklist:{token2}");
         assert_ne!(key1, key2);
     }
 

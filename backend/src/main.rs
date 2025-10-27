@@ -1,8 +1,8 @@
 //! Cobalt Stack Backend API Server.
 //!
-//! Full-featured REST API backend built with Axum, SeaORM, and PostgreSQL.
+//! Full-featured REST API backend built with Axum, `SeaORM`, and `PostgreSQL`.
 //! Provides JWT authentication, email verification, admin user management,
-//! and comprehensive OpenAPI documentation.
+//! and comprehensive `OpenAPI` documentation.
 //!
 //! # Features
 //!
@@ -11,8 +11,8 @@
 //! - **Role-Based Access**: Admin and user role separation
 //! - **Rate Limiting**: Login attempt protection via Valkey/Redis
 //! - **Token Blacklist**: Immediate token revocation support
-//! - **OpenAPI Documentation**: Interactive Swagger UI
-//! - **Database Migrations**: SeaORM migration support
+//! - **`OpenAPI` Documentation**: Interactive Swagger UI
+//! - **Database Migrations**: `SeaORM` migration support
 //! - **CORS Configuration**: Flexible cross-origin setup
 //!
 //! # Quick Start
@@ -36,7 +36,7 @@
 //!
 //! Required configuration via `.env` file:
 //!
-//! - `DATABASE_URL` - PostgreSQL connection string
+//! - `DATABASE_URL` - `PostgreSQL` connection string
 //! - `JWT_SECRET` - Secret key for JWT signing
 //! - `JWT_ACCESS_EXPIRY_MINUTES` - Access token lifetime (default: 30)
 //! - `JWT_REFRESH_EXPIRY_DAYS` - Refresh token lifetime (default: 7)
@@ -69,8 +69,8 @@
 //! # Documentation
 //!
 //! Interactive API documentation available at:
-//! - Swagger UI: http://localhost:3000/swagger-ui
-//! - OpenAPI JSON: http://localhost:3000/openapi.json
+//! - Swagger UI: <http://localhost:3000/swagger-ui>
+//! - `OpenAPI` JSON: <http://localhost:3000/openapi.json>
 //!
 //! # Architecture
 //!
@@ -102,7 +102,7 @@ use axum::{
 };
 use sea_orm::Database;
 use std::{net::SocketAddr, sync::Arc};
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::CorsLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -115,14 +115,14 @@ const API_PREFIX: &str = "/api/v1";
 /// Initializes logging, database connection, and starts the Axum HTTP server.
 /// Loads configuration from environment variables and `.env` file.
 ///
-/// # Panics
+/// # Errors
 ///
-/// Panics if:
+/// Returns error if:
 /// - `DATABASE_URL` environment variable is not set
 /// - Database connection fails
 /// - Server fails to bind to port
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     // Initialize tracing
     tracing_subscriber::registry()
         .with(
@@ -143,8 +143,8 @@ async fn main() {
     }
 
     // Initialize database connection
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let db = Database::connect(&database_url).await.unwrap();
+    let database_url = std::env::var("DATABASE_URL")?;
+    let db = Database::connect(&database_url).await?;
     tracing::info!("Database connected");
 
     // Initialize JWT config
@@ -169,8 +169,9 @@ async fn main() {
     tracing::info!("Starting server on {}", addr);
 
     // Start server
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await?;
+    axum::serve(listener, app).await?;
+    Ok(())
 }
 
 /// Create the Axum router with all routes, middleware, and state.
@@ -195,9 +196,9 @@ async fn main() {
 ///
 /// Allows requests from origins ending with `:2727` (frontend port) for development.
 /// In production, configure specific allowed origins via environment variables.
+#[allow(clippy::too_many_lines)]
 fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtConfig) -> Router {
     // Configure CORS with credentials support
-    use tower_http::cors::AllowOrigin;
 
     // Get allowed origins from environment variable
     let allowed_origins = std::env::var("CORS_ORIGINS")
@@ -230,18 +231,36 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
 
     // Auth routes (public)
     let auth_public_routes = Router::new()
-        .route(&format!("{}/auth/register", API_PREFIX), post(handlers::auth::register))
-        .route(&format!("{}/auth/login", API_PREFIX), post(handlers::auth::login))
-        .route(&format!("{}/auth/refresh", API_PREFIX), post(handlers::auth::refresh_token))
-        .route(&format!("{}/auth/verify-email", API_PREFIX), post(handlers::auth::verify_email))
+        .route(
+            &format!("{API_PREFIX}/auth/register"),
+            post(handlers::auth::register),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/login"),
+            post(handlers::auth::login),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/refresh"),
+            post(handlers::auth::refresh_token),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/verify-email"),
+            post(handlers::auth::verify_email),
+        )
         .with_state(state.clone());
 
     // Auth routes (protected)
     let auth_protected_routes = Router::new()
-        .route(&format!("{}/auth/me", API_PREFIX), get(handlers::auth::get_current_user))
-        .route(&format!("{}/auth/logout", API_PREFIX), post(handlers::auth::logout))
         .route(
-            &format!("{}/auth/send-verification", API_PREFIX),
+            &format!("{API_PREFIX}/auth/me"),
+            get(handlers::auth::get_current_user),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/logout"),
+            post(handlers::auth::logout),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/send-verification"),
             post(handlers::auth::send_verification_email),
         )
         .layer(axum_middleware::from_fn_with_state(
@@ -256,19 +275,28 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
     };
 
     let admin_routes = Router::new()
-        .route(&format!("{}/admin/users", API_PREFIX), get(handlers::admin::list_users))
-        .route(&format!("{}/admin/users/:id", API_PREFIX), get(handlers::admin::get_user))
         .route(
-            &format!("{}/admin/users/:id/disable", API_PREFIX),
+            &format!("{API_PREFIX}/admin/users"),
+            get(handlers::admin::list_users),
+        )
+        .route(
+            &format!("{API_PREFIX}/admin/users/:id"),
+            get(handlers::admin::get_user),
+        )
+        .route(
+            &format!("{API_PREFIX}/admin/users/:id/disable"),
             patch(handlers::admin::disable_user),
         )
         .route(
-            &format!("{}/admin/users/:id/enable", API_PREFIX),
+            &format!("{API_PREFIX}/admin/users/:id/enable"),
             patch(handlers::admin::enable_user),
         )
-        .route(&format!("{}/admin/stats", API_PREFIX), get(handlers::admin::get_stats))
+        .route(
+            &format!("{API_PREFIX}/admin/stats"),
+            get(handlers::admin::get_stats),
+        )
         .layer(axum_middleware::from_fn_with_state(
-            state.db.clone(),
+            state.db,
             middleware::admin::admin_middleware,
         ))
         .layer(axum_middleware::from_fn_with_state(
