@@ -12,7 +12,7 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/api/admin/stats": {
+    "/api/v1/admin/stats": {
       "get": {
         "tags": [
           "Admin"
@@ -44,7 +44,7 @@
         ]
       }
     },
-    "/api/admin/users": {
+    "/api/v1/admin/users": {
       "get": {
         "tags": [
           "Admin"
@@ -136,7 +136,7 @@
         ]
       }
     },
-    "/api/admin/users/{id}": {
+    "/api/v1/admin/users/{id}": {
       "get": {
         "tags": [
           "Admin"
@@ -182,7 +182,7 @@
         ]
       }
     },
-    "/api/admin/users/{id}/disable": {
+    "/api/v1/admin/users/{id}/disable": {
       "patch": {
         "tags": [
           "Admin"
@@ -228,7 +228,7 @@
         ]
       }
     },
-    "/api/admin/users/{id}/enable": {
+    "/api/v1/admin/users/{id}/enable": {
       "patch": {
         "tags": [
           "Admin"
@@ -274,7 +274,7 @@
         ]
       }
     },
-    "/api/auth/login": {
+    "/api/v1/auth/login": {
       "post": {
         "tags": [
           "Authentication"
@@ -336,7 +336,7 @@
         }
       }
     },
-    "/api/auth/logout": {
+    "/api/v1/auth/logout": {
       "post": {
         "tags": [
           "Authentication"
@@ -361,7 +361,7 @@
         }
       }
     },
-    "/api/auth/me": {
+    "/api/v1/auth/me": {
       "get": {
         "tags": [
           "Authentication"
@@ -398,7 +398,7 @@
         ]
       }
     },
-    "/api/auth/refresh": {
+    "/api/v1/auth/refresh": {
       "post": {
         "tags": [
           "Authentication"
@@ -430,7 +430,7 @@
         }
       }
     },
-    "/api/auth/register": {
+    "/api/v1/auth/register": {
       "post": {
         "tags": [
           "Authentication"
@@ -482,7 +482,7 @@
         }
       }
     },
-    "/api/auth/send-verification": {
+    "/api/v1/auth/send-verification": {
       "post": {
         "tags": [
           "Authentication"
@@ -529,7 +529,7 @@
         ]
       }
     },
-    "/api/auth/verify-email": {
+    "/api/v1/auth/verify-email": {
       "post": {
         "tags": [
           "Authentication"
@@ -821,7 +821,8 @@
           "id",
           "username",
           "email",
-          "email_verified"
+          "email_verified",
+          "role"
         ],
         "properties": {
           "email": {
@@ -834,6 +835,9 @@
             "type": "string",
             "example": "550e8400-e29b-41d4-a716-446655440000"
           },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
           "username": {
             "type": "string"
           }
@@ -841,9 +845,10 @@
       },
       "UserRole": {
         "type": "string",
+        "description": "User role enum for role-based access control (RBAC).\n\nDefines the authorization level for a user account.\nUsed in middleware to enforce access control policies.\n\n# Variants\n\n- `User`: Standard user with access to their own resources\n- `Admin`: Administrator with elevated privileges\n\n# Database Mapping\n\nMaps to PostgreSQL ENUM `user_role` with values:\n- `\"user\"` → [`UserRole::User`]\n- `\"admin\"` → [`UserRole::Admin`]\n\n# Examples\n\n```\nuse cobalt_stack::models::sea_orm_active_enums::UserRole;\n\nlet role = UserRole::User;\nassert_eq!(serde_json::to_string(&role).unwrap(), \"\\\"user\\\"\");\n\nlet admin = UserRole::Admin;\nassert_eq!(serde_json::to_string(&admin).unwrap(), \"\\\"admin\\\"\");\n```",
         "enum": [
-          "User",
-          "Admin"
+          "user",
+          "admin"
         ]
       },
       "VerifyEmailRequest": {

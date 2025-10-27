@@ -1,0 +1,20 @@
+# Traefik Configuration for Cloudflare
+# Cloudflare handles HTTPS, Traefik operates in HTTP mode
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: cobalt-network
+
+log:
+  level: INFO
+
+accessLog: {}

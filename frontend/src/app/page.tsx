@@ -4,10 +4,10 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { useAuth } from '@/contexts/auth-context'
-import { LogoutButton } from '@/components/auth/logout-button'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { ThemeSelector } from '@/components/theme/theme-selector'
+import { UserMenu } from '@/components/layout/user-menu'
+import { useAuth } from '@/contexts/auth-context'
 import {
   Zap, Shield, Database, Code2, Layers, Palette,
   CheckCircle2, ArrowRight, Github, BookOpen
@@ -44,25 +44,7 @@ export default function Home() {
               </Link>
               <ThemeSelector />
               <ThemeToggle />
-              {isLoading ? (
-                <div className="text-sm text-muted-foreground">Loading...</div>
-              ) : isAuthenticated && user ? (
-                <div className="flex items-center gap-3">
-                  <Link href="/dashboard">
-                    <Button variant="ghost" size="sm">Dashboard</Button>
-                  </Link>
-                  <LogoutButton variant="outline" size="sm" />
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <Link href="/login">
-                    <Button variant="ghost" size="sm">Login</Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button size="sm">Get Started</Button>
-                  </Link>
-                </div>
-              )}
+              <UserMenu />
             </div>
           </div>
         </div>

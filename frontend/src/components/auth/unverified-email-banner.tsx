@@ -22,7 +22,7 @@ export function UnverifiedEmailBanner() {
     setMessage(null)
 
     try {
-      const response = await fetch(`${env.apiUrl}/api/auth/send-verification`, {
+      const response = await fetch(`${env.apiUrl}/api/v1/auth/send-verification`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,

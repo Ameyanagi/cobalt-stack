@@ -100,7 +100,7 @@ pub struct MessageResponse {
 /// List all users with pagination and filtering
 #[utoipa::path(
     get,
-    path = "/api/admin/users",
+    path = "/api/v1/admin/users",
     params(ListUsersQuery),
     responses(
         (status = 200, description = "List of users", body = UserListResponse),
@@ -194,7 +194,7 @@ pub async fn list_users(
 /// Get user details by ID
 #[utoipa::path(
     get,
-    path = "/api/admin/users/{id}",
+    path = "/api/v1/admin/users/{id}",
     params(
         ("id" = String, Path, description = "User ID (UUID format)")
     ),
@@ -235,7 +235,7 @@ pub async fn get_user(
 /// Disable a user account (soft delete)
 #[utoipa::path(
     patch,
-    path = "/api/admin/users/{id}/disable",
+    path = "/api/v1/admin/users/{id}/disable",
     params(
         ("id" = String, Path, description = "User ID (UUID format)")
     ),
@@ -281,7 +281,7 @@ pub async fn disable_user(
 /// Enable a user account (restore from soft delete)
 #[utoipa::path(
     patch,
-    path = "/api/admin/users/{id}/enable",
+    path = "/api/v1/admin/users/{id}/enable",
     params(
         ("id" = String, Path, description = "User ID (UUID format)")
     ),
@@ -327,7 +327,7 @@ pub async fn enable_user(
 /// Get admin statistics
 #[utoipa::path(
     get,
-    path = "/api/admin/stats",
+    path = "/api/v1/admin/stats",
     responses(
         (status = 200, description = "Admin statistics", body = AdminStatsResponse),
         (status = 401, description = "Unauthorized"),

@@ -27,7 +27,7 @@ function VerifyEmailContent() {
       }
 
       try {
-        const response = await fetch(`${env.apiUrl}/api/auth/verify-email`, {
+        const response = await fetch(`${env.apiUrl}/api/v1/auth/verify-email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

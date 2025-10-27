@@ -47,24 +47,24 @@
 //! ## Public Endpoints
 //!
 //! - `GET /health` - Health check
-//! - `POST /api/auth/register` - User registration
-//! - `POST /api/auth/login` - User login
-//! - `POST /api/auth/refresh` - Refresh access token
-//! - `POST /api/auth/verify-email` - Verify email address
+//! - `POST /api/v1/auth/register` - User registration
+//! - `POST /api/v1/auth/login` - User login
+//! - `POST /api/v1/auth/refresh` - Refresh access token
+//! - `POST /api/v1/auth/verify-email` - Verify email address
 //!
 //! ## Protected Endpoints (Requires JWT)
 //!
-//! - `GET /api/auth/me` - Get current user info
-//! - `POST /api/auth/logout` - Logout user
-//! - `POST /api/auth/send-verification` - Resend verification email
+//! - `GET /api/v1/auth/me` - Get current user info
+//! - `POST /api/v1/auth/logout` - Logout user
+//! - `POST /api/v1/auth/send-verification` - Resend verification email
 //!
 //! ## Admin Endpoints (Requires Admin Role)
 //!
-//! - `GET /api/admin/users` - List all users
-//! - `GET /api/admin/users/:id` - Get user details
-//! - `PATCH /api/admin/users/:id/disable` - Disable user account
-//! - `PATCH /api/admin/users/:id/enable` - Enable user account
-//! - `GET /api/admin/stats` - System statistics
+//! - `GET /api/v1/admin/users` - List all users
+//! - `GET /api/v1/admin/users/:id` - Get user details
+//! - `PATCH /api/v1/admin/users/:id/disable` - Disable user account
+//! - `PATCH /api/v1/admin/users/:id/enable` - Enable user account
+//! - `GET /api/v1/admin/stats` - System statistics
 //!
 //! # Documentation
 //!
@@ -106,6 +106,9 @@ use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
+
+/// API version prefix for all routes
+const API_PREFIX: &str = "/api/v1";
 
 /// Application entry point.
 ///
@@ -194,29 +197,26 @@ async fn main() {
 /// In production, configure specific allowed origins via environment variables.
 fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtConfig) -> Router {
     // Configure CORS with credentials support
-    // Allow any origin ending with :2727 (frontend port) for development
-    // In production, set specific allowed origins
     use tower_http::cors::AllowOrigin;
 
+    // Get allowed origins from environment variable
+    let allowed_origins = std::env::var("CORS_ORIGINS")
+        .unwrap_or_else(|_| "http://localhost:2727,http://localhost:3001".to_string());
+
+    let origins: Vec<HeaderValue> = allowed_origins
+        .split(',')
+        .filter_map(|origin| origin.trim().parse().ok())
+        .collect();
+
+    tracing::info!("CORS allowed origins: {:?}", origins);
+
     let cors = CorsLayer::new()
-        .allow_origin(AllowOrigin::predicate(
-            |origin: &HeaderValue, _request_parts| {
-                // Allow any origin that ends with :2727 (frontend port)
-                // This enables access from localhost, LAN IPs, etc.
-                origin
-                    .to_str()
-                    .map(|s| {
-                        s.ends_with(":2727")
-                            || s == "http://localhost:2727"
-                            || s == "http://127.0.0.1:2727"
-                    })
-                    .unwrap_or(false)
-            },
-        ))
+        .allow_origin(origins)
         .allow_methods(vec![
             Method::GET,
             Method::POST,
             Method::PUT,
+            Method::PATCH,
             Method::DELETE,
             Method::OPTIONS,
         ])
@@ -230,18 +230,18 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
 
     // Auth routes (public)
     let auth_public_routes = Router::new()
-        .route("/api/auth/register", post(handlers::auth::register))
-        .route("/api/auth/login", post(handlers::auth::login))
-        .route("/api/auth/refresh", post(handlers::auth::refresh_token))
-        .route("/api/auth/verify-email", post(handlers::auth::verify_email))
+        .route(&format!("{}/auth/register", API_PREFIX), post(handlers::auth::register))
+        .route(&format!("{}/auth/login", API_PREFIX), post(handlers::auth::login))
+        .route(&format!("{}/auth/refresh", API_PREFIX), post(handlers::auth::refresh_token))
+        .route(&format!("{}/auth/verify-email", API_PREFIX), post(handlers::auth::verify_email))
         .with_state(state.clone());
 
     // Auth routes (protected)
     let auth_protected_routes = Router::new()
-        .route("/api/auth/me", get(handlers::auth::get_current_user))
-        .route("/api/auth/logout", post(handlers::auth::logout))
+        .route(&format!("{}/auth/me", API_PREFIX), get(handlers::auth::get_current_user))
+        .route(&format!("{}/auth/logout", API_PREFIX), post(handlers::auth::logout))
         .route(
-            "/api/auth/send-verification",
+            &format!("{}/auth/send-verification", API_PREFIX),
             post(handlers::auth::send_verification_email),
         )
         .layer(axum_middleware::from_fn_with_state(
@@ -256,17 +256,17 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
     };
 
     let admin_routes = Router::new()
-        .route("/api/admin/users", get(handlers::admin::list_users))
-        .route("/api/admin/users/:id", get(handlers::admin::get_user))
+        .route(&format!("{}/admin/users", API_PREFIX), get(handlers::admin::list_users))
+        .route(&format!("{}/admin/users/:id", API_PREFIX), get(handlers::admin::get_user))
         .route(
-            "/api/admin/users/:id/disable",
+            &format!("{}/admin/users/:id/disable", API_PREFIX),
             patch(handlers::admin::disable_user),
         )
         .route(
-            "/api/admin/users/:id/enable",
+            &format!("{}/admin/users/:id/enable", API_PREFIX),
             patch(handlers::admin::enable_user),
         )
-        .route("/api/admin/stats", get(handlers::admin::get_stats))
+        .route(&format!("{}/admin/stats", API_PREFIX), get(handlers::admin::get_stats))
         .layer(axum_middleware::from_fn_with_state(
             state.db.clone(),
             middleware::admin::admin_middleware,

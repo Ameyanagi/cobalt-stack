@@ -56,7 +56,7 @@ export default function AdminUsersPage() {
       if (verifiedFilter === 'verified') params.append('email_verified', 'true')
       if (verifiedFilter === 'unverified') params.append('email_verified', 'false')
 
-      const response = await fetch(`${env.apiUrl}/api/admin/users?${params}`, {
+      const response = await fetch(`${env.apiUrl}/api/v1/admin/users?${params}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
@@ -89,7 +89,7 @@ export default function AdminUsersPage() {
   const handleToggleUserStatus = async (userId: string, isDisabled: boolean) => {
     try {
       const endpoint = isDisabled ? 'enable' : 'disable'
-      const response = await fetch(`${env.apiUrl}/api/admin/users/${userId}/${endpoint}`, {
+      const response = await fetch(`${env.apiUrl}/api/v1/admin/users/${userId}/${endpoint}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${accessToken}`,

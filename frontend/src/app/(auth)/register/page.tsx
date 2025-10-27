@@ -52,7 +52,7 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${env.apiUrl}/api/auth/register`, {
+      const response = await fetch(`${env.apiUrl}/api/v1/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ export default function RegisterPage() {
       const result = await response.json()
 
       // Fetch user info with access token
-      const userResponse = await fetch(`${env.apiUrl}/api/auth/me`, {
+      const userResponse = await fetch(`${env.apiUrl}/api/v1/auth/me`, {
         headers: {
           'Authorization': `Bearer ${result.access_token}`,
         },

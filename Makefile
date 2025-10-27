@@ -127,8 +127,7 @@ seed-admin:
 ## generate-openapi: Generate OpenAPI schema
 generate-openapi:
 	@echo "📝 Generating OpenAPI schema..."
-	@cd backend && cargo run --bin cobalt-stack-backend
-	@echo "✅ OpenAPI schema generated at openapi/schema.json"
+	@cd backend && cargo run --release --bin generate_openapi
 
 ## generate-types: Generate TypeScript types from OpenAPI schema
 generate-types:

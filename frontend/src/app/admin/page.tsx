@@ -21,7 +21,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch(`${env.apiUrl}/api/admin/stats`, {
+        const response = await fetch(`${env.apiUrl}/api/v1/admin/stats`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },

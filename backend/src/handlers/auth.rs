@@ -21,8 +21,9 @@ pub struct RegisterRequest {
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct LoginRequest {
+    /// Username or email address
     #[schema(example = "alice")]
-    pub username: String,
+    pub username_or_email: String,
 
     #[schema(example = "SecurePass123!")]
     pub password: String,
@@ -95,8 +96,8 @@ impl RegisterRequest {
 
 impl LoginRequest {
     pub fn validate(&self) -> Result<()> {
-        if self.username.is_empty() {
-            return Err(AuthError::InvalidInput("Username cannot be empty".to_string()).into());
+        if self.username_or_email.is_empty() {
+            return Err(AuthError::InvalidInput("Username or email cannot be empty".to_string()).into());
         }
         if self.password.is_empty() {
             return Err(AuthError::InvalidInput("Password cannot be empty".to_string()).into());
@@ -138,7 +139,7 @@ pub struct AppState {
 /// Returns access token on success.
 #[utoipa::path(
     post,
-    path = "/api/auth/register",
+    path = "/api/v1/auth/register",
     request_body = RegisterRequest,
     responses(
         (status = 200, description = "User registered successfully", body = AuthResponse),
@@ -259,7 +260,7 @@ pub async fn register(
 /// Rate limited to 5 attempts per 15 minutes per IP.
 #[utoipa::path(
     post,
-    path = "/api/auth/login",
+    path = "/api/v1/auth/login",
     request_body = LoginRequest,
     responses(
         (status = 200, description = "Login successful", body = AuthResponse),
@@ -281,9 +282,12 @@ pub async fn login(
             .unwrap_or(AuthError::InvalidInput("Validation failed".to_string()))
     })?;
 
-    // Find user by username
+    // Find user by username or email
     let user = Users::find()
-        .filter(users::Column::Username.eq(&req.username))
+        .filter(
+            users::Column::Username.eq(&req.username_or_email)
+                .or(users::Column::Email.eq(&req.username_or_email))
+        )
         .one(state.db.as_ref())
         .await?
         .ok_or(AuthError::InvalidCredentials)?;
@@ -344,7 +348,7 @@ pub async fn login(
 /// Rotates refresh token and returns new access token.
 #[utoipa::path(
     post,
-    path = "/api/auth/refresh",
+    path = "/api/v1/auth/refresh",
     responses(
         (status = 200, description = "Token refreshed", body = AuthResponse),
         (status = 401, description = "Invalid or expired token", body = ErrorResponse),
@@ -433,7 +437,7 @@ pub async fn refresh_token(
 /// Revokes refresh token and blacklists access token.
 #[utoipa::path(
     post,
-    path = "/api/auth/logout",
+    path = "/api/v1/auth/logout",
     responses(
         (status = 200, description = "Logged out successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -479,7 +483,7 @@ pub async fn logout(
 /// Protected route - requires valid access token.
 #[utoipa::path(
     get,
-    path = "/api/auth/me",
+    path = "/api/v1/auth/me",
     responses(
         (status = 200, description = "User information", body = UserResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -539,7 +543,7 @@ pub struct MessageResponse {
 /// Protected route - requires valid access token.
 #[utoipa::path(
     post,
-    path = "/api/auth/send-verification",
+    path = "/api/v1/auth/send-verification",
     responses(
         (status = 200, description = "Verification email sent", body = MessageResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -600,7 +604,7 @@ pub async fn send_verification_email(
 /// Public route - verifies email address using token from email.
 #[utoipa::path(
     post,
-    path = "/api/auth/verify-email",
+    path = "/api/v1/auth/verify-email",
     request_body = VerifyEmailRequest,
     responses(
         (status = 200, description = "Email verified successfully", body = MessageResponse),
@@ -762,7 +766,7 @@ mod tests {
     #[test]
     fn test_login_request_validation_valid() {
         let req = LoginRequest {
-            username: "alice".to_string(),
+            username_or_email: "alice".to_string(),
             password: "SecurePass123!".to_string(),
         };
         assert!(req.validate().is_ok());
@@ -771,7 +775,7 @@ mod tests {
     #[test]
     fn test_login_request_validation_empty_username() {
         let req = LoginRequest {
-            username: "".to_string(),
+            username_or_email: "".to_string(),
             password: "SecurePass123!".to_string(),
         };
         assert!(req.validate().is_err());
@@ -780,7 +784,7 @@ mod tests {
     #[test]
     fn test_login_request_validation_empty_password() {
         let req = LoginRequest {
-            username: "alice".to_string(),
+            username_or_email: "alice".to_string(),
             password: "".to_string(),
         };
         assert!(req.validate().is_err());
