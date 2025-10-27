@@ -58,6 +58,23 @@ mockall = "0.13"
 [features]
 default = []
 
+[lints.clippy]
+all = "warn"
+pedantic = "warn"
+nursery = "warn"
+
+# Deny
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+
+# Allow (too pedantic)
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
 [[bin]]
 name = "cobalt-stack-backend"
 path = "src/main.rs"
