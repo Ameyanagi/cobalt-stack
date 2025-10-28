@@ -24,6 +24,7 @@ export function useSseStream() {
       setIsStreaming(true);
       const reader = stream.getReader();
       const decoder = new TextDecoder();
+      let buffer = ''; // Buffer for incomplete lines
 
       try {
         while (true) {
@@ -34,8 +35,12 @@ export function useSseStream() {
             break;
           }
 
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
+          // Decode and append to buffer
+          buffer += decoder.decode(value, { stream: true });
+
+          // Split by newlines, but keep the last incomplete line in buffer
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || ''; // Keep the last incomplete line
 
           for (const line of lines) {
             if (!line.trim() || !line.startsWith('data: ')) {
@@ -55,7 +60,11 @@ export function useSseStream() {
                 onChunk({ content: parsed.content, done: false });
               }
             } catch (parseError) {
-              console.warn('Failed to parse SSE chunk:', parseError);
+              // Silently skip - this is likely a partial chunk that will be completed in the next read
+              // Only log if it looks like it should be complete (starts and ends with braces)
+              if (data.startsWith('{') && data.endsWith('}')) {
+                console.warn('Failed to parse complete SSE chunk:', data, parseError);
+              }
             }
           }
         }
