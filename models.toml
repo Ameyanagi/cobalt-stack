@@ -177,6 +177,68 @@ cost_per_million_output_tokens = 8.10
 tags = ["powerful", "open-source", "llama"]
 recommended_for = ["complex-reasoning", "open-source-preference"]
 
+# === Azure Grok Models (xAI via Azure) ===
+
+[[models]]
+id = "grok-4"
+name = "Grok 4"
+provider = "azure"
+model_id = "${AZURE_GROK_4_DEPLOYMENT}"
+description = "xAI's most capable model with advanced reasoning"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 5.00  # Estimate
+cost_per_million_output_tokens = 15.00  # Estimate
+tags = ["powerful", "reasoning", "grok"]
+recommended_for = ["complex-reasoning", "advanced-analysis"]
+
+[[models]]
+id = "grok-4-fast-reasoning"
+name = "Grok 4 Fast Reasoning"
+provider = "azure"
+model_id = "${AZURE_GROK_4_FAST_REASONING_DEPLOYMENT}"
+description = "Fast variant of Grok 4 with reasoning capabilities"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 3.00  # Estimate
+cost_per_million_output_tokens = 9.00  # Estimate
+tags = ["fast", "reasoning", "grok"]
+recommended_for = ["chat", "reasoning-tasks"]
+
+[[models]]
+id = "grok-4-fast-non-reasoning"
+name = "Grok 4 Fast (Non-Reasoning)"
+provider = "azure"
+model_id = "${AZURE_GROK_4_FAST_NON_REASONING_DEPLOYMENT}"
+description = "Fastest Grok 4 variant optimized for speed"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 1.00  # Estimate
+cost_per_million_output_tokens = 3.00  # Estimate
+tags = ["fast", "cost-effective", "grok"]
+recommended_for = ["chat", "quick-responses"]
+
+[[models]]
+id = "gpt-5-codex"
+name = "GPT-5 Codex"
+provider = "azure"
+model_id = "${AZURE_GPT5_CODEX_DEPLOYMENT}"
+description = "Advanced code generation and understanding model"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 10.00  # Estimate
+cost_per_million_output_tokens = 30.00  # Estimate
+tags = ["code", "advanced", "gpt-5"]
+recommended_for = ["code-generation", "code-review", "technical-tasks"]
+
 # === Model Groups ===
 # Group models by use case for easier selection
 
@@ -195,7 +257,7 @@ models = ["llama-3.1-8b", "gpt-4o-mini", "gpt-35-turbo"]
 [model_groups.powerful]
 name = "Most Capable"
 description = "Best performance for complex tasks"
-models = ["llama-3.1-405b", "gpt-4o", "gpt-4-turbo", "azure-llama-3.1-405b"]
+models = ["llama-3.1-405b", "gpt-4o", "gpt-4-turbo", "azure-llama-3.1-405b", "grok-4"]
 
 [model_groups.open_source]
 name = "Open Source"
@@ -206,6 +268,16 @@ models = ["llama-3.3-70b", "llama-3.1-8b", "llama-3.1-405b", "azure-llama-3.1-70
 name = "Multimodal"
 description = "Models that support images and other media"
 models = ["gpt-4o"]
+
+[model_groups.code]
+name = "Code Generation"
+description = "Specialized models for code generation and review"
+models = ["gpt-5-codex"]
+
+[model_groups.grok]
+name = "Grok Models"
+description = "xAI's Grok models with advanced reasoning"
+models = ["grok-4", "grok-4-fast-reasoning", "grok-4-fast-non-reasoning"]
 
 # === Feature Flags ===
 [features]
