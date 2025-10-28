@@ -99,7 +99,20 @@ pub struct ModelRegistry {
 impl ModelRegistry {
     /// Load model registry from models.toml
     pub fn load() -> Result<Self, ModelRegistryError> {
-        Self::load_from_path("models.toml")
+        // Try loading from current directory first
+        if let Ok(registry) = Self::load_from_path("models.toml") {
+            return Ok(registry);
+        }
+
+        // Try loading from parent directory (for tests running in backend/)
+        if let Ok(registry) = Self::load_from_path("../models.toml") {
+            return Ok(registry);
+        }
+
+        Err(ModelRegistryError::FileReadError(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "models.toml not found in current or parent directory",
+        )))
     }
 
     /// Load model registry from a specific path (useful for testing)
