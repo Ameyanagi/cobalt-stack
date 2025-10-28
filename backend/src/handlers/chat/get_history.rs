@@ -13,6 +13,7 @@ use crate::{
     application::chat::get_session_history::{
         GetSessionHistoryRequest, GetSessionHistoryUseCase,
     },
+    domain::chat::repository::ChatRepository,
     handlers::chat::{dto::{GetHistoryResponse, MessageDto}, ChatState},
     middleware::auth::AuthUser,
 };
@@ -53,8 +54,21 @@ pub async fn get_session_history(
     State(state): State<ChatState>,
     Path(session_id): Path<Uuid>,
     Query(query): Query<HistoryQuery>,
-    _auth_user: AuthUser,
+    auth_user: AuthUser,
 ) -> Result<Json<GetHistoryResponse>, (StatusCode, String)> {
+    // First, verify the session exists and belongs to the user
+    let session = state
+        .repository
+        .find_session_by_id(session_id)
+        .await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
+        .ok_or((StatusCode::NOT_FOUND, "Session not found".to_string()))?;
+
+    // Verify ownership
+    if session.user_id != auth_user.user_id {
+        return Err((StatusCode::FORBIDDEN, "Access denied".to_string()));
+    }
+
     let use_case = GetSessionHistoryUseCase::new(Arc::clone(&state.repository) as Arc<_>);
 
     let request = GetSessionHistoryRequest {
@@ -73,5 +87,8 @@ pub async fn get_session_history(
         .map(MessageDto::from)
         .collect();
 
-    Ok(Json(GetHistoryResponse { messages }))
+    Ok(Json(GetHistoryResponse {
+        session: session.into(),
+        messages,
+    }))
 }

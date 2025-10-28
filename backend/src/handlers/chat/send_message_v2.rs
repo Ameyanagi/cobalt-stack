@@ -1,4 +1,4 @@
-//! Send message endpoint handler with SSE streaming
+//! Send message endpoint handler with provider abstraction and model selection
 
 use axum::{
     extract::{Path, State},
@@ -14,13 +14,15 @@ use std::{convert::Infallible, sync::Arc};
 use uuid::Uuid;
 
 use crate::{
-    application::chat::send_message::{SendMessageRequest as UseCaseRequest, SendMessageUseCase},
+    application::chat::{SendMessageUseCaseV2, send_message_v2::{
+        SendMessageRequest as UseCaseRequest, UseCaseConfig,
+    }},
     domain::chat::repository::RepositoryError,
     handlers::chat::{dto::SendMessageRequest, ChatState},
     middleware::auth::AuthUser,
 };
 
-/// Send a message in a chat session and stream LLM response
+/// Send a message in a chat session with model selection and stream LLM response
 ///
 /// Returns Server-Sent Events (SSE) stream with message chunks
 ///
@@ -29,10 +31,12 @@ use crate::{
 /// - Session not found (404)
 /// - User not authorized (403)
 /// - Message validation fails (400)
+/// - Model not found (400)
+/// - Provider error (500)
 /// - Database error (500)
 #[utoipa::path(
     post,
-    path = "/api/chat/sessions/{id}/messages",
+    path = "/api/v1/chat/sessions/{id}/messages",
     tag = "chat",
     request_body = SendMessageRequest,
     params(
@@ -40,7 +44,7 @@ use crate::{
     ),
     responses(
         (status = 200, description = "SSE stream of message chunks", content_type = "text/event-stream"),
-        (status = 400, description = "Invalid message content"),
+        (status = 400, description = "Invalid message content or model"),
         (status = 401, description = "Unauthorized"),
         (status = 403, description = "Forbidden - user does not own this session"),
         (status = 404, description = "Session not found"),
@@ -50,21 +54,32 @@ use crate::{
         ("bearer_auth" = [])
     )
 )]
-pub async fn send_message(
+pub async fn send_message_v2(
     State(state): State<ChatState>,
     Path(session_id): Path<Uuid>,
     auth_user: AuthUser,
     Json(request): Json<SendMessageRequest>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
-    let use_case = SendMessageUseCase::new(
-        Arc::clone(&state.repository) as Arc<_>,
-        state.llm_config.clone(),
-    );
+    // Create use case with provider factory
+    let config = UseCaseConfig {
+        max_context_messages: state.llm_config.max_context_messages,
+        max_tokens: state.llm_config.max_tokens,
+    };
+
+    let use_case = SendMessageUseCaseV2::new(Arc::clone(&state.repository) as Arc<_>, config)
+        .map_err(|e| {
+            tracing::error!("Failed to initialize use case: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to initialize LLM provider".to_string(),
+            )
+        })?;
 
     let use_case_request = UseCaseRequest {
         session_id,
         user_id: auth_user.user_id,
         content: request.content,
+        model_id: request.model_id, // Pass model selection
     };
 
     // Execute use case to get streaming response
@@ -76,6 +91,9 @@ pub async fn send_message(
             (StatusCode::FORBIDDEN, msg)
         }
         RepositoryError::ValidationError(msg) => (StatusCode::BAD_REQUEST, msg),
+        RepositoryError::DatabaseError(msg) if msg.contains("Model") || msg.contains("Provider") => {
+            (StatusCode::BAD_REQUEST, msg)
+        }
         _ => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
     })?;
 
@@ -88,28 +106,32 @@ pub async fn send_message(
 /// Convert application stream to SSE event stream
 fn convert_to_sse_stream(
     stream: std::pin::Pin<
-        Box<dyn Stream<Item = Result<crate::application::chat::send_message::StreamChunk, String>> + Send>,
+        Box<
+            dyn Stream<Item = Result<crate::application::chat::send_message_v2::StreamChunk, String>>
+                + Send,
+        >,
     >,
 ) -> impl Stream<Item = Result<Event, Infallible>> {
     use futures::StreamExt;
 
-    stream.map(|result| {
-        match result {
-            Ok(chunk) => {
-                if chunk.is_final {
-                    // Send final event to indicate completion
-                    Ok(Event::default().data("[DONE]"))
-                } else {
-                    // Send chunk content as JSON
-                    let json_data = format!(r#"{{"content":"{}"}}"#, chunk.content.replace('"', r#"\""#));
-                    Ok(Event::default().data(json_data))
-                }
+    stream.map(|result| match result {
+        Ok(chunk) => {
+            if chunk.is_final {
+                // Send final event to indicate completion
+                Ok(Event::default().data("[DONE]"))
+            } else {
+                // Send chunk content as JSON
+                let json_data = format!(
+                    r#"{{"content":"{}"}}"#,
+                    chunk.content.replace('"', r#"\""#).replace('\n', r#"\n"#)
+                );
+                Ok(Event::default().data(json_data))
             }
-            Err(e) => {
-                // Send error event as JSON
-                let error_json = format!(r#"{{"error":"{}"}}"#, e.replace('"', r#"\""#));
-                Ok(Event::default().event("error").data(error_json))
-            }
+        }
+        Err(e) => {
+            // Send error event as JSON
+            let error_json = format!(r#"{{"error":"{}"}}"#, e.replace('"', r#"\""#));
+            Ok(Event::default().event("error").data(error_json))
         }
     })
 }

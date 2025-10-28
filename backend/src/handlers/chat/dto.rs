@@ -30,6 +30,10 @@ pub struct SendMessageRequest {
     /// Message content
     #[schema(example = "Hello, how are you?")]
     pub content: String,
+    /// Optional model ID to use (defaults to configured default)
+    #[serde(default)]
+    #[schema(example = "llama-3.3-70b")]
+    pub model_id: Option<String>,
 }
 
 /// Session details
@@ -86,6 +90,8 @@ impl From<ChatMessage> for MessageDto {
 /// Response containing message history
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct GetHistoryResponse {
+    /// Session details
+    pub session: SessionDto,
     /// Messages in chronological order
     pub messages: Vec<MessageDto>,
 }
