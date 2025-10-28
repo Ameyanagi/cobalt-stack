@@ -359,7 +359,9 @@ fn create_app(
     // Add chat routes if feature is enabled
     if let (Some(chat_state), Some(rate_limit_state)) = (chat_state, rate_limit_state) {
         tracing::info!("Chat feature enabled - mounting chat routes with rate limiting");
-        let chat_routes = handlers::chat::routes(chat_state)
+
+        // Use v2 routes with provider abstraction and model selection
+        let chat_routes = handlers::chat::routes_v2(chat_state)
             .layer(axum_middleware::from_fn_with_state(
                 rate_limit_state,
                 middleware::chat_rate_limit::chat_rate_limit_middleware,
