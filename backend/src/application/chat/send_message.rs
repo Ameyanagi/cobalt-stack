@@ -167,12 +167,19 @@ impl SendMessageUseCase {
             .build()
             .map_err(|e| RepositoryError::ValidationError(e.to_string()))?;
 
+        tracing::info!("Initiating LLM stream request to: {}", self.llm_config.api_base);
+
         // Start streaming
         let mut stream = client
             .chat()
             .create_stream(request)
             .await
-            .map_err(|e| RepositoryError::DatabaseError(e.to_string()))?;
+            .map_err(|e| {
+                tracing::error!("Failed to create LLM stream: {}", e);
+                RepositoryError::DatabaseError(e.to_string())
+            })?;
+
+        tracing::info!("LLM stream created successfully");
 
         // Process stream and save assistant message
         let repository = Arc::clone(&self.repository);
@@ -180,11 +187,18 @@ impl SendMessageUseCase {
 
         use futures::StreamExt;
         let output_stream = async_stream::stream! {
+            tracing::info!("Starting LLM stream processing");
+            let mut chunk_count = 0;
+
             while let Some(result) = stream.next().await {
                 match result {
                     Ok(response) => {
+                        tracing::debug!("Received stream response with {} choices", response.choices.len());
+
                         for choice in response.choices {
                             if let Some(content) = &choice.delta.content {
+                                chunk_count += 1;
+                                tracing::debug!("Chunk #{}: {} bytes", chunk_count, content.len());
                                 accumulated_content.push_str(content);
                                 yield Ok(StreamChunk {
                                     content: content.clone(),
@@ -193,7 +207,10 @@ impl SendMessageUseCase {
                             }
 
                             // Check if streaming is done
-                            if choice.finish_reason.is_some() {
+                            if let Some(reason) = &choice.finish_reason {
+                                tracing::info!("Stream finished: reason={:?}, total_chunks={}, content_length={}",
+                                    reason, chunk_count, accumulated_content.len());
+
                                 // Save complete assistant message
                                 if !accumulated_content.is_empty() {
                                     let assistant_message = match ChatMessage::new(
@@ -203,15 +220,19 @@ impl SendMessageUseCase {
                                     ) {
                                         Ok(msg) => msg,
                                         Err(e) => {
+                                            tracing::error!("Failed to create message: {}", e);
                                             yield Err(format!("Failed to create message: {}", e));
                                             return;
                                         }
                                     };
 
                                     if let Err(e) = repository.save_message(&assistant_message).await {
+                                        tracing::error!("Failed to save message: {}", e);
                                         yield Err(format!("Failed to save message: {}", e));
                                         return;
                                     }
+
+                                    tracing::info!("Assistant message saved successfully");
                                 }
 
                                 yield Ok(StreamChunk {
@@ -222,11 +243,14 @@ impl SendMessageUseCase {
                         }
                     }
                     Err(e) => {
+                        tracing::error!("LLM stream error: {}", e);
                         yield Err(format!("Stream error: {}", e));
                         return;
                     }
                 }
             }
+
+            tracing::warn!("Stream ended without finish_reason (chunks received: {})", chunk_count);
         };
 
         Ok(Box::pin(output_stream))
