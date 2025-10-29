@@ -86,3 +86,9 @@ export interface RateLimitError {
   retry_after: number;
   message: string;
 }
+
+export interface ListModelsResponse {
+  models: LlmModel[];
+  groups: ModelGroup[];
+  default_model: string;
+}

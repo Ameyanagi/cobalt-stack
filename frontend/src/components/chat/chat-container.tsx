@@ -15,12 +15,12 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
 import { useChatApi } from '@/hooks/use-chat-api';
 import { useSseStream } from '@/hooks/use-sse-stream';
+import { useModels } from '@/hooks/use-models';
 import { SessionSidebar } from './session-sidebar';
 import { Message } from './message';
 import { MessageInput } from './message-input';
 import { RateLimitIndicator } from './rate-limit-indicator';
 import { ModelSelector } from './model-selector';
-import { AVAILABLE_MODELS, MODEL_GROUPS, DEFAULT_MODEL_ID } from '@/config/models';
 import type { ChatSession, ChatMessage, RateLimitError } from '@/types/chat';
 
 export function ChatContainer() {
@@ -33,7 +33,7 @@ export function ChatContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rateLimitError, setRateLimitError] = useState<RateLimitError | null>(null);
-  const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_MODEL_ID);
+  const [selectedModelId, setSelectedModelId] = useState<string>('');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -48,6 +48,14 @@ export function ChatContainer() {
   } = useChatApi();
 
   const { parseStream, isStreaming } = useSseStream();
+  const { models, groups, defaultModel, isLoading: modelsLoading, error: modelsError } = useModels();
+
+  // Set default model when available
+  useEffect(() => {
+    if (defaultModel && !selectedModelId) {
+      setSelectedModelId(defaultModel.id);
+    }
+  }, [defaultModel, selectedModelId]);
 
   // Load sessions only after authentication is confirmed
   useEffect(() => {
@@ -170,7 +178,7 @@ export function ChatContainer() {
     try {
       const stream = await sendMessage(currentSession.id, {
         content,
-        model_id: selectedModelId !== DEFAULT_MODEL_ID ? selectedModelId : undefined
+        model_id: selectedModelId || undefined
       });
 
       // Create placeholder for assistant message
@@ -290,6 +298,17 @@ export function ChatContainer() {
           </div>
         )}
 
+        {modelsError && (
+          <div className="p-4">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Failed to load models. Please refresh the page.
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
         <ScrollArea className="flex-1" ref={scrollAreaRef}>
           <div className="max-w-4xl mx-auto p-4 space-y-4">
             {!currentSession && !isLoading && (
@@ -329,11 +348,11 @@ export function ChatContainer() {
 
         <div className="border-t p-4 space-y-3">
           <ModelSelector
-            models={AVAILABLE_MODELS}
-            modelGroups={MODEL_GROUPS}
+            models={models}
+            modelGroups={groups}
             selectedModelId={selectedModelId}
             onSelectModel={setSelectedModelId}
-            disabled={!currentSession || isStreaming || isLoading}
+            disabled={!currentSession || isStreaming || isLoading || modelsLoading}
           />
           <MessageInput
             onSend={handleSendMessage}
