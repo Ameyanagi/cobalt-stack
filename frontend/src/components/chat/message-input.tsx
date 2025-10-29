@@ -4,6 +4,8 @@
  * Text input for sending chat messages with keyboard shortcuts
  */
 
+'use client';
+
 import { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';

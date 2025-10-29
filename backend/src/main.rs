@@ -173,12 +173,29 @@ async fn main() -> anyhow::Result<()> {
         jwt_config: jwt_config.clone(),
     };
 
+    // Initialize provider factory for LLM models (if chat enabled)
+    let provider_factory = if chat_config.enabled {
+        match infrastructure::llm::ProviderFactory::new() {
+            Ok(factory) => {
+                tracing::info!("LLM Provider Factory initialized successfully");
+                Some(Arc::new(factory))
+            }
+            Err(e) => {
+                tracing::error!("Failed to initialize Provider Factory: {}", e);
+                anyhow::bail!("Provider Factory initialization failed: {}", e);
+            }
+        }
+    } else {
+        None
+    };
+
     // Create chat state (if enabled)
     let chat_state = if chat_config.enabled {
         let chat_repository = infrastructure::persistence::SeaOrmChatRepository::new(Arc::clone(&db));
         Some(handlers::chat::ChatState {
             repository: Arc::new(chat_repository),
             llm_config: chat_config.llm.clone(),
+            provider_factory: provider_factory.expect("Provider factory should be initialized when chat is enabled"),
         })
     } else {
         None
@@ -360,8 +377,11 @@ fn create_app(
     if let (Some(chat_state), Some(rate_limit_state)) = (chat_state, rate_limit_state) {
         tracing::info!("Chat feature enabled - mounting chat routes with rate limiting");
 
-        // Use v2 routes with provider abstraction and model selection
-        let chat_routes = handlers::chat::routes_v2(chat_state)
+        // Public chat routes (no auth required)
+        let chat_public_routes = handlers::chat::public_routes(chat_state.clone());
+
+        // Protected chat routes with rate limiting and auth
+        let chat_protected_routes = handlers::chat::routes_v2(chat_state)
             .layer(axum_middleware::from_fn_with_state(
                 rate_limit_state,
                 middleware::chat_rate_limit::chat_rate_limit_middleware,
@@ -370,7 +390,11 @@ fn create_app(
                 jwt_config.clone(),
                 middleware::auth::auth_middleware,
             ));
-        app = app.nest(&format!("{API_PREFIX}/chat"), chat_routes);
+
+        // Merge both public and protected routes under /api/v1/chat
+        app = app
+            .nest(&format!("{API_PREFIX}/chat"), chat_public_routes)
+            .nest(&format!("{API_PREFIX}/chat"), chat_protected_routes);
     } else {
         tracing::info!("Chat feature disabled");
     }

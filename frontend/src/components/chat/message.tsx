@@ -50,14 +50,15 @@ export function Message({ message, isStreaming = false }: MessageProps) {
                 pre: ({ children }) => (
                   <pre className="bg-muted p-4 rounded-lg overflow-x-auto">{children}</pre>
                 ),
-                code: ({ inline, className, children, ...props }) => {
+                code: ({ className, children, ...props }: any) => {
                   const match = /language-(\w+)/.exec(className || '');
-                  return !inline ? (
-                    <code className={className} {...props}>
+                  const inline = !match;
+                  return inline ? (
+                    <code className="bg-muted px-1 py-0.5 rounded text-sm" {...props}>
                       {children}
                     </code>
                   ) : (
-                    <code className="bg-muted px-1 py-0.5 rounded text-sm" {...props}>
+                    <code className={className} {...props}>
                       {children}
                     </code>
                   );

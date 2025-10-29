@@ -1037,6 +1037,7 @@
         "type": "object",
         "description": "Response containing message history",
         "required": [
+          "session",
           "messages"
         ],
         "properties": {
@@ -1046,6 +1047,10 @@
               "$ref": "#/components/schemas/MessageDto"
             },
             "description": "Messages in chronological order"
+          },
+          "session": {
+            "$ref": "#/components/schemas/SessionDto",
+            "description": "Session details"
           }
         }
       },
@@ -1200,6 +1205,14 @@
             "type": "string",
             "description": "Message content",
             "example": "Hello, how are you?"
+          },
+          "model_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional model ID to use (defaults to configured default)",
+            "example": "llama-3.3-70b"
           }
         }
       },

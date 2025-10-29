@@ -60,20 +60,17 @@ pub async fn send_message_v2(
     auth_user: AuthUser,
     Json(request): Json<SendMessageRequest>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
-    // Create use case with provider factory
+    // Create use case with shared provider factory
     let config = UseCaseConfig {
         max_context_messages: state.llm_config.max_context_messages,
         max_tokens: state.llm_config.max_tokens,
     };
 
-    let use_case = SendMessageUseCaseV2::new(Arc::clone(&state.repository) as Arc<_>, config)
-        .map_err(|e| {
-            tracing::error!("Failed to initialize use case: {}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to initialize LLM provider".to_string(),
-            )
-        })?;
+    let use_case = SendMessageUseCaseV2::new(
+        Arc::clone(&state.repository) as Arc<_>,
+        Arc::clone(&state.provider_factory),
+        config,
+    );
 
     let use_case_request = UseCaseRequest {
         session_id,

@@ -3,6 +3,7 @@
 //! Creates and manages LLM provider instances based on model registry configuration.
 
 use super::{
+    azure_provider::AzureAIProvider,
     model_registry::ModelRegistry,
     provider::{LlmProvider, LlmProviderError, LlmResult},
     sambanova_provider::SambaNovaProvider,
@@ -46,14 +47,23 @@ impl ProviderFactory {
             }
         }
 
-        // TODO: Initialize Azure AI provider when implemented
-        // if let Ok(provider_config) = model_registry.get_provider("azure") {
-        //     if provider_config.enabled {
-        //         let provider = AzureAIProvider::new(...);
-        //         providers.insert("azure".to_string(), Arc::new(provider));
-        //         tracing::info!("Initialized Azure AI provider");
-        //     }
-        // }
+        // Initialize Azure AI provider if configured
+        if let Ok(provider_config) = model_registry.get_provider("azure") {
+            if provider_config.enabled {
+                let endpoint = provider_config
+                    .endpoint
+                    .clone()
+                    .ok_or_else(|| LlmProviderError::ConfigError("Azure endpoint missing".to_string()))?;
+                let api_key = provider_config
+                    .api_key
+                    .clone()
+                    .ok_or_else(|| LlmProviderError::ConfigError("Azure api_key missing".to_string()))?;
+
+                let provider = AzureAIProvider::new(endpoint, api_key, model_registry.clone());
+                providers.insert("azure".to_string(), Arc::new(provider));
+                tracing::info!("Initialized Azure AI provider");
+            }
+        }
 
         if providers.is_empty() {
             return Err(LlmProviderError::ConfigError(

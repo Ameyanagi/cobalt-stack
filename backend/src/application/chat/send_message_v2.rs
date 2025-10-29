@@ -48,21 +48,17 @@ pub struct SendMessageUseCase {
 }
 
 impl SendMessageUseCase {
-    /// Create a new use case instance
-    ///
-    /// # Errors
-    /// Returns error if provider factory cannot be initialized
+    /// Create a new use case instance with an existing provider factory
     pub fn new(
         repository: Arc<dyn ChatRepository>,
+        provider_factory: Arc<ProviderFactory>,
         config: UseCaseConfig,
-    ) -> Result<Self, LlmProviderError> {
-        let provider_factory = Arc::new(ProviderFactory::new()?);
-
-        Ok(Self {
+    ) -> Self {
+        Self {
             repository,
             provider_factory,
             config,
-        })
+        }
     }
 
     /// Execute the use case to send a message and stream LLM response

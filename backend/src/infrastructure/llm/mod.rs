@@ -2,6 +2,7 @@
 //!
 //! Contains model registry and provider implementations for LLM services.
 
+pub mod azure_provider;
 pub mod factory;
 pub mod model_registry;
 pub mod provider;

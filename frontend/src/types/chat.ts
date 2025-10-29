@@ -31,6 +31,28 @@ export interface CreateSessionResponse {
 
 export interface SendMessageRequest {
   content: string;
+  model_id?: string;
+}
+
+export interface LlmModel {
+  id: string;
+  name: string;
+  provider: string;
+  description: string;
+  context_window: number;
+  max_output_tokens: number;
+  supports_streaming: boolean;
+  supports_function_calling: boolean;
+  cost_per_million_input_tokens: number;
+  cost_per_million_output_tokens: number;
+  tags: string[];
+  recommended_for: string[];
+}
+
+export interface ModelGroup {
+  name: string;
+  description: string;
+  models: string[];
 }
 
 export interface GetHistoryResponse {

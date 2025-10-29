@@ -4,6 +4,8 @@
  * Lists and manages chat sessions with create/delete operations
  */
 
+'use client';
+
 import { useState } from 'react';
 import { MessageSquarePlus, Trash2, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';

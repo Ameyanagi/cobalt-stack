@@ -4,7 +4,10 @@
  * Provides authenticated API calls to chat endpoints with rate limit handling
  */
 
+'use client';
+
 import { useState } from 'react';
+import { useAuth } from '@/contexts/auth-context';
 import type {
   CreateSessionRequest,
   CreateSessionResponse,
@@ -24,13 +27,13 @@ interface ApiError {
 }
 
 export function useChatApi() {
+  const { accessToken } = useAuth();
   const [rateLimitInfo, setRateLimitInfo] = useState<RateLimitInfo | null>(null);
 
   const getAuthHeaders = (): HeadersInit => {
-    const token = localStorage.getItem('accessToken');
     return {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
     };
   };
 
@@ -51,11 +54,26 @@ export function useChatApi() {
     setRateLimitInfo(rateLimit);
 
     if (!response.ok) {
-      const error: ApiError | RateLimitError = await response.json();
-      if (response.status === 429) {
-        throw { type: 'rate_limit', ...error } as RateLimitError & { type: 'rate_limit' };
+      // Try to parse error body, but handle empty responses
+      let errorData: ApiError | RateLimitError | null = null;
+      try {
+        const text = await response.text();
+        if (text) {
+          errorData = JSON.parse(text);
+        }
+      } catch {
+        // Empty or invalid JSON body
       }
-      throw new Error(error.message || 'API request failed');
+
+      if (response.status === 429 && errorData) {
+        throw { type: 'rate_limit', status: 429, ...errorData } as RateLimitError & { type: 'rate_limit'; status: number };
+      }
+
+      // Throw error with status code for better error handling
+      const error: any = new Error(errorData?.message || `Request failed with status ${response.status}`);
+      error.status = response.status;
+      error.statusText = response.statusText;
+      throw error;
     }
 
     return response.json();
@@ -79,7 +97,7 @@ export function useChatApi() {
   };
 
   const getSessionHistory = async (sessionId: string): Promise<GetHistoryResponse> => {
-    const response = await fetch(`${API_BASE_URL}/api/v1/chat/sessions/${sessionId}/history`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/chat/sessions/${sessionId}/messages`, {
       method: 'GET',
       headers: getAuthHeaders(),
     });
@@ -109,11 +127,25 @@ export function useChatApi() {
     setRateLimitInfo(rateLimit);
 
     if (!response.ok) {
-      const error: ApiError | RateLimitError = await response.json();
-      if (response.status === 429) {
-        throw { type: 'rate_limit', ...error } as RateLimitError & { type: 'rate_limit' };
+      // Try to parse error body, but handle empty responses
+      let errorData: ApiError | RateLimitError | null = null;
+      try {
+        const text = await response.text();
+        if (text) {
+          errorData = JSON.parse(text);
+        }
+      } catch {
+        // Empty or invalid JSON body
       }
-      throw new Error(error.message || 'Failed to send message');
+
+      if (response.status === 429 && errorData) {
+        throw { type: 'rate_limit', status: 429, ...errorData } as RateLimitError & { type: 'rate_limit'; status: number };
+      }
+
+      const error: any = new Error(errorData?.message || `Failed to send message (${response.status})`);
+      error.status = response.status;
+      error.statusText = response.statusText;
+      throw error;
     }
 
     if (!response.body) {

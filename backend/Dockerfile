@@ -15,6 +15,7 @@ RUN apt-get update && \
 # Copy all source code
 COPY Cargo.toml Cargo.lock ./
 COPY backend backend/
+COPY models.toml ./
 
 # Build application with BuildKit cache mounts
 RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
@@ -38,8 +39,9 @@ RUN apt-get update && \
 # Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Copy binary from builder
+# Copy binary and configuration from builder
 COPY --from=builder --chown=appuser:appuser /app/cobalt-stack-backend /app/cobalt-stack-backend
+COPY --from=builder --chown=appuser:appuser /app/models.toml /app/models.toml
 
 # Expose port
 EXPOSE 3000
@@ -47,5 +49,6 @@ EXPOSE 3000
 # Run as non-root user
 USER appuser
 
-# Start application
-CMD ["/app/cobalt-stack-backend"]
+# Start application from /app directory where models.toml is located
+WORKDIR /app
+CMD ["./cobalt-stack-backend"]
