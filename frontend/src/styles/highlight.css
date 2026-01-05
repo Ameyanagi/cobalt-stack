@@ -1,0 +1,160 @@
+/* Syntax Highlighting (GitHub-inspired) */
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+  background: oklch(var(--muted));
+  color: oklch(var(--foreground));
+}
+
+/* Comment */
+.hljs-comment,
+.hljs-quote {
+  color: oklch(var(--muted-foreground));
+  font-style: italic;
+}
+
+/* Keyword, Selector, Tag */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: oklch(0.55 0.15 300); /* Purple */
+  font-weight: bold;
+}
+
+/* Number, Literal, Variable, Template Variable */
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
+  color: oklch(0.55 0.15 30); /* Orange */
+}
+
+/* String, Doctag */
+.hljs-string,
+.hljs-doctag {
+  color: oklch(0.55 0.15 150); /* Green */
+}
+
+/* Title, Section, Selector ID, Selector Class */
+.hljs-title,
+.hljs-section,
+.hljs-selector-id {
+  color: oklch(0.55 0.15 250); /* Blue */
+  font-weight: bold;
+}
+
+/* Attribute, Regexp, Link */
+.hljs-attribute,
+.hljs-regexp,
+.hljs-link {
+  color: oklch(0.55 0.15 180); /* Cyan */
+}
+
+/* Built-in, Built-in name */
+.hljs-built_in,
+.hljs-builtin-name {
+  color: oklch(0.55 0.15 200); /* Light Blue */
+}
+
+/* Meta, Params */
+.hljs-meta,
+.hljs-params {
+  color: oklch(0.55 0.1 250); /* Muted Blue */
+}
+
+/* Deletion */
+.hljs-deletion {
+  background-color: oklch(0.9 0.1 15 / 0.3);
+  color: oklch(0.45 0.15 15);
+}
+
+/* Addition */
+.hljs-addition {
+  background-color: oklch(0.9 0.1 150 / 0.3);
+  color: oklch(0.4 0.15 150);
+}
+
+/* Emphasis */
+.hljs-emphasis {
+  font-style: italic;
+}
+
+/* Strong */
+.hljs-strong {
+  font-weight: bold;
+}
+
+/* Language-specific adjustments */
+
+/* JavaScript/TypeScript */
+.hljs-attr {
+  color: oklch(0.55 0.15 250);
+}
+
+.hljs-function {
+  color: oklch(0.55 0.15 270);
+}
+
+.hljs-class .hljs-title {
+  color: oklch(0.55 0.15 60);
+}
+
+/* Rust */
+.hljs-type {
+  color: oklch(0.55 0.15 180);
+  font-weight: bold;
+}
+
+.hljs-symbol {
+  color: oklch(0.55 0.15 300);
+}
+
+/* JSON */
+.hljs-attr {
+  color: oklch(0.55 0.15 250);
+}
+
+/* YAML */
+.hljs-bullet {
+  color: oklch(0.55 0.15 250);
+}
+
+/* SQL - only uppercase keywords in SQL language blocks */
+.language-sql .hljs-keyword {
+  text-transform: uppercase;
+}
+
+/* Bash */
+.hljs-built_in {
+  color: oklch(0.55 0.15 270);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .hljs-comment,
+  .hljs-quote {
+    color: oklch(0.6 0.05 250);
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag {
+    color: oklch(0.75 0.15 300);
+  }
+
+  .hljs-string,
+  .hljs-doctag {
+    color: oklch(0.75 0.15 150);
+  }
+
+  .hljs-title,
+  .hljs-section {
+    color: oklch(0.75 0.15 250);
+  }
+
+  .hljs-number,
+  .hljs-literal {
+    color: oklch(0.75 0.15 30);
+  }
+}

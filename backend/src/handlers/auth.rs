@@ -21,8 +21,9 @@ pub struct RegisterRequest {
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct LoginRequest {
+    /// Username or email address
     #[schema(example = "alice")]
-    pub username: String,
+    pub username_or_email: String,
 
     #[schema(example = "SecurePass123!")]
     pub password: String,
@@ -42,6 +43,7 @@ pub struct UserResponse {
     pub username: String,
     pub email: String,
     pub email_verified: bool,
+    pub role: crate::models::sea_orm_active_enums::UserRole,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -82,10 +84,10 @@ impl RegisterRequest {
             .into());
         }
         if self.password.len() > 128 {
-            return Err(
-                AuthError::InvalidInput("Password must not exceed 128 characters".to_string())
-                    .into(),
-            );
+            return Err(AuthError::InvalidInput(
+                "Password must not exceed 128 characters".to_string(),
+            )
+            .into());
         }
 
         Ok(())
@@ -94,8 +96,10 @@ impl RegisterRequest {
 
 impl LoginRequest {
     pub fn validate(&self) -> Result<()> {
-        if self.username.is_empty() {
-            return Err(AuthError::InvalidInput("Username cannot be empty".to_string()).into());
+        if self.username_or_email.is_empty() {
+            return Err(
+                AuthError::InvalidInput("Username or email cannot be empty".to_string()).into(),
+            );
         }
         if self.password.is_empty() {
             return Err(AuthError::InvalidInput("Password cannot be empty".to_string()).into());
@@ -110,10 +114,15 @@ impl LoginRequest {
 
 use crate::models::{prelude::*, users};
 use crate::services::auth::{
-    create_access_token, create_refresh_token, hash_password, verify_password, JwtConfig,
-    store_refresh_token,
+    create_access_token, create_refresh_token, hash_password, store_refresh_token, verify_password,
+    JwtConfig,
 };
-use axum::{extract::State, http::{header, StatusCode}, response::IntoResponse, Json};
+use axum::{
+    extract::State,
+    http::{header, StatusCode},
+    response::IntoResponse,
+    Json,
+};
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use chrono::Utc;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
@@ -132,7 +141,7 @@ pub struct AppState {
 /// Returns access token on success.
 #[utoipa::path(
     post,
-    path = "/api/auth/register",
+    path = "/api/v1/auth/register",
     request_body = RegisterRequest,
     responses(
         (status = 200, description = "User registered successfully", body = AuthResponse),
@@ -149,7 +158,8 @@ pub async fn register(
     req.validate().map_err(|e| {
         // The validate() function already returns AuthError wrapped in anyhow::Error
         // Extract the AuthError from the anyhow chain
-        e.downcast::<AuthError>().unwrap_or(AuthError::InvalidInput("Validation failed".to_string()))
+        e.downcast::<AuthError>()
+            .unwrap_or_else(|_| AuthError::InvalidInput("Validation failed".to_string()))
     })?;
 
     // Check if username already exists
@@ -188,6 +198,22 @@ pub async fn register(
 
     let user = user.insert(state.db.as_ref()).await?;
 
+    // Send verification email
+    {
+        use crate::services::email::{create_verification_token, EmailSender, MockEmailSender};
+
+        // Create verification token
+        let token = create_verification_token(state.db.as_ref(), user.id)
+            .await
+            .map_err(|e| AuthError::DatabaseError(format!("Failed to create token: {e}")))?;
+
+        // Send verification email
+        let email_sender = MockEmailSender;
+        email_sender
+            .send_verification_email(&user.email, &token)
+            .map_err(|_| AuthError::InternalError)?;
+    }
+
     // Generate tokens
     let access_token = create_access_token(user.id, user.username.clone(), &state.jwt_config)
         .map_err(|_| AuthError::JwtEncodingError)?;
@@ -211,7 +237,9 @@ pub async fn register(
         .secure(true)
         .same_site(SameSite::Strict)
         .path("/")
-        .max_age(time::Duration::days(state.jwt_config.refresh_token_expiry_days))
+        .max_age(time::Duration::days(
+            state.jwt_config.refresh_token_expiry_days,
+        ))
         .build();
 
     // Return response with cookie
@@ -234,7 +262,7 @@ pub async fn register(
 /// Rate limited to 5 attempts per 15 minutes per IP.
 #[utoipa::path(
     post,
-    path = "/api/auth/login",
+    path = "/api/v1/auth/login",
     request_body = LoginRequest,
     responses(
         (status = 200, description = "Login successful", body = AuthResponse),
@@ -252,12 +280,17 @@ pub async fn login(
     req.validate().map_err(|e| {
         // The validate() function already returns AuthError wrapped in anyhow::Error
         // Extract the AuthError from the anyhow chain
-        e.downcast::<AuthError>().unwrap_or(AuthError::InvalidInput("Validation failed".to_string()))
+        e.downcast::<AuthError>()
+            .unwrap_or_else(|_| AuthError::InvalidInput("Validation failed".to_string()))
     })?;
 
-    // Find user by username
+    // Find user by username or email
     let user = Users::find()
-        .filter(users::Column::Username.eq(&req.username))
+        .filter(
+            users::Column::Username
+                .eq(&req.username_or_email)
+                .or(users::Column::Email.eq(&req.username_or_email)),
+        )
         .one(state.db.as_ref())
         .await?
         .ok_or(AuthError::InvalidCredentials)?;
@@ -294,7 +327,9 @@ pub async fn login(
         .secure(true)
         .same_site(SameSite::Strict)
         .path("/")
-        .max_age(time::Duration::days(state.jwt_config.refresh_token_expiry_days))
+        .max_age(time::Duration::days(
+            state.jwt_config.refresh_token_expiry_days,
+        ))
         .build();
 
     // Return response with cookie
@@ -316,7 +351,7 @@ pub async fn login(
 /// Rotates refresh token and returns new access token.
 #[utoipa::path(
     post,
-    path = "/api/auth/refresh",
+    path = "/api/v1/auth/refresh",
     responses(
         (status = 200, description = "Token refreshed", body = AuthResponse),
         (status = 401, description = "Invalid or expired token", body = ErrorResponse),
@@ -328,8 +363,8 @@ pub async fn refresh_token(
     jar: axum_extra::extract::CookieJar,
 ) -> std::result::Result<impl IntoResponse, AuthError> {
     use crate::services::auth::{
-        verify_refresh_token, rotate_refresh_token, validate_refresh_token,
-        create_access_token, create_refresh_token,
+        create_access_token, create_refresh_token, rotate_refresh_token, validate_refresh_token,
+        verify_refresh_token,
     };
 
     // Extract refresh token from cookie
@@ -381,7 +416,9 @@ pub async fn refresh_token(
         .secure(true)
         .same_site(SameSite::Strict)
         .path("/")
-        .max_age(time::Duration::days(state.jwt_config.refresh_token_expiry_days))
+        .max_age(time::Duration::days(
+            state.jwt_config.refresh_token_expiry_days,
+        ))
         .build();
 
     // Return response with new access token
@@ -403,7 +440,7 @@ pub async fn refresh_token(
 /// Revokes refresh token and blacklists access token.
 #[utoipa::path(
     post,
-    path = "/api/auth/logout",
+    path = "/api/v1/auth/logout",
     responses(
         (status = 200, description = "Logged out successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -414,7 +451,7 @@ pub async fn logout(
     State(state): State<AppState>,
     jar: axum_extra::extract::CookieJar,
 ) -> std::result::Result<impl IntoResponse, AuthError> {
-    use crate::services::auth::{verify_refresh_token, revoke_refresh_token};
+    use crate::services::auth::{revoke_refresh_token, verify_refresh_token};
 
     // Extract refresh token from cookie
     let refresh_token = jar
@@ -441,10 +478,7 @@ pub async fn logout(
         .max_age(time::Duration::seconds(0)) // Expire immediately
         .build();
 
-    Ok((
-        StatusCode::OK,
-        [(header::SET_COOKIE, cookie.to_string())],
-    ))
+    Ok((StatusCode::OK, [(header::SET_COOKIE, cookie.to_string())]))
 }
 
 /// GET /api/auth/me - Get current user information
@@ -452,7 +486,7 @@ pub async fn logout(
 /// Protected route - requires valid access token.
 #[utoipa::path(
     get,
-    path = "/api/auth/me",
+    path = "/api/v1/auth/me",
     responses(
         (status = 200, description = "User information", body = UserResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -486,9 +520,118 @@ pub async fn get_current_user(
         username: user.username,
         email: user.email,
         email_verified: user.email_verified,
+        role: user.role,
     };
 
     Ok((StatusCode::OK, Json(response)))
+}
+
+// ============================================================================
+// Email Verification
+// ============================================================================
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct VerifyEmailRequest {
+    #[schema(example = "abc123def456")]
+    pub token: String,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct MessageResponse {
+    pub message: String,
+}
+
+/// POST /api/auth/send-verification - Send verification email
+///
+/// Protected route - requires valid access token.
+#[utoipa::path(
+    post,
+    path = "/api/v1/auth/send-verification",
+    responses(
+        (status = 200, description = "Verification email sent", body = MessageResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 400, description = "Email already verified", body = ErrorResponse),
+    ),
+    tag = "Authentication",
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn send_verification_email(
+    State(state): State<AppState>,
+    req: axum::http::Request<axum::body::Body>,
+) -> std::result::Result<impl IntoResponse, AuthError> {
+    use crate::middleware::auth::AuthUser;
+    use crate::services::email::{create_verification_token, EmailSender, MockEmailSender};
+
+    // Extract AuthUser from request extensions
+    let auth_user = req
+        .extensions()
+        .get::<AuthUser>()
+        .ok_or(AuthError::InvalidToken)?;
+
+    // Get user from database
+    let user = Users::find_by_id(auth_user.user_id)
+        .one(state.db.as_ref())
+        .await?
+        .ok_or(AuthError::UserNotFound)?;
+
+    // Check if already verified
+    if user.email_verified {
+        return Err(AuthError::InvalidInput(
+            "Email already verified".to_string(),
+        ));
+    }
+
+    // Create verification token
+    let token = create_verification_token(state.db.as_ref(), user.id)
+        .await
+        .map_err(|e| AuthError::DatabaseError(format!("Failed to create token: {e}")))?;
+
+    // Send verification email
+    let email_sender = MockEmailSender;
+    email_sender
+        .send_verification_email(&user.email, &token)
+        .map_err(|_e| AuthError::InternalError)?;
+
+    Ok((
+        StatusCode::OK,
+        Json(MessageResponse {
+            message: "Verification email sent".to_string(),
+        }),
+    ))
+}
+
+/// POST /api/auth/verify-email - Verify email with token
+///
+/// Public route - verifies email address using token from email.
+#[utoipa::path(
+    post,
+    path = "/api/v1/auth/verify-email",
+    request_body = VerifyEmailRequest,
+    responses(
+        (status = 200, description = "Email verified successfully", body = MessageResponse),
+        (status = 400, description = "Invalid or expired token", body = ErrorResponse),
+    ),
+    tag = "Authentication"
+)]
+pub async fn verify_email(
+    State(state): State<AppState>,
+    Json(req): Json<VerifyEmailRequest>,
+) -> std::result::Result<impl IntoResponse, AuthError> {
+    use crate::services::email::verify_email_token;
+
+    // Verify the token
+    verify_email_token(state.db.as_ref(), &req.token)
+        .await
+        .map_err(|e| AuthError::InvalidInput(format!("Verification failed: {e}")))?;
+
+    Ok((
+        StatusCode::OK,
+        Json(MessageResponse {
+            message: "Email verified successfully".to_string(),
+        }),
+    ))
 }
 
 #[cfg(test)]
@@ -550,7 +693,7 @@ mod tests {
     #[test]
     fn test_register_request_validation_empty_username() {
         let req = RegisterRequest {
-            username: "".to_string(),
+            username: String::new(),
             email: "alice@example.com".to_string(),
             password: "SecurePass123!".to_string(),
         };
@@ -626,7 +769,7 @@ mod tests {
     #[test]
     fn test_login_request_validation_valid() {
         let req = LoginRequest {
-            username: "alice".to_string(),
+            username_or_email: "alice".to_string(),
             password: "SecurePass123!".to_string(),
         };
         assert!(req.validate().is_ok());
@@ -635,7 +778,7 @@ mod tests {
     #[test]
     fn test_login_request_validation_empty_username() {
         let req = LoginRequest {
-            username: "".to_string(),
+            username_or_email: String::new(),
             password: "SecurePass123!".to_string(),
         };
         assert!(req.validate().is_err());
@@ -644,8 +787,8 @@ mod tests {
     #[test]
     fn test_login_request_validation_empty_password() {
         let req = LoginRequest {
-            username: "alice".to_string(),
-            password: "".to_string(),
+            username_or_email: "alice".to_string(),
+            password: String::new(),
         };
         assert!(req.validate().is_err());
     }

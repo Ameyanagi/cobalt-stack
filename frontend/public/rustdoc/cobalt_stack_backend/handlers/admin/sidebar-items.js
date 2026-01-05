@@ -1,0 +1,11 @@
+window.SIDEBAR_ITEMS = {
+  fn: ['disable_user', 'enable_user', 'get_stats', 'get_user', 'list_users'],
+  struct: [
+    'AdminState',
+    'AdminStatsResponse',
+    'AdminUserResponse',
+    'ListUsersQuery',
+    'MessageResponse',
+    'UserListResponse',
+  ],
+}

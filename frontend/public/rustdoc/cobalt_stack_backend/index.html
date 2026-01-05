@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Cobalt Stack Backend API Library"><title>cobalt_stack_backend - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="cobalt_stack_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../static.files/storage-68b7e25d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../cobalt_stack_backend/index.html">cobalt_<wbr>stack_<wbr>backend</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#architecture" title="Architecture">Architecture</a></li><li><a href="#key-features" title="Key Features">Key Features</a></li><li><a href="#examples" title="Examples">Examples</a></li><li><a href="#security" title="Security">Security</a></li></ul><h3><a href="#modules">Crate Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>cobalt_stack_backend</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/cobalt_stack_backend/lib.rs.html#1-56">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Cobalt Stack Backend API Library</p>
+<p>This library provides the core functionality for the Cobalt Stack authentication
+and authorization system. It follows a layered architecture with clear separation
+of concerns between HTTP handlers, business logic services, and data models.</p>
+<h2 id="architecture"><a class="doc-anchor" href="#architecture">§</a>Architecture</h2>
+<p>The codebase is organized into the following layers:</p>
+<ul>
+<li><strong>Handlers</strong>: HTTP request/response handling and routing</li>
+<li><strong>Services</strong>: Business logic and domain operations</li>
+<li><strong>Models</strong>: Database entities and domain models (SeaORM)</li>
+<li><strong>Middleware</strong>: Cross-cutting concerns (authentication, authorization)</li>
+<li><strong>Config</strong>: Application configuration management</li>
+<li><strong>Utils</strong>: Shared utilities and helpers</li>
+</ul>
+<h2 id="key-features"><a class="doc-anchor" href="#key-features">§</a>Key Features</h2>
+<ul>
+<li>JWT-based authentication with access and refresh tokens</li>
+<li>Secure token rotation to prevent token theft</li>
+<li>Email verification workflow</li>
+<li>Role-based access control (RBAC)</li>
+<li>Rate limiting and token blacklisting</li>
+<li>PostgreSQL database with SeaORM</li>
+<li>Valkey/Redis for caching and session management</li>
+</ul>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>cobalt_stack::{handlers, services, models};
+<span class="kw">use </span>axum::Router;
+
+<span class="comment">// Create application with configured routes
+</span><span class="kw">let </span>app = Router::new()
+    .merge(handlers::auth::routes());</code></pre></div>
+<h2 id="security"><a class="doc-anchor" href="#security">§</a>Security</h2>
+<p>This library implements security best practices:</p>
+<ul>
+<li>HttpOnly cookies for refresh tokens</li>
+<li>Secure password hashing with Argon2</li>
+<li>JWT signature verification</li>
+<li>Token rotation and revocation</li>
+<li>Rate limiting on authentication endpoints</li>
+</ul>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="config/index.html" title="mod cobalt_stack_backend::config">config</a></dt><dt><a class="mod" href="handlers/index.html" title="mod cobalt_stack_backend::handlers">handlers</a></dt><dt><a class="mod" href="middleware/index.html" title="mod cobalt_stack_backend::middleware">middleware</a></dt><dd>Axum middleware modules for authentication and authorization.</dd><dt><a class="mod" href="models/index.html" title="mod cobalt_stack_backend::models">models</a></dt><dd>Database entity models and domain types.</dd><dt><a class="mod" href="services/index.html" title="mod cobalt_stack_backend::services">services</a></dt><dd>Business logic and service layer modules.</dd><dt><a class="mod" href="utils/index.html" title="mod cobalt_stack_backend::utils">utils</a></dt><dd>Utility functions module.</dd></dl></section></div></main></body></html>

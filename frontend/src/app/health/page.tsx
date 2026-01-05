@@ -7,15 +7,9 @@
 
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { apiClient } from '@/lib/api-client'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { apiClient } from '@/lib/api-client'
 
 export default function HealthPage() {
   const { data, isLoading, isError, error, refetch } = useQuery({
@@ -28,9 +22,7 @@ export default function HealthPage() {
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="max-w-2xl w-full space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
-            System Health
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">System Health</h1>
           <p className="text-lg text-gray-600">
             Real-time health status of the Cobalt Stack backend
           </p>
@@ -39,9 +31,7 @@ export default function HealthPage() {
         <Card>
           <CardHeader>
             <CardTitle>API Health Status</CardTitle>
-            <CardDescription>
-              Current status of the backend service
-            </CardDescription>
+            <CardDescription>Current status of the backend service</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading && (
@@ -54,9 +44,7 @@ export default function HealthPage() {
             {isError && (
               <div className="text-center py-8">
                 <div className="text-red-500 text-4xl mb-4">⚠️</div>
-                <p className="text-red-600 font-semibold mb-2">
-                  Failed to connect to API
-                </p>
+                <p className="text-red-600 font-semibold mb-2">Failed to connect to API</p>
                 <p className="text-gray-600 text-sm">
                   {error instanceof Error ? error.message : 'Unknown error'}
                 </p>
@@ -71,16 +59,12 @@ export default function HealthPage() {
                     <p className="text-green-600 font-semibold text-xl mb-2">
                       Service is {data.data.status}
                     </p>
-                    <p className="text-gray-600 text-sm">
-                      All systems operational
-                    </p>
+                    <p className="text-gray-600 text-sm">All systems operational</p>
                   </div>
                 ) : (
                   <div className="text-center py-8">
                     <div className="text-red-500 text-4xl mb-4">✗</div>
-                    <p className="text-red-600 font-semibold mb-2">
-                      Service Error
-                    </p>
+                    <p className="text-red-600 font-semibold mb-2">Service Error</p>
                     <p className="text-gray-600 text-sm">{data.error}</p>
                   </div>
                 )}

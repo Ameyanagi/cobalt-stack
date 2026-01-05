@@ -1,4 +1,4 @@
-.PHONY: setup dev dev-backend dev-frontend test build build-frontend docker-build clean help migrate generate-openapi generate-types
+.PHONY: setup dev dev-backend dev-frontend test build build-frontend docker-build clean help migrate seed-admin generate-openapi generate-types lint fmt fmt-check typecheck ci ci-frontend ci-all check fix
 
 ## Default target
 .DEFAULT_GOAL := help
@@ -26,10 +26,22 @@ help:
 	@echo ""
 	@echo "Database:"
 	@echo "  make migrate        - Run database migrations"
+	@echo "  make seed-admin     - Create initial admin user"
 	@echo ""
 	@echo "OpenAPI:"
 	@echo "  make generate-openapi - Generate OpenAPI schema"
 	@echo "  make generate-types   - Generate TypeScript types from OpenAPI schema"
+	@echo ""
+	@echo "Code Quality:"
+	@echo "  make lint           - Run linting (backend: clippy, frontend: biome)"
+	@echo "  make fmt            - Format code (backend: cargo fmt, frontend: biome)"
+	@echo "  make fmt-check      - Check code formatting"
+	@echo "  make typecheck      - Run type checking (backend + frontend)"
+	@echo "  make check          - Run all quality checks (typecheck + lint)"
+	@echo "  make fix            - Auto-fix all formatting and linting issues"
+	@echo "  make ci             - Run backend CI checks (fmt-check + lint + test)"
+	@echo "  make ci-frontend    - Run frontend CI checks (typecheck + lint)"
+	@echo "  make ci-all         - Run all CI checks (backend + frontend)"
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  make clean          - Clean build artifacts and stop containers"
@@ -118,11 +130,15 @@ migrate:
 	fi
 	@cd backend && sea-orm-cli migrate up
 
+## seed-admin: Create initial admin user
+seed-admin:
+	@echo "🌱 Creating admin user..."
+	@cd backend && cargo run --bin seed-admin
+
 ## generate-openapi: Generate OpenAPI schema
 generate-openapi:
 	@echo "📝 Generating OpenAPI schema..."
-	@cd backend && cargo run
-	@echo "✅ OpenAPI schema generated at openapi/schema.json"
+	@cd backend && cargo run --release --bin generate_openapi
 
 ## generate-types: Generate TypeScript types from OpenAPI schema
 generate-types:
@@ -138,21 +154,72 @@ clean:
 	@docker-compose down -v
 	@echo "✅ Cleanup complete"
 
-## lint: Run clippy linter
+## lint: Run linting (backend + frontend)
 lint:
-	@echo "🔍 Running clippy..."
-	@cd backend && cargo clippy -- -D warnings
+	@echo "🔍 Running linting checks..."
+	@echo "📦 Backend (clippy)..."
+	@cd backend && cargo clippy --all-features --all-targets -- -D warnings
+	@echo "📦 Frontend (biome)..."
+	@cd frontend && bun run lint
+	@echo "✅ Linting complete"
 
-## fmt: Format code
+## fmt: Format code (backend + frontend)
 fmt:
 	@echo "✨ Formatting code..."
+	@echo "🦀 Backend (cargo fmt)..."
 	@cd backend && cargo fmt
+	@echo "📦 Frontend (biome)..."
+	@cd frontend && bun run format
+	@echo "✅ Formatting complete"
 
-## fmt-check: Check code formatting
+## fmt-check: Check code formatting (backend + frontend)
 fmt-check:
 	@echo "🔍 Checking code formatting..."
+	@echo "🦀 Backend (cargo fmt)..."
 	@cd backend && cargo fmt --check
+	@echo "📦 Frontend (biome)..."
+	@cd frontend && bun run lint
+	@echo "✅ Format check complete"
 
-## ci: Run CI checks (fmt, lint, test)
-ci: fmt-check lint test
+## typecheck: Run type checking (backend + frontend)
+typecheck:
+	@echo "🔍 Running type checks..."
+	@echo "🦀 Backend (cargo check)..."
+	@cd backend && cargo check --all-features
+	@echo "📦 Frontend (tsc)..."
+	@cd frontend && bun run typecheck
+	@echo "✅ Type checking complete"
+
+## check: Run all quality checks (typecheck + lint)
+check: typecheck lint
+	@echo "✅ All quality checks passed"
+
+## fix: Auto-fix all formatting and linting issues
+fix:
+	@echo "🔧 Auto-fixing all issues..."
+	@echo "🦀 Backend (cargo fmt + clippy --fix)..."
+	@cd backend && cargo fmt
+	@cd backend && cargo clippy --fix --allow-dirty --allow-staged --all-features --all-targets
+	@echo "📦 Frontend (biome)..."
+	@cd frontend && bun run lint:fix
+	@cd frontend && bun run format
+	@echo "✅ Auto-fix complete"
+
+## ci: Run backend CI checks (fmt-check + lint + test)
+ci:
+	@echo "🔍 Running backend CI checks..."
+	@cd backend && cargo fmt --check
+	@cd backend && cargo clippy --all-features --all-targets -- -D warnings
+	@cd backend && cargo test
+	@echo "✅ Backend CI checks passed"
+
+## ci-frontend: Run frontend CI checks (typecheck + lint)
+ci-frontend:
+	@echo "🔍 Running frontend CI checks..."
+	@cd frontend && bun run typecheck
+	@cd frontend && bun run lint
+	@echo "✅ Frontend CI checks passed"
+
+## ci-all: Run all CI checks (backend + frontend)
+ci-all: ci ci-frontend
 	@echo "✅ All CI checks passed"

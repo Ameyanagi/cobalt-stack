@@ -18,16 +18,24 @@ sea-orm = { workspace = true }
 # Valkey (Redis-compatible) - required for auth
 redis = { workspace = true }
 
+# LLM / AI
+async-openai = { workspace = true }
+async-trait = { workspace = true }
+async-stream = { workspace = true }
+futures = { workspace = true }
+
 # Serialization
 serde = { workspace = true }
 serde_json = { workspace = true }
+toml = { workspace = true }
+regex = { workspace = true }
 
 # Logging
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 # OpenAPI
-utoipa = { workspace = true }
+utoipa = { workspace = true, features = ["uuid", "chrono"] }
 utoipa-swagger-ui = { workspace = true }
 
 # Environment variables
@@ -48,6 +56,8 @@ uuid = { workspace = true }
 jsonwebtoken = { workspace = true }
 argon2 = { workspace = true }
 sha2 = { workspace = true }
+rand = { workspace = true }
+hex = { workspace = true }
 
 [dev-dependencies]
 # Testing
@@ -56,6 +66,26 @@ mockall = "0.13"
 [features]
 default = []
 
+[lints.clippy]
+all = "warn"
+pedantic = "warn"
+nursery = "warn"
+
+# Allow (too pedantic or future features)
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+struct_field_names = "allow"
+too_many_lines = "allow"
+needless_for_each = "allow"
+
+[lints.rust]
+dead_code = "allow"
+
 [[bin]]
 name = "cobalt-stack-backend"
 path = "src/main.rs"
+
+[[bin]]
+name = "seed-admin"
+path = "src/bin/seed_admin.rs"

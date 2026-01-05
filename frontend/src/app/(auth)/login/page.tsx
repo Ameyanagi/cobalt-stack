@@ -1,20 +1,27 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useAuth } from '@/contexts/auth-context'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import Link from 'next/link'
+import { useAuth } from '@/contexts/auth-context'
 import { env } from '@/lib/env'
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Username is required'),
+  username_or_email: z.string().min(1, 'Username or email is required'),
   password: z.string().min(1, 'Password is required'),
 })
 
@@ -29,7 +36,7 @@ export default function LoginPage() {
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      username_or_email: '',
       password: '',
     },
   })
@@ -39,7 +46,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${env.apiUrl}/api/auth/login`, {
+      const response = await fetch(`${env.apiUrl}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,9 +63,9 @@ export default function LoginPage() {
       const result = await response.json()
 
       // Fetch user info with access token
-      const userResponse = await fetch(`${env.apiUrl}/api/auth/me`, {
+      const userResponse = await fetch(`${env.apiUrl}/api/v1/auth/me`, {
         headers: {
-          'Authorization': `Bearer ${result.access_token}`,
+          Authorization: `Bearer ${result.access_token}`,
         },
       })
 
@@ -96,15 +103,17 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username_or_email">Username or Email</Label>
               <Input
-                id="username"
-                {...form.register('username')}
-                placeholder="Enter your username"
+                id="username_or_email"
+                {...form.register('username_or_email')}
+                placeholder="Enter your username or email"
                 disabled={isLoading}
               />
-              {form.formState.errors.username && (
-                <p className="text-sm text-destructive">{form.formState.errors.username.message}</p>
+              {form.formState.errors.username_or_email && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.username_or_email.message}
+                </p>
               )}
             </div>
 

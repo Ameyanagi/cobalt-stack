@@ -1,0 +1,307 @@
+# LLM Models Configuration
+# Define available models across different providers
+
+# Default provider and model
+default_provider = "sambanova"
+default_model = "llama-3.3-70b"
+
+# Provider configurations
+[providers.sambanova]
+name = "SambaNova"
+api_base = "${SAMBANOVA_API_BASE}"  # Will be replaced from env var
+api_key = "${SAMBANOVA_API_KEY}"
+enabled = true
+
+[providers.azure]
+name = "Azure AI Foundry"
+endpoint = "${AZURE_AI_ENDPOINT}"
+api_key = "${AZURE_AI_API_KEY}"
+api_version = "2024-02-15-preview"
+enabled = true  # Azure Grok models are configured
+
+# Model definitions
+# Format: [models.<unique_id>]
+
+# === SambaNova Models ===
+
+[[models]]
+id = "llama-3.3-70b"
+name = "Llama 3.3 70B Instruct"
+provider = "sambanova"
+model_id = "Meta-Llama-3.3-70B-Instruct"  # Provider-specific model identifier
+description = "Fast and capable instruction-tuned model"
+context_window = 8192
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = false
+cost_per_million_input_tokens = 0.0   # Free tier or unknown
+cost_per_million_output_tokens = 0.0
+tags = ["general", "fast", "instruct"]
+recommended_for = ["chat", "general-purpose"]
+
+[[models]]
+id = "llama-3.1-8b"
+name = "Llama 3.1 8B Instruct"
+provider = "sambanova"
+model_id = "Meta-Llama-3.1-8B-Instruct"
+description = "Smaller, faster model for simple tasks"
+context_window = 8192
+max_output_tokens = 2048
+supports_streaming = true
+supports_function_calling = false
+cost_per_million_input_tokens = 0.0
+cost_per_million_output_tokens = 0.0
+tags = ["fast", "lightweight", "instruct"]
+recommended_for = ["simple-chat", "quick-responses"]
+
+[[models]]
+id = "llama-3.1-405b"
+name = "Llama 3.1 405B Instruct"
+provider = "sambanova"
+model_id = "Meta-Llama-3.1-405B-Instruct"
+description = "Most capable model for complex reasoning"
+context_window = 8192
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = false
+cost_per_million_input_tokens = 0.0
+cost_per_million_output_tokens = 0.0
+tags = ["powerful", "reasoning", "instruct"]
+recommended_for = ["complex-reasoning", "creative-writing"]
+
+[[models]]
+id = "maverick-17b"
+name = "Llama 4 Maverick 17B 128E Instruct"
+provider = "sambanova"
+model_id = "Llama-4-Maverick-17B-128E-Instruct"
+description = "Experimental model with extended context"
+context_window = 131072  # 128k context
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = false
+cost_per_million_input_tokens = 0.0
+cost_per_million_output_tokens = 0.0
+tags = ["experimental", "long-context"]
+recommended_for = ["long-documents"]
+enabled = false  # Currently experiencing timeout issues
+
+# === Azure AI Foundry Models ===
+
+[[models]]
+id = "gpt-4o"
+name = "GPT-4o"
+provider = "azure"
+enabled = false
+model_id = "${AZURE_GPT4O_DEPLOYMENT}"  # Azure deployment name from env
+description = "OpenAI's most advanced multimodal model"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 2.50
+cost_per_million_output_tokens = 10.00
+tags = ["multimodal", "advanced", "gpt"]
+recommended_for = ["complex-tasks", "multimodal", "function-calling"]
+
+[[models]]
+id = "gpt-4o-mini"
+name = "GPT-4o Mini"
+provider = "azure"
+enabled = false
+model_id = "${AZURE_GPT4O_MINI_DEPLOYMENT}"
+description = "Smaller, faster, and cheaper GPT-4o variant"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 0.15
+cost_per_million_output_tokens = 0.60
+tags = ["fast", "cost-effective", "gpt"]
+recommended_for = ["chat", "general-purpose"]
+
+[[models]]
+id = "gpt-4-turbo"
+name = "GPT-4 Turbo"
+provider = "azure"
+enabled = false
+model_id = "${AZURE_GPT4_TURBO_DEPLOYMENT}"
+description = "Previous generation GPT-4 with large context"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 10.00
+cost_per_million_output_tokens = 30.00
+tags = ["powerful", "large-context", "gpt"]
+recommended_for = ["complex-reasoning", "long-documents"]
+
+[[models]]
+id = "gpt-35-turbo"
+name = "GPT-3.5 Turbo"
+provider = "azure"
+enabled = false
+model_id = "${AZURE_GPT35_TURBO_DEPLOYMENT}"
+description = "Fast and cost-effective model"
+context_window = 16385
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 0.50
+cost_per_million_output_tokens = 1.50
+tags = ["fast", "cost-effective", "legacy"]
+recommended_for = ["simple-chat", "cost-sensitive"]
+
+[[models]]
+id = "azure-llama-3.1-70b"
+name = "Llama 3.1 70B (Azure)"
+provider = "azure"
+enabled = false
+model_id = "${AZURE_LLAMA_70B_DEPLOYMENT}"
+description = "Meta's Llama 3.1 70B hosted on Azure"
+context_window = 8192
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = false
+cost_per_million_input_tokens = 0.90
+cost_per_million_output_tokens = 2.70
+tags = ["open-source", "llama", "instruct"]
+recommended_for = ["chat", "open-source-preference"]
+
+[[models]]
+id = "azure-llama-3.1-405b"
+name = "Llama 3.1 405B (Azure)"
+provider = "azure"
+enabled = false
+model_id = "${AZURE_LLAMA_405B_DEPLOYMENT}"
+description = "Meta's largest Llama model hosted on Azure"
+context_window = 8192
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = false
+cost_per_million_input_tokens = 2.70
+cost_per_million_output_tokens = 8.10
+tags = ["powerful", "open-source", "llama"]
+recommended_for = ["complex-reasoning", "open-source-preference"]
+
+# === Azure Grok Models (xAI via Azure) ===
+
+[[models]]
+id = "grok-4"
+name = "Grok 4"
+provider = "azure"
+enabled = true
+model_id = "${AZURE_GROK_4_DEPLOYMENT}"
+description = "xAI's most capable model with advanced reasoning"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 5.00  # Estimate
+cost_per_million_output_tokens = 15.00  # Estimate
+tags = ["powerful", "reasoning", "grok"]
+recommended_for = ["complex-reasoning", "advanced-analysis"]
+
+[[models]]
+id = "grok-4-fast-reasoning"
+name = "Grok 4 Fast Reasoning"
+provider = "azure"
+enabled = true
+model_id = "${AZURE_GROK_4_FAST_REASONING_DEPLOYMENT}"
+description = "Fast variant of Grok 4 with reasoning capabilities"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 3.00  # Estimate
+cost_per_million_output_tokens = 9.00  # Estimate
+tags = ["fast", "reasoning", "grok"]
+recommended_for = ["chat", "reasoning-tasks"]
+
+[[models]]
+id = "grok-4-fast-non-reasoning"
+name = "Grok 4 Fast (Non-Reasoning)"
+provider = "azure"
+enabled = true
+model_id = "${AZURE_GROK_4_FAST_NON_REASONING_DEPLOYMENT}"
+description = "Fastest Grok 4 variant optimized for speed"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 1.00  # Estimate
+cost_per_million_output_tokens = 3.00  # Estimate
+tags = ["fast", "cost-effective", "grok"]
+recommended_for = ["chat", "quick-responses"]
+
+[[models]]
+id = "gpt-5-codex"
+name = "GPT-5 Codex"
+provider = "azure"
+enabled = false
+model_id = "${AZURE_GPT5_CODEX_DEPLOYMENT}"
+description = "Advanced code generation and understanding model"
+context_window = 128000
+max_output_tokens = 4096
+supports_streaming = true
+supports_function_calling = true
+cost_per_million_input_tokens = 10.00  # Estimate
+cost_per_million_output_tokens = 30.00  # Estimate
+tags = ["code", "advanced", "gpt-5"]
+recommended_for = ["code-generation", "code-review", "technical-tasks"]
+
+# === Model Groups ===
+# Group models by use case for easier selection
+
+[model_groups]
+
+[model_groups.default]
+name = "Recommended"
+description = "Balanced performance and cost"
+models = ["llama-3.3-70b", "gpt-4o-mini"]
+
+[model_groups.fast]
+name = "Fast & Cheap"
+description = "Quick responses with lower cost"
+models = ["llama-3.1-8b", "gpt-4o-mini", "gpt-35-turbo"]
+
+[model_groups.powerful]
+name = "Most Capable"
+description = "Best performance for complex tasks"
+models = ["llama-3.1-405b", "gpt-4o", "gpt-4-turbo", "azure-llama-3.1-405b", "grok-4"]
+
+[model_groups.open_source]
+name = "Open Source"
+description = "Llama-based models"
+models = ["llama-3.3-70b", "llama-3.1-8b", "llama-3.1-405b", "azure-llama-3.1-70b", "azure-llama-3.1-405b"]
+
+[model_groups.multimodal]
+name = "Multimodal"
+description = "Models that support images and other media"
+models = ["gpt-4o"]
+
+[model_groups.code]
+name = "Code Generation"
+description = "Specialized models for code generation and review"
+models = ["gpt-5-codex"]
+
+[model_groups.grok]
+name = "Grok Models"
+description = "xAI's Grok models with advanced reasoning"
+models = ["grok-4", "grok-4-fast-reasoning", "grok-4-fast-non-reasoning"]
+
+# === Feature Flags ===
+[features]
+# Enable model selection in UI
+enable_model_selection = true
+
+# Allow users to override max tokens
+allow_token_override = true
+
+# Show cost information in UI
+show_cost_info = true
+
+# Enable model recommendations based on message content
+enable_smart_model_routing = false  # Future feature
+
+# Cache model responses (requires Redis configuration)
+enable_response_caching = false  # Future feature

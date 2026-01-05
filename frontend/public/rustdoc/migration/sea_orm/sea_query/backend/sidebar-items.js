@@ -1,0 +1,18 @@
+window.SIDEBAR_ITEMS = {
+  enum: ['Mode', 'Oper'],
+  struct: ['MysqlQueryBuilder', 'PostgresQueryBuilder', 'SqliteQueryBuilder'],
+  trait: [
+    'EscapeBuilder',
+    'ForeignKeyBuilder',
+    'GenericBuilder',
+    'IndexBuilder',
+    'OperLeftAssocDecider',
+    'PrecedenceDecider',
+    'QueryBuilder',
+    'QuotedBuilder',
+    'SchemaBuilder',
+    'TableBuilder',
+    'TableRefBuilder',
+  ],
+  type: ['MySqlQueryBuilder'],
+}

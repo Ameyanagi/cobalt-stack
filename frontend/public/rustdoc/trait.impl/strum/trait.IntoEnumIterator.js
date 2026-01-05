@@ -1,0 +1,58 @@
+;(() => {
+  var implementors = Object.fromEntries([
+    [
+      'cobalt_stack_backend',
+      [
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/email_verifications/enum.Column.html" title="enum cobalt_stack_backend::models::email_verifications::Column">Column</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/email_verifications/enum.PrimaryKey.html" title="enum cobalt_stack_backend::models::email_verifications::PrimaryKey">PrimaryKey</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/email_verifications/enum.Relation.html" title="enum cobalt_stack_backend::models::email_verifications::Relation">Relation</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/o_auth_accounts/enum.Column.html" title="enum cobalt_stack_backend::models::o_auth_accounts::Column">Column</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/o_auth_accounts/enum.PrimaryKey.html" title="enum cobalt_stack_backend::models::o_auth_accounts::PrimaryKey">PrimaryKey</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/o_auth_accounts/enum.Relation.html" title="enum cobalt_stack_backend::models::o_auth_accounts::Relation">Relation</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/refresh_tokens/enum.Column.html" title="enum cobalt_stack_backend::models::refresh_tokens::Column">Column</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/refresh_tokens/enum.PrimaryKey.html" title="enum cobalt_stack_backend::models::refresh_tokens::PrimaryKey">PrimaryKey</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/refresh_tokens/enum.Relation.html" title="enum cobalt_stack_backend::models::refresh_tokens::Relation">Relation</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/sea_orm_active_enums/enum.UserRole.html" title="enum cobalt_stack_backend::models::sea_orm_active_enums::UserRole">UserRole</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/sea_orm_active_enums/enum.UserRoleVariant.html" title="enum cobalt_stack_backend::models::sea_orm_active_enums::UserRoleVariant">UserRoleVariant</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/users/enum.Column.html" title="enum cobalt_stack_backend::models::users::Column">Column</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/users/enum.PrimaryKey.html" title="enum cobalt_stack_backend::models::users::PrimaryKey">PrimaryKey</a>',
+        ],
+        [
+          'impl IntoEnumIterator for <a class="enum" href="cobalt_stack_backend/models/users/enum.Relation.html" title="enum cobalt_stack_backend::models::users::Relation">Relation</a>',
+        ],
+      ],
+    ],
+    ['migration', []],
+  ])
+  if (window.register_implementors) {
+    window.register_implementors(implementors)
+  } else {
+    window.pending_implementors = implementors
+  }
+})()
+//{"start":57,"fragment_lengths":[2881,17]}

@@ -1,0 +1,36 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="JWT authentication middleware for Axum."><title>cobalt_stack_backend::middleware::auth - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="cobalt_stack_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../cobalt_stack_backend/index.html">cobalt_<wbr>stack_<wbr>backend</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module auth</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#security" title="Security">Security</a></li><li><a href="#usage" title="Usage">Usage</a></li><li><a href="#handler-access" title="Handler Access">Handler Access</a></li></ul><h3><a href="#structs">Module Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In cobalt_<wbr>stack_<wbr>backend::<wbr>middleware</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">cobalt_stack_backend</a>::<wbr><a href="../index.html">middleware</a></div><h1>Module <span>auth</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/cobalt_stack_backend/middleware/auth.rs.html#1-323">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>JWT authentication middleware for Axum.</p>
+<p>This module provides authentication middleware that validates JWT tokens
+from the Authorization header and injects authenticated user information
+into request extensions for downstream handlers.</p>
+<h2 id="security"><a class="doc-anchor" href="#security">§</a>Security</h2>
+<ul>
+<li>Validates JWT signature and expiration</li>
+<li>Requires “Bearer &lt;token&gt;” format in Authorization header</li>
+<li>Returns 401 Unauthorized for missing/invalid tokens</li>
+<li>Injects <a href="struct.AuthUser.html" title="struct cobalt_stack_backend::middleware::auth::AuthUser"><code>AuthUser</code></a> into request extensions for handler access</li>
+</ul>
+<h2 id="usage"><a class="doc-anchor" href="#usage">§</a>Usage</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>axum::{Router, routing::get, middleware};
+<span class="kw">use </span>cobalt_stack_backend::middleware::auth::auth_middleware;
+<span class="kw">use </span>cobalt_stack_backend::services::auth::JwtConfig;
+
+<span class="kw">let </span>jwt_config = JwtConfig::from_env();
+
+<span class="kw">let </span>app = Router::new()
+    .route(<span class="string">"/protected"</span>, get(protected_handler))
+    .layer(middleware::from_fn_with_state(
+        jwt_config,
+        auth_middleware
+    ));
+</code></pre></div>
+<h2 id="handler-access"><a class="doc-anchor" href="#handler-access">§</a>Handler Access</h2>
+<p>Protected handlers can access authenticated user via request extensions:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>axum::extract::Request;
+<span class="kw">use </span>cobalt_stack_backend::middleware::auth::AuthUser;
+
+<span class="kw">async fn </span>handler(req: Request) -&gt; String {
+    <span class="kw">let </span>auth_user = req.extensions().get::&lt;AuthUser&gt;().unwrap();
+    <span class="macro">format!</span>(<span class="string">"Hello, {}!"</span>, auth_user.username)
+}</code></pre></div>
+</div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.AuthUser.html" title="struct cobalt_stack_backend::middleware::auth::AuthUser">Auth<wbr>User</a></dt><dd>Authenticated user information extracted from JWT token.</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.auth_middleware.html" title="fn cobalt_stack_backend::middleware::auth::auth_middleware">auth_<wbr>middleware</a></dt><dd>Axum middleware that validates JWT tokens and injects authenticated user.</dd></dl></section></div></main></body></html>

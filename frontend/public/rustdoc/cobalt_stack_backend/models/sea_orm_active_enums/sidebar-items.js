@@ -1,0 +1,4 @@
+window.SIDEBAR_ITEMS = {
+  enum: ['UserRole', 'UserRoleVariant'],
+  struct: ['UserRoleEnum', 'UserRoleIter', 'UserRoleVariantIter'],
+}

@@ -1,11 +1,14 @@
 'use client'
 
+import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
+import { LogoutButton } from '@/components/auth/logout-button'
+import { ProtectedRoute } from '@/components/auth/protected-route'
+import { ThemeSelector } from '@/components/theme/theme-selector'
+import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ProtectedRoute } from '@/components/auth/protected-route'
 import { useAuth } from '@/contexts/auth-context'
-import { LogoutButton } from '@/components/auth/logout-button'
 import { env } from '@/lib/env'
 
 export default function Dashboard() {
@@ -19,11 +22,11 @@ export default function Dashboard() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground mt-1">
-                Welcome back, {user?.username}!
-              </p>
+              <p className="text-muted-foreground mt-1">Welcome back, {user?.username}!</p>
             </div>
             <div className="flex gap-2">
+              <ThemeSelector />
+              <ThemeToggle />
               <Link href="/">
                 <Button variant="outline">Home</Button>
               </Link>
@@ -71,6 +74,26 @@ export default function Dashboard() {
 
           {/* Quick Actions */}
           <div className="grid gap-4 md:grid-cols-2">
+            <Card className="md:col-span-2 border-primary/20 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-primary" />
+                  AI Chat
+                </CardTitle>
+                <CardDescription>
+                  Start a conversation with the AI assistant
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link href="/chat">
+                  <Button className="w-full gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    Open Chat
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle>System Health</CardTitle>
@@ -78,7 +101,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <Link href="/health">
-                  <Button className="w-full">View Health Status</Button>
+                  <Button variant="outline" className="w-full">View Health Status</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -89,11 +112,7 @@ export default function Dashboard() {
                 <CardDescription>Explore the API endpoints</CardDescription>
               </CardHeader>
               <CardContent>
-                <a
-                  href={`${env.apiUrl}/swagger-ui`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={`${env.apiUrl}/swagger-ui`} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="w-full">
                     Open API Docs
                   </Button>

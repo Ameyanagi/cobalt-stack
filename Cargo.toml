@@ -17,9 +17,16 @@ sea-orm-migration = "1.1"
 # Redis
 redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
 
+# LLM / AI
+async-openai = "0.20"
+async-trait = "0.1"
+async-stream = "0.3"
+futures = "0.3"
+
 # Serialization
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+toml = "0.8"
 
 # Logging
 tracing = "0.1"
@@ -33,6 +40,8 @@ utoipa-swagger-ui = { version = "8", features = ["axum"] }
 jsonwebtoken = "9"
 argon2 = "0.5"
 sha2 = "0.10"
+rand = "0.8"
+hex = "0.4"
 
 # Environment variables
 dotenvy = "0.15"
@@ -47,6 +56,9 @@ time = "0.3"
 
 # UUID
 uuid = { version = "1", features = ["v4", "serde"] }
+
+# Regex
+regex = "1"
 
 [workspace.metadata]
 rust-version = "1.75"

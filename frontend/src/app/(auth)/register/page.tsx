@@ -1,32 +1,42 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useAuth } from '@/contexts/auth-context'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import Link from 'next/link'
+import { useAuth } from '@/contexts/auth-context'
 import { env } from '@/lib/env'
 
-const registerSchema = z.object({
-  username: z.string()
-    .min(3, 'Username must be at least 3 characters')
-    .max(50, 'Username must not exceed 50 characters'),
-  email: z.string()
-    .email('Invalid email address'),
-  password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(128, 'Password must not exceed 128 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-})
+const registerSchema = z
+  .object({
+    username: z
+      .string()
+      .min(3, 'Username must be at least 3 characters')
+      .max(50, 'Username must not exceed 50 characters'),
+    email: z.string().email('Invalid email address'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(128, 'Password must not exceed 128 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  })
 
 type RegisterForm = z.infer<typeof registerSchema>
 
@@ -35,6 +45,7 @@ export default function RegisterPage() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false)
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -51,7 +62,7 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${env.apiUrl}/api/auth/register`, {
+      const response = await fetch(`${env.apiUrl}/api/v1/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,9 +83,9 @@ export default function RegisterPage() {
       const result = await response.json()
 
       // Fetch user info with access token
-      const userResponse = await fetch(`${env.apiUrl}/api/auth/me`, {
+      const userResponse = await fetch(`${env.apiUrl}/api/v1/auth/me`, {
         headers: {
-          'Authorization': `Bearer ${result.access_token}`,
+          Authorization: `Bearer ${result.access_token}`,
         },
       })
 
@@ -87,8 +98,13 @@ export default function RegisterPage() {
       // Update auth context
       login(result.access_token, user)
 
-      // Redirect to home
-      router.push('/')
+      // Show verification message
+      setShowVerificationMessage(true)
+
+      // Redirect to dashboard after a moment
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 3000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {
@@ -105,6 +121,18 @@ export default function RegisterPage() {
         </CardHeader>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
+            {showVerificationMessage && (
+              <div className="rounded-md bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-900 p-4 text-sm">
+                <p className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                  Account created successfully!
+                </p>
+                <p className="text-blue-700 dark:text-blue-300">
+                  A verification email has been sent to your email address. Please check your inbox
+                  and click the verification link to activate all features.
+                </p>
+              </div>
+            )}
+
             {error && (
               <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
                 {error}
@@ -162,7 +190,9 @@ export default function RegisterPage() {
                 disabled={isLoading}
               />
               {form.formState.errors.confirmPassword && (
-                <p className="text-sm text-destructive">{form.formState.errors.confirmPassword.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.confirmPassword.message}
+                </p>
               )}
             </div>
           </CardContent>

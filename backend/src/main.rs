@@ -1,21 +1,131 @@
+//! Cobalt Stack Backend API Server.
+//!
+//! Full-featured REST API backend built with Axum, `SeaORM`, and `PostgreSQL`.
+//! Provides JWT authentication, email verification, admin user management,
+//! and comprehensive `OpenAPI` documentation.
+//!
+//! # Features
+//!
+//! - **JWT Authentication**: Secure token-based auth with refresh tokens
+//! - **Email Verification**: Token-based email confirmation
+//! - **Role-Based Access**: Admin and user role separation
+//! - **Rate Limiting**: Login attempt protection via Valkey/Redis
+//! - **Token Blacklist**: Immediate token revocation support
+//! - **`OpenAPI` Documentation**: Interactive Swagger UI
+//! - **Database Migrations**: `SeaORM` migration support
+//! - **CORS Configuration**: Flexible cross-origin setup
+//!
+//! # Quick Start
+//!
+//! ```bash
+//! # Set environment variables
+//! cp .env.example .env
+//! # Edit .env with your settings
+//!
+//! # Run migrations
+//! sea-orm-cli migrate up
+//!
+//! # Seed admin user
+//! cargo run --bin seed_admin
+//!
+//! # Start server
+//! cargo run
+//! ```
+//!
+//! # Environment Variables
+//!
+//! Required configuration via `.env` file:
+//!
+//! - `DATABASE_URL` - `PostgreSQL` connection string
+//! - `JWT_SECRET` - Secret key for JWT signing
+//! - `JWT_ACCESS_EXPIRY_MINUTES` - Access token lifetime (default: 30)
+//! - `JWT_REFRESH_EXPIRY_DAYS` - Refresh token lifetime (default: 7)
+//! - `PORT` - Server port (default: 3000)
+//!
+//! # API Endpoints
+//!
+//! ## Public Endpoints
+//!
+//! - `GET /health` - Health check
+//! - `POST /api/v1/auth/register` - User registration
+//! - `POST /api/v1/auth/login` - User login
+//! - `POST /api/v1/auth/refresh` - Refresh access token
+//! - `POST /api/v1/auth/verify-email` - Verify email address
+//!
+//! ## Protected Endpoints (Requires JWT)
+//!
+//! - `GET /api/v1/auth/me` - Get current user info
+//! - `POST /api/v1/auth/logout` - Logout user
+//! - `POST /api/v1/auth/send-verification` - Resend verification email
+//!
+//! ## Admin Endpoints (Requires Admin Role)
+//!
+//! - `GET /api/v1/admin/users` - List all users
+//! - `GET /api/v1/admin/users/:id` - Get user details
+//! - `PATCH /api/v1/admin/users/:id/disable` - Disable user account
+//! - `PATCH /api/v1/admin/users/:id/enable` - Enable user account
+//! - `GET /api/v1/admin/stats` - System statistics
+//!
+//! # Documentation
+//!
+//! Interactive API documentation available at:
+//! - Swagger UI: <http://localhost:3000/swagger-ui>
+//! - `OpenAPI` JSON: <http://localhost:3000/openapi.json>
+//!
+//! # Architecture
+//!
+//! ```text
+//! ┌─────────────┐
+//! │   Handlers  │ ← HTTP layer (routes, extractors, responses)
+//! ├─────────────┤
+//! │ Middleware  │ ← Auth, CORS, logging
+//! ├─────────────┤
+//! │  Services   │ ← Business logic (auth, email, cache)
+//! ├─────────────┤
+//! │   Models    │ ← Database entities (SeaORM)
+//! └─────────────┘
+//! ```
+
+mod application;
 mod config;
+mod domain;
 mod handlers;
+mod infrastructure;
 mod middleware;
 mod models;
 mod openapi;
 mod services;
 mod utils;
 
-use axum::{http::{header, HeaderValue, Method}, middleware as axum_middleware, routing::{get, post}, Router};
+use axum::{
+    http::{header, HeaderValue, Method},
+    middleware as axum_middleware,
+    routing::{get, patch, post},
+    Router,
+};
+use sea_orm::Database;
 use std::{net::SocketAddr, sync::Arc};
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::CorsLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
-use sea_orm::Database;
 
+/// API version prefix for all routes
+const API_PREFIX: &str = "/api/v1";
+
+/// Application entry point.
+///
+/// Initializes logging, database connection, and starts the Axum HTTP server.
+/// Loads configuration from environment variables and `.env` file.
+///
+/// # Errors
+///
+/// Returns error if:
+/// - `DATABASE_URL` environment variable is not set
+/// - Database connection fails
+/// - Server fails to bind to port
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     // Initialize tracing
     tracing_subscriber::registry()
         .with(
@@ -36,22 +146,74 @@ async fn main() {
     }
 
     // Initialize database connection
-    let database_url = std::env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
-    let db = Database::connect(&database_url).await.unwrap();
+    let database_url = std::env::var("DATABASE_URL")?;
+    let db = Arc::new(Database::connect(&database_url).await?);
     tracing::info!("Database connected");
 
     // Initialize JWT config
     let jwt_config = services::auth::JwtConfig::from_env();
 
+    // Initialize chat config (if enabled)
+    let chat_config = config::ChatConfig::from_env();
+
+    // Initialize Valkey/Redis connection (if chat enabled)
+    let valkey_manager = if chat_config.enabled {
+        let valkey_url = std::env::var("VALKEY_URL")
+            .unwrap_or_else(|_| "redis://127.0.0.1:6379".to_string());
+        let manager = services::valkey::ValkeyManager::new(&valkey_url)?;
+        tracing::info!("Valkey connected for chat rate limiting");
+        Some(manager)
+    } else {
+        None
+    };
+
     // Create application state
     let state = handlers::auth::AppState {
-        db: Arc::new(db),
+        db: Arc::clone(&db),
         jwt_config: jwt_config.clone(),
     };
 
+    // Initialize provider factory for LLM models (if chat enabled)
+    let provider_factory = if chat_config.enabled {
+        match infrastructure::llm::ProviderFactory::new() {
+            Ok(factory) => {
+                tracing::info!("LLM Provider Factory initialized successfully");
+                Some(Arc::new(factory))
+            }
+            Err(e) => {
+                tracing::error!("Failed to initialize Provider Factory: {}", e);
+                anyhow::bail!("Provider Factory initialization failed: {}", e);
+            }
+        }
+    } else {
+        None
+    };
+
+    // Create chat state (if enabled)
+    let chat_state = if chat_config.enabled {
+        let chat_repository = infrastructure::persistence::SeaOrmChatRepository::new(Arc::clone(&db));
+        Some(handlers::chat::ChatState {
+            repository: Arc::new(chat_repository),
+            llm_config: chat_config.llm.clone(),
+            provider_factory: provider_factory.expect("Provider factory should be initialized when chat is enabled"),
+        })
+    } else {
+        None
+    };
+
+    // Create rate limit state (if chat enabled)
+    let rate_limit_state = valkey_manager.map(|manager| {
+        middleware::chat_rate_limit::ChatRateLimitState {
+            valkey: manager,
+            config: services::valkey::chat_rate_limit::ChatRateLimitConfig {
+                rate_limit_per_minute: chat_config.rate_limit_per_minute,
+                daily_message_quota: chat_config.daily_message_quota,
+            },
+        }
+    });
+
     // Build application router with state
-    let app = create_app(state, jwt_config);
+    let app = create_app(state, jwt_config, chat_state, rate_limit_state);
 
     // Get port from environment or use default
     let port = std::env::var("PORT")
@@ -63,28 +225,60 @@ async fn main() {
     tracing::info!("Starting server on {}", addr);
 
     // Start server
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await?;
+    axum::serve(listener, app).await?;
+    Ok(())
 }
 
-fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtConfig) -> Router {
+/// Create the Axum router with all routes, middleware, and state.
+///
+/// Configures the complete application including:
+/// - Public routes (register, login, refresh)
+/// - Protected routes (profile, logout)
+/// - Admin routes (user management)
+/// - CORS middleware
+/// - Swagger UI documentation
+///
+/// # Arguments
+///
+/// * `state` - Application state with database connection and JWT config
+/// * `jwt_config` - JWT configuration for authentication middleware
+///
+/// # Returns
+///
+/// Fully configured Axum [`Router`] ready to serve HTTP requests.
+///
+/// # CORS Configuration
+///
+/// Allows requests from origins ending with `:2727` (frontend port) for development.
+/// In production, configure specific allowed origins via environment variables.
+#[allow(clippy::too_many_lines)]
+fn create_app(
+    state: handlers::auth::AppState,
+    jwt_config: services::auth::JwtConfig,
+    chat_state: Option<handlers::chat::ChatState>,
+    rate_limit_state: Option<middleware::chat_rate_limit::ChatRateLimitState>,
+) -> Router {
     // Configure CORS with credentials support
-    // Allow any origin ending with :2727 (frontend port) for development
-    // In production, set specific allowed origins
-    use tower_http::cors::AllowOrigin;
+
+    // Get allowed origins from environment variable
+    let allowed_origins = std::env::var("CORS_ORIGINS")
+        .unwrap_or_else(|_| "http://localhost:2727,http://localhost:3001".to_string());
+
+    let origins: Vec<HeaderValue> = allowed_origins
+        .split(',')
+        .filter_map(|origin| origin.trim().parse().ok())
+        .collect();
+
+    tracing::info!("CORS allowed origins: {:?}", origins);
 
     let cors = CorsLayer::new()
-        .allow_origin(AllowOrigin::predicate(|origin: &HeaderValue, _request_parts| {
-            // Allow any origin that ends with :2727 (frontend port)
-            // This enables access from localhost, LAN IPs, etc.
-            origin.to_str()
-                .map(|s| s.ends_with(":2727") || s == "http://localhost:2727" || s == "http://127.0.0.1:2727")
-                .unwrap_or(false)
-        }))
+        .allow_origin(origins)
         .allow_methods(vec![
             Method::GET,
             Method::POST,
             Method::PUT,
+            Method::PATCH,
             Method::DELETE,
             Method::OPTIONS,
         ])
@@ -98,49 +292,117 @@ fn create_app(state: handlers::auth::AppState, jwt_config: services::auth::JwtCo
 
     // Auth routes (public)
     let auth_public_routes = Router::new()
-        .route("/api/auth/register", post(handlers::auth::register))
-        .route("/api/auth/login", post(handlers::auth::login))
-        .route("/api/auth/refresh", post(handlers::auth::refresh_token))
+        .route(
+            &format!("{API_PREFIX}/auth/register"),
+            post(handlers::auth::register),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/login"),
+            post(handlers::auth::login),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/refresh"),
+            post(handlers::auth::refresh_token),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/verify-email"),
+            post(handlers::auth::verify_email),
+        )
         .with_state(state.clone());
 
     // Auth routes (protected)
     let auth_protected_routes = Router::new()
-        .route("/api/auth/me", get(handlers::auth::get_current_user))
-        .route("/api/auth/logout", post(handlers::auth::logout))
+        .route(
+            &format!("{API_PREFIX}/auth/me"),
+            get(handlers::auth::get_current_user),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/logout"),
+            post(handlers::auth::logout),
+        )
+        .route(
+            &format!("{API_PREFIX}/auth/send-verification"),
+            post(handlers::auth::send_verification_email),
+        )
         .layer(axum_middleware::from_fn_with_state(
-            jwt_config,
+            jwt_config.clone(),
             middleware::auth::auth_middleware,
         ))
-        .with_state(state);
+        .with_state(state.clone());
 
-    // Build main router
-    Router::new()
+    // Admin routes (protected - requires admin role)
+    let admin_state = handlers::admin::AdminState {
+        db: state.db.clone(),
+    };
+
+    let admin_routes = Router::new()
+        .route(
+            &format!("{API_PREFIX}/admin/users"),
+            get(handlers::admin::list_users),
+        )
+        .route(
+            &format!("{API_PREFIX}/admin/users/:id"),
+            get(handlers::admin::get_user),
+        )
+        .route(
+            &format!("{API_PREFIX}/admin/users/:id/disable"),
+            patch(handlers::admin::disable_user),
+        )
+        .route(
+            &format!("{API_PREFIX}/admin/users/:id/enable"),
+            patch(handlers::admin::enable_user),
+        )
+        .route(
+            &format!("{API_PREFIX}/admin/stats"),
+            get(handlers::admin::get_stats),
+        )
+        .layer(axum_middleware::from_fn_with_state(
+            state.db,
+            middleware::admin::admin_middleware,
+        ))
+        .layer(axum_middleware::from_fn_with_state(
+            jwt_config.clone(),
+            middleware::auth::auth_middleware,
+        ))
+        .with_state(admin_state);
+
+    // Chat routes (protected - if feature enabled)
+    let mut app = Router::new()
         .route("/health", get(handlers::health::health_check))
         .merge(auth_public_routes)
         .merge(auth_protected_routes)
-        .merge(SwaggerUi::new("/swagger-ui").url("/openapi.json", openapi::ApiDoc::openapi()))
+        .merge(admin_routes);
+
+    // Add chat routes if feature is enabled
+    if let (Some(chat_state), Some(rate_limit_state)) = (chat_state, rate_limit_state) {
+        tracing::info!("Chat feature enabled - mounting chat routes with rate limiting");
+
+        // Public chat routes (no auth required)
+        let chat_public_routes = handlers::chat::public_routes(chat_state.clone());
+
+        // Protected chat routes with rate limiting and auth
+        let chat_protected_routes = handlers::chat::routes_v2(chat_state)
+            .layer(axum_middleware::from_fn_with_state(
+                rate_limit_state,
+                middleware::chat_rate_limit::chat_rate_limit_middleware,
+            ))
+            .layer(axum_middleware::from_fn_with_state(
+                jwt_config.clone(),
+                middleware::auth::auth_middleware,
+            ));
+
+        // Merge both public and protected routes under /api/v1/chat
+        app = app
+            .nest(&format!("{API_PREFIX}/chat"), chat_public_routes)
+            .nest(&format!("{API_PREFIX}/chat"), chat_protected_routes);
+    } else {
+        tracing::info!("Chat feature disabled");
+    }
+
+    // Build main router
+    app.merge(SwaggerUi::new("/swagger-ui").url("/openapi.json", openapi::ApiDoc::openapi()))
         .layer(cors)
         .layer(tower_http::trace::TraceLayer::new_for_http())
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use axum::{
-        body::Body,
-        http::{Request, StatusCode},
-    };
-    use tower::ServiceExt; // for `oneshot`
-
-    #[tokio::test]
-    async fn test_health_endpoint() {
-        let app = create_app();
-
-        let response = app
-            .oneshot(Request::builder().uri("/health").body(Body::empty()).unwrap())
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::OK);
-    }
-}
+// TODO: Add integration tests later

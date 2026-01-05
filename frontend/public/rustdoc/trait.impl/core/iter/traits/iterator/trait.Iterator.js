@@ -1,0 +1,57 @@
+;(() => {
+  var implementors = Object.fromEntries([
+    [
+      'cobalt_stack_backend',
+      [
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/email_verifications/struct.ColumnIter.html" title="struct cobalt_stack_backend::models::email_verifications::ColumnIter">ColumnIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/email_verifications/struct.PrimaryKeyIter.html" title="struct cobalt_stack_backend::models::email_verifications::PrimaryKeyIter">PrimaryKeyIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/email_verifications/struct.RelationIter.html" title="struct cobalt_stack_backend::models::email_verifications::RelationIter">RelationIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/o_auth_accounts/struct.ColumnIter.html" title="struct cobalt_stack_backend::models::o_auth_accounts::ColumnIter">ColumnIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/o_auth_accounts/struct.PrimaryKeyIter.html" title="struct cobalt_stack_backend::models::o_auth_accounts::PrimaryKeyIter">PrimaryKeyIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/o_auth_accounts/struct.RelationIter.html" title="struct cobalt_stack_backend::models::o_auth_accounts::RelationIter">RelationIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/refresh_tokens/struct.ColumnIter.html" title="struct cobalt_stack_backend::models::refresh_tokens::ColumnIter">ColumnIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/refresh_tokens/struct.PrimaryKeyIter.html" title="struct cobalt_stack_backend::models::refresh_tokens::PrimaryKeyIter">PrimaryKeyIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/refresh_tokens/struct.RelationIter.html" title="struct cobalt_stack_backend::models::refresh_tokens::RelationIter">RelationIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/sea_orm_active_enums/struct.UserRoleIter.html" title="struct cobalt_stack_backend::models::sea_orm_active_enums::UserRoleIter">UserRoleIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/sea_orm_active_enums/struct.UserRoleVariantIter.html" title="struct cobalt_stack_backend::models::sea_orm_active_enums::UserRoleVariantIter">UserRoleVariantIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/users/struct.ColumnIter.html" title="struct cobalt_stack_backend::models::users::ColumnIter">ColumnIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/users/struct.PrimaryKeyIter.html" title="struct cobalt_stack_backend::models::users::PrimaryKeyIter">PrimaryKeyIter</a>',
+        ],
+        [
+          'impl <a class="trait" href="https://doc.rust-lang.org/1.90.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a> for <a class="struct" href="cobalt_stack_backend/models/users/struct.RelationIter.html" title="struct cobalt_stack_backend::models::users::RelationIter">RelationIter</a>',
+        ],
+      ],
+    ],
+  ])
+  if (window.register_implementors) {
+    window.register_implementors(implementors)
+  } else {
+    window.pending_implementors = implementors
+  }
+})()
+//{"start":57,"fragment_lengths":[5345]}

@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Rate limiting service for preventing abuse and brute force attacks."><title>cobalt_stack_backend::services::valkey::rate_limit - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="cobalt_stack_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../../static.files/storage-68b7e25d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../cobalt_stack_backend/index.html">cobalt_<wbr>stack_<wbr>backend</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module rate_<wbr>limit</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#architecture" title="Architecture">Architecture</a></li><li><a href="#default-configuration" title="Default Configuration">Default Configuration</a></li><li><a href="#use-cases" title="Use Cases">Use Cases</a></li><li><a href="#examples" title="Examples">Examples</a></li></ul><h3><a href="#structs">Module Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In cobalt_<wbr>stack_<wbr>backend::<wbr>services::<wbr>valkey</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../../index.html">cobalt_stack_backend</a>::<wbr><a href="../../index.html">services</a>::<wbr><a href="../index.html">valkey</a></div><h1>Module <span>rate_limit</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../../src/cobalt_stack_backend/services/valkey/rate_limit.rs.html#1-319">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Rate limiting service for preventing abuse and brute force attacks.</p>
+<p>This module provides sliding window rate limiting for login attempts
+and other security-sensitive operations. Uses Valkey/Redis for distributed
+rate limiting across multiple application instances.</p>
+<h2 id="architecture"><a class="doc-anchor" href="#architecture">§</a>Architecture</h2>
+<ul>
+<li><strong>Key Format</strong>: <code>ratelimit:login:{ip}</code> with attempt counter</li>
+<li><strong>Window</strong>: Sliding time window (default 15 minutes)</li>
+<li><strong>Threshold</strong>: Maximum attempts before blocking (default 5)</li>
+<li><strong>Auto-Expiry</strong>: Counters reset automatically after window expires</li>
+</ul>
+<h2 id="default-configuration"><a class="doc-anchor" href="#default-configuration">§</a>Default Configuration</h2>
+<ul>
+<li><strong>Max Attempts</strong>: 5 login attempts</li>
+<li><strong>Window</strong>: 900 seconds (15 minutes)</li>
+<li><strong>Behavior</strong>: Block on 6th attempt, reset after 15 minutes</li>
+</ul>
+<h2 id="use-cases"><a class="doc-anchor" href="#use-cases">§</a>Use Cases</h2>
+<ul>
+<li><strong>Login Attempts</strong>: Prevent brute force password attacks</li>
+<li><strong>Password Reset</strong>: Limit reset request frequency</li>
+<li><strong>Email Verification</strong>: Prevent verification spam</li>
+<li><strong>API Endpoints</strong>: General rate limiting for public APIs</li>
+</ul>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>cobalt_stack_backend::services::valkey::rate_limit::{
+    check_rate_limit, reset_rate_limit, RateLimitConfig
+};
+<span class="kw">use </span>redis::Client;
+
+<span class="kw">let </span>client = Client::open(<span class="string">"redis://127.0.0.1/"</span>)<span class="question-mark">?</span>;
+<span class="kw">let </span><span class="kw-2">mut </span>conn = client.get_connection()<span class="question-mark">?</span>;
+<span class="kw">let </span>config = RateLimitConfig::default();
+
+<span class="kw">let </span>ip = <span class="string">"192.168.1.100"</span>;
+
+<span class="comment">// Check rate limit before processing login
+</span><span class="kw">if </span>check_rate_limit(<span class="kw-2">&amp;mut </span>conn, ip, <span class="kw-2">&amp;</span>config)<span class="question-mark">? </span>{
+    <span class="comment">// Rate limit exceeded - reject request
+    </span><span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">anyhow::anyhow!</span>(<span class="string">"Too many login attempts"</span>));
+}
+
+<span class="comment">// Process login attempt...
+
+// On successful login, optionally reset counter
+</span>reset_rate_limit(<span class="kw-2">&amp;mut </span>conn, ip)<span class="question-mark">?</span>;</code></pre></div>
+</div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.RateLimitConfig.html" title="struct cobalt_stack_backend::services::valkey::rate_limit::RateLimitConfig">Rate<wbr>Limit<wbr>Config</a></dt><dd>Configuration for rate limiting behavior.</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.check_rate_limit.html" title="fn cobalt_stack_backend::services::valkey::rate_limit::check_rate_limit">check_<wbr>rate_<wbr>limit</a></dt><dd>Check and increment rate limit counter for an IP address.</dd><dt><a class="fn" href="fn.get_attempt_count.html" title="fn cobalt_stack_backend::services::valkey::rate_limit::get_attempt_count">get_<wbr>attempt_<wbr>count</a></dt><dd>Get current attempt count for an IP address without incrementing.</dd><dt><a class="fn" href="fn.reset_rate_limit.html" title="fn cobalt_stack_backend::services::valkey::rate_limit::reset_rate_limit">reset_<wbr>rate_<wbr>limit</a></dt><dd>Reset rate limit counter for an IP address.</dd></dl></section></div></main></body></html>

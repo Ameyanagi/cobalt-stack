@@ -1,15 +1,89 @@
+//! Password hashing and verification using Argon2id.
+//!
+//! This module provides secure password hashing with industry-standard
+//! Argon2id algorithm following OWASP recommendations. Passwords are
+//! validated for strength before hashing.
+//!
+//! # Security Properties
+//!
+//! - **Algorithm**: Argon2id (hybrid mode combining Argon2i and Argon2d)
+//! - **Memory Cost**: 19 MiB (19456 KiB) - OWASP recommended
+//! - **Time Cost**: 2 iterations - OWASP recommended
+//! - **Parallelism**: 1 thread
+//! - **Salt**: Cryptographically random, unique per password
+//! - **Verification**: Constant-time comparison prevents timing attacks
+//!
+//! # Password Requirements
+//!
+//! - Minimum length: 8 characters
+//! - Maximum length: 128 characters (`DoS` prevention)
+//! - No complexity requirements (length-based security)
+//!
+//! # Examples
+//!
+//! ```no_run
+//! use cobalt_stack::services::auth::password::{hash_password, verify_password};
+//!
+//! # fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! // Hash a password
+//! let password = "user_secure_password";
+//! let hash = hash_password(password)?;
+//!
+//! // Verify correct password
+//! assert!(verify_password(password, &hash)?);
+//!
+//! // Verify incorrect password
+//! assert!(!verify_password("wrong_password", &hash)?);
+//! # Ok(())
+//! # }
+//! ```
+
 use super::{AuthError, Result};
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
 
-/// Hash a password using Argon2id
+/// Hashes a password using Argon2id with OWASP-recommended parameters.
 ///
-/// Uses OWASP recommended parameters:
-/// - Memory: 19 MiB (19456 KiB)
-/// - Iterations: 2
-/// - Parallelism: 1
+/// Generates a cryptographically random salt and produces a PHC string format hash
+/// that includes algorithm parameters, salt, and hash value. Each call produces a
+/// different hash due to unique salts.
+///
+/// # Arguments
+///
+/// * `password` - The plaintext password to hash (8-128 characters)
+///
+/// # Returns
+///
+/// Returns the password hash in PHC string format (e.g., `$argon2id$v=19$m=19456...`)
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - Password is shorter than 8 characters ([`AuthError::WeakPassword`])
+/// - Password is longer than 128 characters ([`AuthError::WeakPassword`])
+/// - Argon2 hashing fails ([`AuthError::PasswordHashError`] - rare system issue)
+///
+/// # Security
+///
+/// - Uses Argon2id (hybrid mode) for resistance against side-channel and GPU attacks
+/// - Memory cost: 19 MiB prevents parallelization by attackers
+/// - Unique salt per hash prevents rainbow table attacks
+/// - PHC format allows algorithm upgrades while maintaining compatibility
+///
+/// # Examples
+///
+/// ```no_run
+/// use cobalt_stack::services::auth::password::hash_password;
+///
+/// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// let hash = hash_password("my_secure_password")?;
+/// assert!(hash.starts_with("$argon2"));
+/// assert!(hash.len() > 50); // Typical hash length
+/// # Ok(())
+/// # }
+/// ```
 pub fn hash_password(password: &str) -> Result<String> {
     // Validate password strength
     validate_password_strength(password)?;
@@ -27,7 +101,47 @@ pub fn hash_password(password: &str) -> Result<String> {
     Ok(password_hash.to_string())
 }
 
-/// Verify a password against a hash using constant-time comparison
+/// Verifies a password against an Argon2id hash using constant-time comparison.
+///
+/// Uses constant-time comparison to prevent timing attacks that could reveal
+/// information about the password or hash. Always returns a boolean rather than
+/// erroring on mismatch.
+///
+/// # Arguments
+///
+/// * `password` - The plaintext password to verify
+/// * `password_hash` - The PHC format hash string to verify against
+///
+/// # Returns
+///
+/// - `Ok(true)` if the password matches the hash
+/// - `Ok(false)` if the password does not match
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - The hash string is not valid PHC format ([`AuthError::InvalidCredentials`])
+/// - The hash uses an unsupported algorithm ([`AuthError::InvalidCredentials`])
+///
+/// # Security
+///
+/// - Uses constant-time comparison to prevent timing attacks
+/// - Fails closed: parse errors return error, not false
+/// - No information leakage about hash validity
+///
+/// # Examples
+///
+/// ```no_run
+/// use cobalt_stack::services::auth::password::{hash_password, verify_password};
+///
+/// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// let hash = hash_password("correct_password")?;
+///
+/// assert!(verify_password("correct_password", &hash)?);
+/// assert!(!verify_password("wrong_password", &hash)?);
+/// # Ok(())
+/// # }
+/// ```
 pub fn verify_password(password: &str, password_hash: &str) -> Result<bool> {
     let parsed_hash = PasswordHash::new(password_hash).map_err(|e| {
         tracing::error!("Failed to parse password hash: {:?}", e);
@@ -46,7 +160,7 @@ pub fn verify_password(password: &str, password_hash: &str) -> Result<bool> {
 ///
 /// Requirements:
 /// - Minimum 8 characters
-/// - Maximum 128 characters (prevent DoS)
+/// - Maximum 128 characters (prevent `DoS`)
 fn validate_password_strength(password: &str) -> Result<()> {
     let len = password.len();
 

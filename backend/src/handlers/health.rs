@@ -2,7 +2,7 @@ use axum::{http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, ToSchema)]
 pub struct HealthResponse {
     /// Health status of the service
     #[schema(example = "healthy")]
@@ -20,6 +20,7 @@ pub struct HealthResponse {
     ),
     tag = "health"
 )]
+#[allow(clippy::unused_async)]
 pub async fn health_check() -> (StatusCode, Json<HealthResponse>) {
     (
         StatusCode::OK,
@@ -69,6 +70,9 @@ mod tests {
 
         // Assert: Should execute in less than 10ms
         let duration = start.elapsed();
-        assert!(duration.as_millis() < 10, "Health check took {:?}, expected < 10ms", duration);
+        assert!(
+            duration.as_millis() < 10,
+            "Health check took {duration:?}, expected < 10ms"
+        );
     }
 }

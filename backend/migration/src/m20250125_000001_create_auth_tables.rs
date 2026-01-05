@@ -31,11 +31,7 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .unique_key(),
                     )
-                    .col(
-                        ColumnDef::new(Users::PasswordHash)
-                            .string_len(255)
-                            .null(),
-                    )
+                    .col(ColumnDef::new(Users::PasswordHash).string_len(255).null())
                     .col(
                         ColumnDef::new(Users::EmailVerified)
                             .boolean()
@@ -95,11 +91,7 @@ impl MigrationTrait for Migration {
                             .primary_key()
                             .extra("DEFAULT gen_random_uuid()".to_owned()),
                     )
-                    .col(
-                        ColumnDef::new(RefreshTokens::UserId)
-                            .uuid()
-                            .not_null(),
-                    )
+                    .col(ColumnDef::new(RefreshTokens::UserId).uuid().not_null())
                     .col(
                         ColumnDef::new(RefreshTokens::TokenHash)
                             .string_len(255)
@@ -123,7 +115,7 @@ impl MigrationTrait for Migration {
                             .extra("DEFAULT NOW()".to_owned()),
                     )
                     .foreign_key(
-                        &mut ForeignKey::create()
+                        ForeignKey::create()
                             .name("fk_refresh_tokens_user_id")
                             .from(RefreshTokens::Table, RefreshTokens::UserId)
                             .to(Users::Table, Users::Id)
@@ -182,11 +174,7 @@ impl MigrationTrait for Migration {
                             .primary_key()
                             .extra("DEFAULT gen_random_uuid()".to_owned()),
                     )
-                    .col(
-                        ColumnDef::new(OAuthAccounts::UserId)
-                            .uuid()
-                            .not_null(),
-                    )
+                    .col(ColumnDef::new(OAuthAccounts::UserId).uuid().not_null())
                     .col(
                         ColumnDef::new(OAuthAccounts::Provider)
                             .string_len(50)
@@ -197,16 +185,8 @@ impl MigrationTrait for Migration {
                             .string_len(255)
                             .not_null(),
                     )
-                    .col(
-                        ColumnDef::new(OAuthAccounts::AccessToken)
-                            .text()
-                            .null(),
-                    )
-                    .col(
-                        ColumnDef::new(OAuthAccounts::RefreshToken)
-                            .text()
-                            .null(),
-                    )
+                    .col(ColumnDef::new(OAuthAccounts::AccessToken).text().null())
+                    .col(ColumnDef::new(OAuthAccounts::RefreshToken).text().null())
                     .col(
                         ColumnDef::new(OAuthAccounts::ExpiresAt)
                             .timestamp_with_time_zone()
@@ -219,7 +199,7 @@ impl MigrationTrait for Migration {
                             .extra("DEFAULT NOW()".to_owned()),
                     )
                     .foreign_key(
-                        &mut ForeignKey::create()
+                        ForeignKey::create()
                             .name("fk_oauth_accounts_user_id")
                             .from(OAuthAccounts::Table, OAuthAccounts::UserId)
                             .to(Users::Table, Users::Id)

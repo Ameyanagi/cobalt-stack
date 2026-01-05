@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { env } from '@/lib/env'
 
 // Types for authentication state
@@ -9,6 +9,7 @@ interface User {
   username: string
   email: string
   email_verified: boolean
+  role: 'admin' | 'user'
 }
 
 interface AuthState {
@@ -66,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     try {
       // Call logout endpoint to revoke refresh token
-      const response = await fetch(`${env.apiUrl}/api/auth/logout`, {
+      const response = await fetch(`${env.apiUrl}/api/v1/auth/logout`, {
         method: 'POST',
         credentials: 'include', // Send HttpOnly cookie
       })
@@ -93,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await fetch(`${env.apiUrl}/api/auth/refresh`, {
+      const response = await fetch(`${env.apiUrl}/api/v1/auth/refresh`, {
         method: 'POST',
         credentials: 'include', // Send HttpOnly cookie
         headers: {
@@ -115,9 +116,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json()
 
       // Fetch user info with new access token
-      const userResponse = await fetch(`${env.apiUrl}/api/auth/me`, {
+      const userResponse = await fetch(`${env.apiUrl}/api/v1/auth/me`, {
         headers: {
-          'Authorization': `Bearer ${data.access_token}`,
+          Authorization: `Bearer ${data.access_token}`,
         },
       })
 
@@ -152,7 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Update user information
    */
   const updateUser = useCallback((user: User) => {
-    setAuthState(prev => ({
+    setAuthState((prev) => ({
       ...prev,
       user,
     }))
