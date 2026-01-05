@@ -190,6 +190,16 @@ temp/
 # ==========================================
 .claude/
 openspec/
+claudedocs/
+AGENTS.md
+CLAUDE.md
+
+# ==========================================
+# MCP Screenshots & Artifacts
+# ==========================================
+*.png
+!frontend/public/**/*.png
+!docs/**/*.png
 
 # ==========================================
 # Package Manager Lock Files (Optional)
