@@ -186,6 +186,12 @@ temp/
 .playwright-mcp/
 
 # ==========================================
+# Claude Code & AI Tools
+# ==========================================
+.claude/
+openspec/
+
+# ==========================================
 # Package Manager Lock Files (Optional)
 # ==========================================
 # Uncomment if you want to ignore lock files
