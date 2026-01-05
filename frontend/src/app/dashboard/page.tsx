@@ -1,5 +1,6 @@
 'use client'
 
+import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { LogoutButton } from '@/components/auth/logout-button'
 import { ProtectedRoute } from '@/components/auth/protected-route'
@@ -73,6 +74,26 @@ export default function Dashboard() {
 
           {/* Quick Actions */}
           <div className="grid gap-4 md:grid-cols-2">
+            <Card className="md:col-span-2 border-primary/20 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-primary" />
+                  AI Chat
+                </CardTitle>
+                <CardDescription>
+                  Start a conversation with the AI assistant
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link href="/chat">
+                  <Button className="w-full gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    Open Chat
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle>System Health</CardTitle>
@@ -80,7 +101,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <Link href="/health">
-                  <Button className="w-full">View Health Status</Button>
+                  <Button variant="outline" className="w-full">View Health Status</Button>
                 </Link>
               </CardContent>
             </Card>

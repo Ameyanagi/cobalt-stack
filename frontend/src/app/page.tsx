@@ -8,6 +8,7 @@ import {
   Database,
   Github,
   Layers,
+  MessageSquare,
   Palette,
   Shield,
   Zap,
@@ -38,6 +39,14 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
+              {isAuthenticated && (
+                <Link href="/chat">
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    Chat
+                  </Button>
+                </Link>
+              )}
               <Link href="/docs">
                 <Button variant="ghost" size="sm" className="gap-2">
                   <BookOpen className="h-4 w-4" />
@@ -81,10 +90,10 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             {isAuthenticated ? (
-              <Link href="/dashboard">
+              <Link href="/chat">
                 <Button size="lg" className="gap-2">
-                  Go to Dashboard
-                  <ArrowRight className="h-4 w-4" />
+                  <MessageSquare className="h-4 w-4" />
+                  Start Chatting
                 </Button>
               </Link>
             ) : (

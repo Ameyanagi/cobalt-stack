@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   LogOut,
   Mail,
+  MessageSquare,
   Shield,
   User,
   XCircle,
@@ -117,6 +118,13 @@ export function UserMenu() {
         <DropdownMenuSeparator />
 
         {/* Navigation Links */}
+        <DropdownMenuItem asChild>
+          <Link href="/chat" className="cursor-pointer">
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Chat
+          </Link>
+        </DropdownMenuItem>
+
         <DropdownMenuItem asChild>
           <Link href="/dashboard" className="cursor-pointer">
             <LayoutDashboard className="h-4 w-4 mr-2" />
